@@ -1,0 +1,12 @@
+storage_type: "sqlite3"
+storage_path: "./tmp/repository.db"
+cors_enabled: true
+http_server:
+  address: "0.0.0.0:7077"
+  timeout: 4s
+  iddle_timeout: 60s
+database:
+  migration: true
+  dialect: "sqlite3"
+logger:
+  level: "debug"
