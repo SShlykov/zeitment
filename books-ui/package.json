@@ -1,0 +1,37 @@
+{
+  "name": "book-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "flowbite": "^2.3.0",
+    "flowbite-vue": "^0.1.2",
+    "postcss-import": "^16.0.1",
+    "ramda": "^0.29.1",
+    "tippy.js": "^6.3.7",
+    "vue": "^3.4.15",
+    "vue-multiselect": "^2.1.8",
+    "vue-router": "^4.2.5",
+    "vue-tippy": "^6.4.1",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-plugin-vue": "^9.21.1",
+    "postcss": "^8.4.35",
+    "postcss-advanced-variables": "^3.0.1",
+    "postcss-apply": "^0.12.0",
+    "postcss-nesting": "^12.0.2",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.1.0"
+  }
+}

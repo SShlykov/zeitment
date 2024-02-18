@@ -1,0 +1,119 @@
+
+body {
+  background-color: transparent;
+}
+
+html body {
+  overflow-x: hidden;
+  font-family: Nunito;
+  font-size: 0.875rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0 !important;
+}
+
+.text-ssm {
+  font-size: 0.675rem;
+  line-height: 1.1rem;
+}
+
+input[phx-hook='ToggleInput'] {
+  border-color: transparent;
+}
+
+
+.fontw-100 {
+  font-weight: 100
+}
+
+.fontw-200 {
+  font-weight: 200;
+}
+
+.fontw-300 {
+  font-weight: 300;
+}
+
+.fontw-400 {
+  font-weight: 400;
+}
+
+.fontw-500 {
+  font-weight: 500;
+}
+
+.fontw-600 {
+  font-weight: 600;
+}
+
+.fontw-700 {
+  font-weight: 700;
+}
+
+.fontw-800 {
+  font-weight: 800;
+}
+
+.fontw-900 {
+  font-weight: 900;
+}
+
+.font-w-100 {
+  font-weight: 100
+}
+
+.font-w-200 {
+  font-weight: 200;
+}
+
+.font-w-300 {
+  font-weight: 300;
+}
+
+.font-w-400 {
+  font-weight: 400;
+}
+
+.font-w-500 {
+  font-weight: 500;
+}
+
+.font-w-600 {
+  font-weight: 600;
+}
+
+.font-w-700 {
+  font-weight: 700;
+}
+
+.font-w-800 {
+  font-weight: 800;
+}
+
+.font-w-900 {
+  font-weight: 900;
+}
+
+.transition-all {
+  transition: all .3s;
+}
+
+.transition-3 {
+  transition: all .3s;
+}
+
+.transition-4 {
+  transition: all .4s;
+}
+
+.transition-5 {
+  transition: all .5s;
+}
+
+.transition-6 {
+  transition: all .6s;
+}
+
+.transition-7 {
+  transition: all .7s;
+}
