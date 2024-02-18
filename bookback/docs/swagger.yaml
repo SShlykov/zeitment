@@ -1,0 +1,241 @@
+basePath: /api/v1
+definitions:
+  config.HTTPError:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Book:
+    properties:
+      author:
+        type: string
+      chapters:
+        items:
+          $ref: '#/definitions/models.Chapter'
+        type: array
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      owner:
+        type: integer
+      publication:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Chapter:
+    properties:
+      book_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      number:
+        type: integer
+      pages:
+        items:
+          $ref: '#/definitions/models.Page'
+        type: array
+      text:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Page:
+    properties:
+      chapter_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      paragraphs:
+        items:
+          $ref: '#/definitions/models.Paragraph'
+        type: array
+      text:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Paragraph:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      page_id:
+        type: string
+      text:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:7077
+info:
+  contact: {}
+  description: Это API для работы с книгами
+  title: Book API
+  version: "0.1"
+paths:
+  /books:
+    get:
+      description: Извлекает список всех книг
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Book'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Get list of books
+      tags:
+      - Books
+    post:
+      consumes:
+      - application/json
+      description: Создает новую книгу
+      parameters:
+      - description: Book object
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/models.Book'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Создать книгу
+      tags:
+      - Книги
+  /books/{id}:
+    delete:
+      description: Delete a book by its ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Delete book
+      tags:
+      - Books
+    get:
+      description: Извлекает книгу по ее ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Book'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить книгу по ID
+      tags:
+      - Книги
+    put:
+      consumes:
+      - application/json
+      description: Обновляет книгу по ее ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Book object
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/models.Book'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Обновить книгу
+      tags:
+      - Books
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of this application
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'healthy: This application is started.'
+          schema:
+            type: string
+        "404":
+          description: 'None: This application is stopped.'
+          schema:
+            type: string
+      summary: Get the status of this application
+      tags:
+      - Health
+schemes:
+- http
+swagger: "2.0"

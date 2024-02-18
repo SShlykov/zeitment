@@ -3,83 +3,67 @@ package app
 import (
 	"context"
 	"fmt"
-	"net"
+	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
+	"github.com/SShlykov/zeitment/bookback/pkg/db"
+	"github.com/labstack/echo/v4"
+	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
-	"time"
 )
 
 type App struct {
+	configPath string
+	logger     *slog.Logger
+	config     *cfg.Config
+	db         db.Client
+	Echo       *echo.Echo
+
 	ctx      context.Context
 	closeCtx func()
 }
 
 func NewApp(configPath string) (*App, error) {
 	ctx, closeCtx := context.WithCancel(context.Background())
-	_ = configPath
-	app := &App{
-		ctx:      ctx,
-		closeCtx: closeCtx,
+	app := &App{ctx: ctx, closeCtx: closeCtx, configPath: configPath}
+
+	inits := []func(ctx context.Context) error{
+		app.initConfig,
+		app.initLogger,
+		app.initDB,
+		app.initEndpoint,
+		app.initRouter,
+	}
+
+	for _, init := range inits {
+		if err := init(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	return app, nil
 }
 
-func (app *App) Run() error {
-	go handleSignals(app.closeCtx)
+func (a *App) Run() error {
+	ctx, stop := signal.NotifyContext(a.ctx, os.Interrupt)
+	defer stop()
 
-	if err := startServer(app.ctx); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func startServer(ctx context.Context) error {
-	laddr, err := net.ResolveTCPAddr("tcp", ":7709")
-	if err != nil {
-		return err
-	}
-
-	l, err := net.ListenTCP("tcp", laddr)
-	if err != nil {
-		return err
-	}
-
-	defer func(l *net.TCPListener) {
-		err = l.Close()
-	}(l)
-
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		default:
-			if err = l.SetDeadline(time.Now().Add(time.Second)); err != nil {
-				return err
-			}
-
-			_, err = l.Accept()
-			if err != nil && !os.IsTimeout(err) {
-				return err
-			}
+	go func() {
+		httpServer := &http.Server{
+			ReadHeaderTimeout: a.config.Timeout,
+			ReadTimeout:       a.config.Timeout,
+			WriteTimeout:      a.config.Timeout,
+			IdleTimeout:       a.config.IddleTimeout,
+			Addr:              fmt.Sprintf(a.config.Address),
+			Handler:           a.Echo,
 		}
-	}
-}
 
-func handleSignals(cancel context.CancelFunc) {
-	sigCh := make(chan os.Signal, 1)
-
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-
-	for {
-		sig := <-sigCh
-		switch sig {
-		case os.Interrupt:
-			cancel()
-			fmt.Println("Interrupted")
-			return
+		a.logger.Info("Started servers", slog.String("address", a.config.Address))
+		err := httpServer.ListenAndServe()
+		if err != nil {
+			panic(err)
 		}
-	}
+	}()
+
+	return a.closer(ctx)
 }
