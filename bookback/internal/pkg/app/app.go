@@ -2,14 +2,13 @@ package app
 
 import (
 	"context"
-	"fmt"
 	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"github.com/labstack/echo/v4"
 	"log/slog"
-	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 )
 
 type App struct {
@@ -44,26 +43,23 @@ func NewApp(configPath string) (*App, error) {
 	return app, nil
 }
 
-func (a *App) Run() error {
-	ctx, stop := signal.NotifyContext(a.ctx, os.Interrupt)
+func (app *App) Run() error {
+	ctx, stop := signal.NotifyContext(app.ctx, os.Interrupt)
 	defer stop()
 
-	go func() {
-		httpServer := &http.Server{
-			ReadHeaderTimeout: a.config.Timeout,
-			ReadTimeout:       a.config.Timeout,
-			WriteTimeout:      a.config.Timeout,
-			IdleTimeout:       a.config.IddleTimeout,
-			Addr:              fmt.Sprintf(a.config.Address),
-			Handler:           a.Echo,
-		}
+	logger := app.logger
+	logger.Info("starting book app", slog.String("at", app.config.Address))
+	logger.Debug("debug messages enabled")
 
-		a.logger.Info("Started servers", slog.String("address", a.config.Address))
-		err := httpServer.ListenAndServe()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	var wg sync.WaitGroup
 
-	return a.closer(ctx)
+	runs := []func(*sync.WaitGroup, context.Context){
+		app.runWebServer,
+	}
+
+	for _, run := range runs {
+		run(&wg, ctx)
+	}
+
+	return app.closer(ctx)
 }

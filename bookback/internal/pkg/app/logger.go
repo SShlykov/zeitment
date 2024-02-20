@@ -6,10 +6,10 @@ import (
 	"github.com/SShlykov/zeitment/bookback/pkg/logger"
 )
 
-func (a *App) initLogger(ctx context.Context) error {
-	if a.config == nil {
+func (app *App) initLogger(ctx context.Context) error {
+	if app.config == nil {
 		return errors.New("config is nil")
 	}
-	a.logger = logger.SetupLogger(a.config.Level)
+	app.logger = logger.SetupLogger(app.config.Level)
 	return nil
 }

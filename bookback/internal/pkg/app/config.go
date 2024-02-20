@@ -6,12 +6,12 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 )
 
-func (a *App) initConfig(_ context.Context) error {
-	cfg, err := config.LoadConfig(a.configPath)
+func (app *App) initConfig(_ context.Context) error {
+	cfg, err := config.LoadConfig(app.configPath)
 	if err != nil {
 		return errors.New("failed to load config: " + err.Error())
 	}
-	a.config = cfg
+	app.config = cfg
 
 	return nil
 }

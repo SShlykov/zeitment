@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (a *App) initDB(ctx context.Context) error {
+func (app *App) initDB(ctx context.Context) error {
 	pgConf, err := config.NewPGConfig()
 	if err != nil {
 		return errors.New("failed to init pg config: " + err.Error())
@@ -17,7 +17,7 @@ func (a *App) initDB(ctx context.Context) error {
 	if err != nil {
 		return errors.New("failed to init pg client: " + err.Error())
 	}
-	a.db = db
+	app.db = db
 
 	go func() {
 		var broken int
@@ -27,11 +27,11 @@ func (a *App) initDB(ctx context.Context) error {
 			if err != nil {
 				broken++
 				if broken > pgConf.MaxPingAttempts() {
-					a.logger.Error("db is down")
-					a.closeCtx()
+					app.logger.Error("db is down")
+					app.closeCtx()
 					break
 				}
-				a.logger.Error("failed to ping db")
+				app.logger.Error("failed to ping db")
 			} else {
 				broken = 0
 			}
