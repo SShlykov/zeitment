@@ -101,8 +101,9 @@ func (r *repository) Update(ctx context.Context, id string, updChapter *models.C
 		Set(columnText, updChapter.Title).
 		Set(columnBookID, updChapter.IsPublic).
 		Set(columnIsPublic, updChapter.IsPublic).
-		Suffix(Returning + fmt.Sprintf("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-			columnTitle, columnIsPublic)).
+		Suffix(Returning +
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
+				columnTitle, columnIsPublic)).
 		ToSql()
 
 	if err != nil {
@@ -123,8 +124,9 @@ func (r *repository) Update(ctx context.Context, id string, updChapter *models.C
 func (r *repository) Delete(ctx context.Context, id string) (*models.Chapter, error) {
 	query, args, err := sq.SQ.Delete(tableName).
 		Where(sq.Eq{columnID: id}).
-		Suffix(Returning + fmt.Sprintf("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-			columnTitle)).
+		Suffix(Returning +
+			fmt.Sprintf("%s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
+				columnTitle)).
 		ToSql()
 
 	if err != nil {
