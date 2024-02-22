@@ -8,6 +8,10 @@ import (
 
 type State int
 
+var (
+	ErrorCb = errors.New("circuit breaker error")
+)
+
 const (
 	Closed State = iota
 	Open
@@ -20,6 +24,7 @@ type CircuitBreaker struct {
 	requestCount             int
 	errorCount               int
 	requestLimit             int
+	minRequests              int
 	errorThresholdPercentage float64
 	intervalDuration         time.Duration
 	openStateTimeout         time.Duration
@@ -32,10 +37,12 @@ type CircuitBreaker struct {
 // errorThresholdPercentage - процент ошибок при котором срабатывает отключение
 // intervalDuration - длительность интервала для сброса счетчиков
 // openStateTimeout - длительность периода ожидания в состоянии Open
-func NewCircuitBreaker(requestLimit int, errorThresholdPercentage float64, intervalDuration, openStateTimeout time.Duration) *CircuitBreaker {
+func NewCircuitBreaker(requestLimit int, minRequests int, errorThresholdPercentage float64,
+	intervalDuration, openStateTimeout time.Duration) *CircuitBreaker {
 	return &CircuitBreaker{
 		state:                    Closed,
 		requestLimit:             requestLimit,
+		minRequests:              minRequests,
 		errorThresholdPercentage: errorThresholdPercentage,
 		intervalDuration:         intervalDuration,
 		openStateTimeout:         openStateTimeout,
@@ -55,8 +62,9 @@ func (cb *CircuitBreaker) Execute(action func() error) error {
 	case Closed:
 		if cb.requestCount >= cb.requestLimit {
 			cb.mutex.Unlock()
-			return errors.New("request limit exceeded")
+			return errors.Join(ErrorCb, errors.New("request limit exceeded"))
 		}
+
 		cb.requestCount++
 		cb.mutex.Unlock()
 
@@ -71,7 +79,7 @@ func (cb *CircuitBreaker) Execute(action func() error) error {
 	case Open:
 		if now.Before(cb.nextAttempt) {
 			cb.mutex.Unlock()
-			return errors.New("circuit breaker open")
+			return errors.Join(ErrorCb, errors.New("open state"))
 		}
 
 		cb.state = HalfOpen
@@ -89,7 +97,7 @@ func (cb *CircuitBreaker) Execute(action func() error) error {
 	case HalfOpen:
 		if cb.requestCount >= 1 {
 			cb.mutex.Unlock()
-			return errors.New("circuit breaker half-open: waiting for test request result")
+			return errors.Join(ErrorCb, errors.New("half-open: waiting for test request result"))
 		}
 		cb.requestCount++
 		cb.mutex.Unlock()
@@ -103,7 +111,7 @@ func (cb *CircuitBreaker) Execute(action func() error) error {
 		return nil
 	}
 
-	return errors.New("unexpected circuit breaker state")
+	return errors.Join(ErrorCb, errors.New("unexpected state"))
 }
 
 func (cb *CircuitBreaker) recordFailure() {
@@ -111,6 +119,9 @@ func (cb *CircuitBreaker) recordFailure() {
 	defer cb.mutex.Unlock()
 
 	cb.errorCount++
+	if cb.requestCount < cb.minRequests {
+		return
+	}
 	if cb.state == HalfOpen {
 		cb.transitionToOpen()
 	} else {

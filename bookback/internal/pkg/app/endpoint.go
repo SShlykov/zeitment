@@ -2,7 +2,9 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/SShlykov/zeitment/bookback/internal/circuitbreaker"
 	"github.com/SShlykov/zeitment/bookback/internal/servers/http/router"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -35,12 +37,22 @@ func (app *App) runWebServer(wg *sync.WaitGroup, ctx context.Context) {
 
 }
 
-func (app *App) initEndpoint(ctx context.Context) error {
+func (app *App) initEndpoint(_ context.Context) error {
 	e := echo.New()
-	e.Use(middleware.Recover())
-	addLogger(e, app.logger, ctx)
-	app.Echo = e
+	cb := circuitbreaker.NewCircuitBreaker(app.config.RequestLimit, app.config.MinRequests, app.config.ErrorThresholdPercentage,
+		app.config.IntervalDuration, app.config.OpenStateTimeout)
 
+	e.Use(middleware.Recover())
+
+	middlewares := []echo.MiddlewareFunc{
+		loggerConfiguration(app.logger),
+		middleware.Recover(),
+		createCircuitBreakerMiddleware(cb),
+	}
+
+	e.Use(middlewares...)
+
+	app.Echo = e
 	return nil
 }
 
@@ -53,20 +65,40 @@ func (app *App) initRouter(_ context.Context) error {
 	return nil
 }
 
-func addLogger(e *echo.Echo, logger *slog.Logger, ctx context.Context) {
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+func createCircuitBreakerMiddleware(cb *circuitbreaker.CircuitBreaker) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			err := cb.Execute(func() error {
+				return next(c)
+			})
+
+			if err != nil {
+				if errors.Is(err, circuitbreaker.ErrorCb) {
+					return c.JSON(http.StatusUnavailableForLegalReasons,
+						map[string]string{"error": "Server is overloaded, please try again later.", "status": "error"})
+				}
+				return err
+			}
+
+			return nil
+		}
+	}
+}
+
+func loggerConfiguration(logger *slog.Logger) echo.MiddlewareFunc {
+	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,
 		LogError:    true,
 		HandleError: true,
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
 			if v.Error == nil {
-				logger.LogAttrs(ctx, slog.LevelInfo, "REQUEST",
+				logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
 					slog.String("uri", v.URI),
 					slog.Int("status", v.Status),
 				)
 			} else {
-				logger.LogAttrs(ctx, slog.LevelError, "REQUEST_ERROR",
+				logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
 					slog.String("uri", v.URI),
 					slog.Int("status", v.Status),
 					slog.String("err", v.Error.Error()),
@@ -74,5 +106,5 @@ func addLogger(e *echo.Echo, logger *slog.Logger, ctx context.Context) {
 			}
 			return nil
 		},
-	}))
+	})
 }

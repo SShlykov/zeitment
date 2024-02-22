@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewCircuitBreaker(t *testing.T) {
-	cb := NewCircuitBreaker(10, 0.5, 1*time.Minute, 1*time.Minute)
+	cb := NewCircuitBreaker(10, 1, 0.5, 1*time.Minute, 1*time.Minute)
 	assert.NotNil(t, cb)
 	assert.Equal(t, Closed, cb.state)
 	assert.Equal(t, 10, cb.requestLimit)
@@ -19,14 +19,14 @@ func TestNewCircuitBreaker(t *testing.T) {
 
 func TestCircuitBreakerTransitionToOpenFromClosed(t *testing.T) {
 	requestLimit := 5
-	errorThreshold := 0.2 // 20%
+	errorThreshold := 0.2
 	intervalDuration := 1 * time.Minute
 	openStateTimeout := 1 * time.Minute
 
-	cb := NewCircuitBreaker(requestLimit, errorThreshold, intervalDuration, openStateTimeout)
+	cb := NewCircuitBreaker(requestLimit, 1, errorThreshold, intervalDuration, openStateTimeout)
 
 	for i := 0; i < int(float64(requestLimit)*errorThreshold)+1; i++ {
-		cb.Execute(func() error {
+		_ = cb.Execute(func() error {
 			return errors.New("error")
 		})
 	}
@@ -35,7 +35,7 @@ func TestCircuitBreakerTransitionToOpenFromClosed(t *testing.T) {
 }
 
 func TestCircuitBreakerHalfOpenToClosed(t *testing.T) {
-	cb := NewCircuitBreaker(1, 0.5, 1*time.Minute, 1*time.Minute)
+	cb := NewCircuitBreaker(1, 1, 0.5, 1*time.Minute, 1*time.Minute)
 	cb.state = HalfOpen
 
 	err := cb.Execute(func() error {
@@ -47,7 +47,7 @@ func TestCircuitBreakerHalfOpenToClosed(t *testing.T) {
 }
 
 func TestCircuitBreakerOpenToClosed(t *testing.T) {
-	cb := NewCircuitBreaker(1, 0.5, 1*time.Minute, 1*time.Minute)
+	cb := NewCircuitBreaker(1, 1, 0.5, 1*time.Minute, 1*time.Minute)
 	cb.state = Open
 	cb.nextAttempt = time.Now().Add(-2 * time.Minute)
 
@@ -60,7 +60,7 @@ func TestCircuitBreakerOpenToClosed(t *testing.T) {
 }
 
 func TestCircuitBreakerHalfOpenToOneRequest(t *testing.T) {
-	cb := NewCircuitBreaker(1, 0.5, 1*time.Minute, 1*time.Minute)
+	cb := NewCircuitBreaker(1, 0, 0.5, 1*time.Minute, 1*time.Minute)
 	cb.state = HalfOpen
 
 	err := cb.Execute(func() error {
@@ -72,5 +72,5 @@ func TestCircuitBreakerHalfOpenToOneRequest(t *testing.T) {
 		return nil
 	})
 	assert.NotNil(t, err)
-	assert.Equal(t, "circuit breaker open", err.Error())
+	assert.Equal(t, errors.Is(err, ErrorCb), true)
 }
