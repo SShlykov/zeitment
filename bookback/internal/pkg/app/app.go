@@ -2,84 +2,64 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"net"
+	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
+	"github.com/SShlykov/zeitment/bookback/pkg/db"
+	"github.com/labstack/echo/v4"
+	"log/slog"
 	"os"
 	"os/signal"
-	"syscall"
-	"time"
+	"sync"
 )
 
 type App struct {
+	configPath string
+	logger     *slog.Logger
+	config     *cfg.Config
+	db         db.Client
+	Echo       *echo.Echo
+
 	ctx      context.Context
 	closeCtx func()
 }
 
 func NewApp(configPath string) (*App, error) {
 	ctx, closeCtx := context.WithCancel(context.Background())
-	_ = configPath
-	app := &App{
-		ctx:      ctx,
-		closeCtx: closeCtx,
+	app := &App{ctx: ctx, closeCtx: closeCtx, configPath: configPath}
+
+	inits := []func(ctx context.Context) error{
+		app.initConfig,
+		app.initLogger,
+		app.initDB,
+		app.initEndpoint,
+		app.initRouter,
+	}
+
+	for _, init := range inits {
+		if err := init(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	return app, nil
 }
 
 func (app *App) Run() error {
-	go handleSignals(app.closeCtx)
+	ctx, stop := signal.NotifyContext(app.ctx, os.Interrupt)
+	defer stop()
 
-	if err := startServer(app.ctx); err != nil {
-		return err
+	logger := app.logger
+	logger.Info("starting book app", slog.String("at", app.config.Address))
+	logger.Debug("debug messages enabled")
+
+	var wg sync.WaitGroup
+
+	runs := []func(*sync.WaitGroup, context.Context){
+		app.runWebServer,
 	}
 
-	return nil
-}
-
-func startServer(ctx context.Context) error {
-	laddr, err := net.ResolveTCPAddr("tcp", ":7709")
-	if err != nil {
-		return err
+	for _, run := range runs {
+		run(&wg, ctx)
 	}
 
-	l, err := net.ListenTCP("tcp", laddr)
-	if err != nil {
-		return err
-	}
-
-	defer func(l *net.TCPListener) {
-		err = l.Close()
-	}(l)
-
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		default:
-			if err = l.SetDeadline(time.Now().Add(time.Second)); err != nil {
-				return err
-			}
-
-			_, err = l.Accept()
-			if err != nil && !os.IsTimeout(err) {
-				return err
-			}
-		}
-	}
-}
-
-func handleSignals(cancel context.CancelFunc) {
-	sigCh := make(chan os.Signal, 1)
-
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-
-	for {
-		sig := <-sigCh
-		switch sig {
-		case os.Interrupt:
-			cancel()
-			fmt.Println("Interrupted")
-			return
-		}
-	}
+	return app.closer(ctx)
 }

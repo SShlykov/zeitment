@@ -9,11 +9,16 @@ import (
 
 var configPath string
 
-func init() {
-	flag.StringVar(&configPath, "config", "./config/default.yml", "path to the configuration file")
-}
-
+// @title Book API
+// @version 0.1
+// @description Это API для работы с книгами
+// @host localhost:7077
+// @BasePath /api/v1
+// @schemes http
+// @produces application/json
+// @consumes application/json
 func main() {
+	flag.StringVar(&configPath, "config", "./config/default.yml", "path to the configuration file")
 	app, err := appPkg.NewApp(configPath)
 	if err != nil {
 		fmt.Printf("failed to create app: %+v\n", err)

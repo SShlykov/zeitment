@@ -1,4 +1,4 @@
-FROM golang:1.21-rc-alpine as server
+FROM golang:1.22-alpine as server
 WORKDIR /app
 
 COPY ../go.mod .
@@ -8,6 +8,10 @@ COPY .. .
 
 RUN go build -o /app/main ./cmd/bookback
 
-EXPOSE $PORT
+#FROM alpine:latest
+#WORKDIR /app
+#COPY --from=builder /app/main /app/main
+#
+#EXPOSE $PORT
 
 CMD [ "/app/main" ]
