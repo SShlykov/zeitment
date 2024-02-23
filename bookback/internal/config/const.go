@@ -14,4 +14,5 @@ var (
 	ErrorForbidden  = HTTPError{"forbidden"}
 	ErrorNotCreated = HTTPError{"not created"}
 	ErrorNotUpdated = HTTPError{"not updated"}
+	ErrorNotDeleted = HTTPError{"not deleted"}
 )

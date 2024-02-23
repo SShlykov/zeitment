@@ -22,9 +22,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Books"
+                    "Книги"
                 ],
-                "summary": "Get list of books",
+                "summary": "Получить список книг",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Books"
+                    "Книги"
                 ],
                 "summary": "Обновить книгу",
                 "parameters": [
@@ -162,11 +162,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a book by its ID",
+                "description": "Удаляет книгу по ее ID",
                 "tags": [
-                    "Books"
+                    "Книги"
                 ],
-                "summary": "Delete book",
+                "summary": "Удалить книгу",
                 "parameters": [
                     {
                         "type": "string",
@@ -189,9 +189,36 @@ const docTemplate = `{
                 }
             }
         },
-        "/health": {
+        "/chapters": {
             "get": {
-                "description": "Get the status of this application",
+                "description": "Извлекает список всех глав",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Главы"
+                ],
+                "summary": "Получить список глав",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Chapter"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает новую главу",
                 "consumes": [
                     "application/json"
                 ],
@@ -199,20 +226,449 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Health"
+                    "Главы"
                 ],
-                "summary": "Get the status of this application",
+                "summary": "Создать главу",
+                "parameters": [
+                    {
+                        "description": "Chapter object",
+                        "name": "chapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/chapters/{id}": {
+            "get": {
+                "description": "Извлекает главу по ее ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Главы"
+                ],
+                "summary": "Получить главу по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID главы",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "healthy: This application is started.",
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Обновляет главу по ее ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Главы"
+                ],
+                "summary": "Обновить главу",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID главы",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Chapter object",
+                        "name": "chapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет главу по ее ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Главы"
+                ],
+                "summary": "Удалить главу",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID главы",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Chapter"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Возвращает статус приложения",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Статус приложения"
+                ],
+                "summary": "Получить статус приложения",
+                "responses": {
+                    "200": {
+                        "description": "healthy",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "None: This application is stopped.",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/pages": {
+            "get": {
+                "description": "Извлекает список всех страниц",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Страницы"
+                ],
+                "summary": "Получить список страниц",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Page"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает новую страницу",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Страницы"
+                ],
+                "summary": "Создать страницу",
+                "parameters": [
+                    {
+                        "description": "Page object",
+                        "name": "page",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Page"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Page"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/pages/{id}": {
+            "get": {
+                "description": "Извлекает страницу по ее ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Страницы"
+                ],
+                "summary": "Получить страницу по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID страницы",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Page"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/paragraphs": {
+            "get": {
+                "description": "Извлекает список всех параграфов",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Параграфы"
+                ],
+                "summary": "Получить список параграфов",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Paragraph"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает новый параграф",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Параграфы"
+                ],
+                "summary": "Создать параграф",
+                "parameters": [
+                    {
+                        "description": "Paragraph object",
+                        "name": "paragraph",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/paragraphs/{id}": {
+            "get": {
+                "description": "Извлекает параграф по его ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Параграфы"
+                ],
+                "summary": "Получить параграф по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID параграфа",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Обновляет параграф по его ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Параграфы"
+                ],
+                "summary": "Обновить параграф",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID параграфа",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Paragraph object",
+                        "name": "paragraph",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет параграф по его ID",
+                "tags": [
+                    "Параграфы"
+                ],
+                "summary": "Удалить параграф",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID параграфа",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Paragraph"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/config.HTTPError"
                         }
                     }
                 }
@@ -234,16 +690,7 @@ const docTemplate = `{
                 "author": {
                     "type": "string"
                 },
-                "chapters": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Chapter"
-                    }
-                },
                 "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
                     "type": "string"
                 },
                 "description": {
@@ -257,9 +704,6 @@ const docTemplate = `{
                 },
                 "owner": {
                     "type": "integer"
-                },
-                "publication": {
-                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -276,9 +720,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
                     "type": "string"
                 },
                 "id": {
@@ -316,20 +757,11 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "deleted_at": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "is_public": {
                     "type": "boolean"
-                },
-                "paragraphs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Paragraph"
-                    }
                 },
                 "text": {
                     "type": "string"
@@ -343,9 +775,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
                     "type": "string"
                 },
                 "id": {

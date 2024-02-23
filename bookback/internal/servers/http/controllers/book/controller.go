@@ -31,9 +31,9 @@ func (bc *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 
 // ListBooks обрабатывает запросы на получение списка книг.
 // @router /books [get]
-// @summary Get list of books
+// @summary Получить список книг
 // @description Извлекает список всех книг
-// @tags Books
+// @tags Книги
 // @produce  application/json
 // @success 200 {array} models.Book
 // @failure 500 {object} config.HTTPError
@@ -89,7 +89,7 @@ func (bc *Controller) GetBookByID(c echo.Context, ctx context.Context) error {
 // @router /books/{id} [put]
 // @summary Обновить книгу
 // @description Обновляет книгу по ее ID
-// @tags Books
+// @tags Книги
 // @accept application/json
 // @produce application/json
 // @param id path string true "Book ID"
@@ -112,9 +112,9 @@ func (bc *Controller) UpdateBook(c echo.Context, ctx context.Context) error {
 
 // DeleteBook обрабатывает удаление книги по ID.
 // @router /books/{id} [delete]
-// @summary Delete book
-// @description Delete a book by its ID
-// @tags Books
+// @summary Удалить книгу
+// @description Удаляет книгу по ее ID
+// @tags Книги
 // @param id path string true "Book ID"
 // @success 204
 // @failure 404 {object} config.HTTPError

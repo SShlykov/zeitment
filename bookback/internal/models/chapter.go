@@ -4,11 +4,12 @@ import (
 	"time"
 )
 
+// DeletedAt sql.NullTime `json:"deleted_at"`
+
 type Chapter struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt NullTime  `json:"deleted_at"`
 	Title     string    `json:"title"`
 	Number    int       `json:"number"`
 	Text      string    `json:"text"`

@@ -9,13 +9,7 @@ definitions:
     properties:
       author:
         type: string
-      chapters:
-        items:
-          $ref: '#/definitions/models.Chapter'
-        type: array
       created_at:
-        type: string
-      deleted_at:
         type: string
       description:
         type: string
@@ -25,8 +19,6 @@ definitions:
         type: boolean
       owner:
         type: integer
-      publication:
-        type: string
       title:
         type: string
       updated_at:
@@ -37,8 +29,6 @@ definitions:
       book_id:
         type: string
       created_at:
-        type: string
-      deleted_at:
         type: string
       id:
         type: string
@@ -63,16 +53,10 @@ definitions:
         type: string
       created_at:
         type: string
-      deleted_at:
-        type: string
       id:
         type: string
       is_public:
         type: boolean
-      paragraphs:
-        items:
-          $ref: '#/definitions/models.Paragraph'
-        type: array
       text:
         type: string
       updated_at:
@@ -81,8 +65,6 @@ definitions:
   models.Paragraph:
     properties:
       created_at:
-        type: string
-      deleted_at:
         type: string
       id:
         type: string
@@ -118,9 +100,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/config.HTTPError'
-      summary: Get list of books
+      summary: Получить список книг
       tags:
-      - Books
+      - Книги
     post:
       consumes:
       - application/json
@@ -148,7 +130,7 @@ paths:
       - Книги
   /books/{id}:
     delete:
-      description: Delete a book by its ID
+      description: Удаляет книгу по ее ID
       parameters:
       - description: Book ID
         in: path
@@ -162,9 +144,9 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/config.HTTPError'
-      summary: Delete book
+      summary: Удалить книгу
       tags:
-      - Books
+      - Книги
     get:
       description: Извлекает книгу по ее ID
       parameters:
@@ -216,26 +198,327 @@ paths:
             $ref: '#/definitions/config.HTTPError'
       summary: Обновить книгу
       tags:
-      - Books
-  /health:
+      - Книги
+  /chapters:
     get:
-      consumes:
-      - application/json
-      description: Get the status of this application
+      description: Извлекает список всех глав
       produces:
       - application/json
       responses:
         "200":
-          description: 'healthy: This application is started.'
+          description: OK
           schema:
-            type: string
-        "404":
-          description: 'None: This application is stopped.'
+            items:
+              $ref: '#/definitions/models.Chapter'
+            type: array
+        "500":
+          description: Internal Server Error
           schema:
-            type: string
-      summary: Get the status of this application
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить список глав
       tags:
-      - Health
+      - Главы
+    post:
+      consumes:
+      - application/json
+      description: Создает новую главу
+      parameters:
+      - description: Chapter object
+        in: body
+        name: chapter
+        required: true
+        schema:
+          $ref: '#/definitions/models.Chapter'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Chapter'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Создать главу
+      tags:
+      - Главы
+  /chapters/{id}:
+    delete:
+      description: Удаляет главу по ее ID
+      parameters:
+      - description: ID главы
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Chapter'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Удалить главу
+      tags:
+      - Главы
+    get:
+      description: Извлекает главу по ее ID
+      parameters:
+      - description: ID главы
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Chapter'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить главу по ID
+      tags:
+      - Главы
+    put:
+      consumes:
+      - application/json
+      description: Обновляет главу по ее ID
+      parameters:
+      - description: ID главы
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chapter object
+        in: body
+        name: chapter
+        required: true
+        schema:
+          $ref: '#/definitions/models.Chapter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Chapter'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Обновить главу
+      tags:
+      - Главы
+  /health:
+    get:
+      description: Возвращает статус приложения
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: healthy
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить статус приложения
+      tags:
+      - Статус приложения
+  /pages:
+    get:
+      description: Извлекает список всех страниц
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Page'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить список страниц
+      tags:
+      - Страницы
+    post:
+      consumes:
+      - application/json
+      description: Создает новую страницу
+      parameters:
+      - description: Page object
+        in: body
+        name: page
+        required: true
+        schema:
+          $ref: '#/definitions/models.Page'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Page'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Создать страницу
+      tags:
+      - Страницы
+  /pages/{id}:
+    get:
+      description: Извлекает страницу по ее ID
+      parameters:
+      - description: ID страницы
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Page'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить страницу по ID
+      tags:
+      - Страницы
+  /paragraphs:
+    get:
+      description: Извлекает список всех параграфов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Paragraph'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить список параграфов
+      tags:
+      - Параграфы
+    post:
+      consumes:
+      - application/json
+      description: Создает новый параграф
+      parameters:
+      - description: Paragraph object
+        in: body
+        name: paragraph
+        required: true
+        schema:
+          $ref: '#/definitions/models.Paragraph'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Paragraph'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Создать параграф
+      tags:
+      - Параграфы
+  /paragraphs/{id}:
+    delete:
+      description: Удаляет параграф по его ID
+      parameters:
+      - description: ID параграфа
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Paragraph'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Удалить параграф
+      tags:
+      - Параграфы
+    get:
+      description: Извлекает параграф по его ID
+      parameters:
+      - description: ID параграфа
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Paragraph'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Получить параграф по ID
+      tags:
+      - Параграфы
+    put:
+      consumes:
+      - application/json
+      description: Обновляет параграф по его ID
+      parameters:
+      - description: ID параграфа
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Paragraph object
+        in: body
+        name: paragraph
+        required: true
+        schema:
+          $ref: '#/definitions/models.Paragraph'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Paragraph'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/config.HTTPError'
+      summary: Обновить параграф
+      tags:
+      - Параграфы
 schemes:
 - http
 swagger: "2.0"

@@ -13,8 +13,7 @@ import (
 	"sync"
 )
 
-func (app *App) runWebServer(wg *sync.WaitGroup, ctx context.Context) {
-
+func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
 	wg.Add(1)
 
 	go func() {
@@ -28,13 +27,12 @@ func (app *App) runWebServer(wg *sync.WaitGroup, ctx context.Context) {
 			Handler:           app.Echo,
 		}
 
-		app.logger.Info("Started servers", slog.String("address", app.config.Address))
+		app.logger.Info("HTTP server started")
 		err := httpServer.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}
 	}()
-
 }
 
 func (app *App) initEndpoint(_ context.Context) error {
@@ -60,6 +58,9 @@ func (app *App) initRouter(_ context.Context) error {
 	router.SetCORSConfig(app.Echo, app.config.CorsEnabled)
 	router.SetHealthController(app.Echo, app.ctx)
 	router.SetBookController(app.Echo, app.db, app.ctx)
+	router.SetChapterController(app.Echo, app.db, app.ctx)
+	router.SetPageController(app.Echo, app.db, app.ctx)
+	router.SetParagraphController(app.Echo, app.db, app.ctx)
 	router.SetSwagger(app.Echo, app.config.SwaggerEnabled)
 
 	return nil

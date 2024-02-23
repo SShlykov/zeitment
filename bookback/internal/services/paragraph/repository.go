@@ -25,7 +25,7 @@ type Repository interface {
 	Create(ctx context.Context, paragraph *models.Paragraph) (string, error)
 	FindByID(ctx context.Context, id string) (*models.Paragraph, error)
 	Update(ctx context.Context, id string, updParagraph *models.Paragraph) (*models.Paragraph, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string) (*models.Paragraph, error)
 	List(ctx context.Context) ([]models.Paragraph, error)
 }
 
@@ -107,30 +107,36 @@ func (r *repository) Update(ctx context.Context, id string, updParagraph *models
 }
 
 // Delete removes a paragraph from the database
-func (r *repository) Delete(ctx context.Context, id string) error {
+func (r *repository) Delete(ctx context.Context, id string) (*models.Paragraph, error) {
 	query, args, err := sq.SQ.Delete(tableName).
 		Where(sq.Eq{"id": id}).
 		Suffix("RETURNING id").
 		ToSql()
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	var paragraph *models.Paragraph
+	paragraph, err = r.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
 	}
 
 	q := db.Query{Name: "ParagraphRepository.Delete", Raw: query}
 
 	var deletedID string
 	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&deletedID); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return paragraph, nil
 }
 
 // List retrieves all paragraphs (adjust based on your needs, e.g., by parent Page or Chapter ID)
 func (r *repository) List(ctx context.Context) ([]models.Paragraph, error) {
 	query, args, err := sq.SQ.Select("id", "created_at", "updated_at", "deleted_at", "text", "is_public").
 		From(tableName).
-		Where(sq.Eq{"deleted_at": nil}). // Adjust if you need to filter by a parent entity
+		Where(sq.Eq{"deleted_at": nil}).
 		ToSql()
 	if err != nil {
 		return nil, err

@@ -26,7 +26,7 @@ const (
 	Returning       = "RETURNING "
 )
 
-// Repository определяет интерфейс для взаимодействия с хранилищем книг.
+// Repository определяет интерфейс для взаимодействия с хранилищем глав.
 type Repository interface {
 	Create(ctx context.Context, book *models.Chapter) (string, error)
 	FindByID(ctx context.Context, id string) (*models.Chapter, error)
