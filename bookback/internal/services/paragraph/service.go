@@ -43,6 +43,6 @@ func (s *service) DeleteParagraph(ctx context.Context, id string) (*models.Parag
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *service) ListParagraphs(ctx context.Context, pageID string) ([]models.Paragraph, error) {
+func (s *service) ListParagraphs(ctx context.Context, _ string) ([]models.Paragraph, error) {
 	return s.repo.List(ctx)
 }
