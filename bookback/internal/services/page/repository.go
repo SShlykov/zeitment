@@ -27,7 +27,9 @@ type Repository interface {
 	FindByID(ctx context.Context, id string) (*models.Page, error)
 	Update(ctx context.Context, id string, book *models.Page) (*models.Page, error)
 	Delete(ctx context.Context, id string) (*models.Page, error)
-	List(ctx context.Context, chapterID string) ([]models.Page, error)
+	List(ctx context.Context) ([]models.Page, error)
+
+	GetPagesByChapterID(ctx context.Context, chapterID string) ([]models.Page, error)
 }
 
 type repository struct {
@@ -99,13 +101,9 @@ func (r *repository) Update(ctx context.Context, id string, updPage *models.Page
 
 	q := db.Query{Name: "PageRepository.Update", Raw: query}
 
-	var page models.Page
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt,
-		&page.DeletedAt, &page.Text, &page.ChapterID, &page.IsPublic); err != nil {
-		return nil, err
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, args...)
 
-	return &page, nil
+	return readItem(row)
 }
 
 // Delete removes a page from the database.
@@ -129,35 +127,37 @@ func (r *repository) Delete(ctx context.Context, id string) (*models.Page, error
 }
 
 // List retrieves all pages for a given chapter ID.
-func (r *repository) List(ctx context.Context, chapterID string) ([]models.Page, error) {
-	query, args, err := sq.Select("id", "created_at", "updated_at", "deleted_at", "text", "chapter_id", "is_public").
-		From("pages").
-		Where(sq.Eq{"chapter_id": chapterID, "deleted_at": nil}).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+func (r *repository) List(ctx context.Context) ([]models.Page, error) {
+	query :=
+		`SELECT id, created_at, updated_at, deleted_at, text, chapter_id, is_public 
+		 FROM pages 
+		 WHERE deleted_at IS NULL`
 
 	q := db.Query{Name: "PageRepository.List", Raw: query}
 
-	rows, err := r.db.DB().QueryContext(ctx, q, args...)
+	rows, err := r.db.DB().QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var pages []models.Page
-	for rows.Next() {
-		var page models.Page
-		if err = rows.Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt, &page.DeletedAt, &page.Text, &page.ChapterID,
-			&page.IsPublic); err != nil {
-			return nil, err
-		}
-		pages = append(pages, page)
-	}
-	if err = rows.Err(); err != nil {
+	return readList(rows)
+}
+
+// GetPagesByChapterID retrieves all pages for a given chapter ID.
+func (r *repository) GetPagesByChapterID(ctx context.Context, chapterID string) ([]models.Page, error) {
+	query :=
+		`SELECT id, created_at, updated_at, deleted_at, text, chapter_id, is_public 
+		 FROM pages 
+		 WHERE chapter_id = $1 AND deleted_at IS NULL`
+
+	q := db.Query{Name: "PageRepository.GetPagesByChapterID", Raw: query}
+
+	rows, err := r.db.DB().QueryContext(ctx, q, chapterID)
+	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	return pages, nil
+	return readList(rows)
 }

@@ -45,7 +45,7 @@ func (p *pg) ScanAllContext(ctx context.Context, q db.Query, dest interface{}, a
 	return pgxscan.ScanAll(dest, rows)
 }
 
-func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (pgconn.CommandTag, error) {
+func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (pgconn.CommandTag, error) { //nolint:gofmt
 	// TODO: logQuery(ctx, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)

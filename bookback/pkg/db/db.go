@@ -11,7 +11,7 @@ type Handler func(ctx context.Context) error
 type Client interface {
 	DB() DB
 	Close() error
-	QueryRowContext(ctx context.Context, query string, args ...interface{})
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) //nolint:gofmt
 }
 
 type DB interface {

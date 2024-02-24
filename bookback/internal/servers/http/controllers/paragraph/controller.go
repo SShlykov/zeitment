@@ -34,7 +34,7 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @success 200 {array} models.Paragraph
 // @failure 500 {object} config.HTTPError
 func (p *Controller) ListParagraphs(c echo.Context, ctx context.Context) error {
-	paragraphs, err := p.Service.ListParagraphs(ctx, "")
+	paragraphs, err := p.Service.ListParagraphs(ctx)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
@@ -120,4 +120,22 @@ func (p *Controller) DeleteParagraph(c echo.Context, ctx context.Context) error 
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotDeleted)
 	}
 	return c.JSON(http.StatusOK, deletedParagraph)
+}
+
+// GetParagraphsByPageID получение параграфов по ID страницы
+// @router /pages/{id}/paragraphs [get]
+// @summary Получить параграфы по ID страницы
+// @description Извлекает параграфы по ID страницы
+// @tags Параграфы
+// @param id path string true "ID страницы"
+// @produce application/json
+// @success 200 {array} models.Paragraph
+// @failure 404 {object} config.HTTPError
+func (p *Controller) GetParagraphsByPageID(c echo.Context, ctx context.Context) error {
+	id := c.Param("id")
+	paragraphs, err := p.Service.GetParagraphsByPageID(ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+	return c.JSON(http.StatusOK, paragraphs)
 }

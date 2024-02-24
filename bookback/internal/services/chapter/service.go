@@ -11,6 +11,8 @@ type Service interface {
 	UpdateChapter(ctx context.Context, id string, chapter *models.Chapter) (*models.Chapter, error)
 	DeleteChapter(ctx context.Context, id string) (*models.Chapter, error)
 	ListChapters(ctx context.Context) ([]models.Chapter, error)
+
+	GetChapterByBookID(ctx context.Context, bookID string) ([]models.Chapter, error)
 }
 
 type service struct {
@@ -45,4 +47,8 @@ func (ch *service) DeleteChapter(ctx context.Context, id string) (*models.Chapte
 
 func (ch *service) ListChapters(ctx context.Context) ([]models.Chapter, error) {
 	return ch.repo.List(ctx)
+}
+
+func (ch *service) GetChapterByBookID(ctx context.Context, bookID string) ([]models.Chapter, error) {
+	return ch.repo.GetChapterByBookID(ctx, bookID)
 }
