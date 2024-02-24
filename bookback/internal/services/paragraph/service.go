@@ -10,7 +10,9 @@ type Service interface {
 	GetParagraphByID(ctx context.Context, id string) (*models.Paragraph, error)
 	UpdateParagraph(ctx context.Context, id string, paragraph *models.Paragraph) (*models.Paragraph, error)
 	DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error)
-	ListParagraphs(ctx context.Context, pageID string) ([]models.Paragraph, error)
+	ListParagraphs(ctx context.Context) ([]models.Paragraph, error)
+
+	GetParagraphsByPageID(ctx context.Context, pageID string) ([]models.Paragraph, error)
 }
 
 type service struct {
@@ -43,6 +45,10 @@ func (s *service) DeleteParagraph(ctx context.Context, id string) (*models.Parag
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *service) ListParagraphs(ctx context.Context, _ string) ([]models.Paragraph, error) {
+func (s *service) ListParagraphs(ctx context.Context) ([]models.Paragraph, error) {
 	return s.repo.List(ctx)
+}
+
+func (s *service) GetParagraphsByPageID(ctx context.Context, pageID string) ([]models.Paragraph, error) {
+	return s.repo.GetParagraphsByPageID(ctx, pageID)
 }

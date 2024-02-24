@@ -27,6 +27,8 @@ type Repository interface {
 	Update(ctx context.Context, id string, updParagraph *models.Paragraph) (*models.Paragraph, error)
 	Delete(ctx context.Context, id string) (*models.Paragraph, error)
 	List(ctx context.Context) ([]models.Paragraph, error)
+
+	GetParagraphsByPageID(ctx context.Context, pageID string) ([]models.Paragraph, error)
 }
 
 type repository struct {
@@ -74,13 +76,9 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.Paragraph
 
 	q := db.Query{Name: "ParagraphRepository.FindByID", Raw: query}
 
-	var paragraph models.Paragraph
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&paragraph.ID, &paragraph.CreatedAt, &paragraph.UpdatedAt,
-		&paragraph.DeletedAt, &paragraph.Text, &paragraph.IsPublic); err != nil {
-		return nil, err
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, args...)
 
-	return &paragraph, nil
+	return readItem(row)
 }
 
 // Update modifies an existing paragraph's data
@@ -97,13 +95,9 @@ func (r *repository) Update(ctx context.Context, id string, updParagraph *models
 
 	q := db.Query{Name: "ParagraphRepository.Update", Raw: query}
 
-	var paragraph models.Paragraph
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&paragraph.ID, &paragraph.CreatedAt, &paragraph.UpdatedAt,
-		&paragraph.DeletedAt, &paragraph.Text, &paragraph.IsPublic); err != nil {
-		return nil, err
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, args...)
 
-	return &paragraph, nil
+	return readItem(row)
 }
 
 // Delete removes a paragraph from the database
@@ -150,18 +144,25 @@ func (r *repository) List(ctx context.Context) ([]models.Paragraph, error) {
 	}
 	defer rows.Close()
 
-	var paragraphs []models.Paragraph
-	for rows.Next() {
-		var paragraph models.Paragraph
-		if err = rows.Scan(&paragraph.ID, &paragraph.CreatedAt, &paragraph.UpdatedAt, &paragraph.DeletedAt,
-			&paragraph.Text, &paragraph.IsPublic); err != nil {
-			return nil, err
-		}
-		paragraphs = append(paragraphs, paragraph)
-	}
-	if err = rows.Err(); err != nil {
+	return readList(rows)
+}
+
+func (r *repository) GetParagraphsByPageID(ctx context.Context, pageID string) ([]models.Paragraph, error) {
+	query, args, err := sq.SQ.Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnText, columnIsPublic).
+		From(tableName).
+		Where(sq.Eq{"page_id": pageID, "deleted_at": nil}).
+		ToSql()
+	if err != nil {
 		return nil, err
 	}
 
-	return paragraphs, nil
+	q := db.Query{Name: "ParagraphRepository.GetParagraphsByPageID", Raw: query}
+
+	rows, err := r.db.DB().QueryContext(ctx, q, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return readList(rows)
 }
