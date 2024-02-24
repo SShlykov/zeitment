@@ -23,6 +23,8 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 	e.GET("/api/v1/pages/:id", func(c echo.Context) error { return p.GetPageByID(c, ctx) })
 	e.PUT("/api/v1/pages/:id", func(c echo.Context) error { return p.UpdatePage(c, ctx) })
 	e.DELETE("/api/v1/pages/:id", func(c echo.Context) error { return p.DeletePage(c, ctx) })
+
+	e.GET("/api/v1/chapters/:id/pages", func(c echo.Context) error { return p.GetPagesByChapterID(c, ctx) })
 }
 
 // ListPages список страниц
@@ -34,7 +36,7 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @success 200 {array} models.Page
 // @failure 500 {object} config.HTTPError
 func (p *Controller) ListPages(c echo.Context, ctx context.Context) error {
-	pages, err := p.Service.ListPages(ctx, "")
+	pages, err := p.Service.ListPages(ctx)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
@@ -81,6 +83,17 @@ func (p *Controller) GetPageByID(c echo.Context, ctx context.Context) error {
 	return c.JSON(http.StatusOK, page)
 }
 
+// UpdatePage обновление страницы
+// @router /pages/{id} [put]
+// @summary Обновить страницу
+// @description Обновляет страницу
+// @tags Страницы
+// @accept application/json
+// @produce application/json
+// @param id path string true "ID страницы"
+// @param page body models.Page true "Page object"
+// @success 200 {object} models.Page
+// @failure 400 {object} config.HTTPError
 func (p *Controller) UpdatePage(c echo.Context, ctx context.Context) error {
 	id := c.Param("id")
 	var page models.Page
@@ -94,6 +107,15 @@ func (p *Controller) UpdatePage(c echo.Context, ctx context.Context) error {
 	return c.JSON(http.StatusOK, updatedPage)
 }
 
+// DeletePage удаление страницы
+// @router /pages/{id} [delete]
+// @summary Удалить страницу
+// @description Удаляет страницу
+// @tags Страницы
+// @param id path string true "ID страницы"
+// @produce application/json
+// @success 200 {object} models.Page
+// @failure 500 {object} config.HTTPError
 func (p *Controller) DeletePage(c echo.Context, ctx context.Context) error {
 	id := c.Param("id")
 	deletedPage, err := p.Service.DeletePage(ctx, id)
@@ -101,4 +123,22 @@ func (p *Controller) DeletePage(c echo.Context, ctx context.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotDeleted)
 	}
 	return c.JSON(http.StatusOK, deletedPage)
+}
+
+// GetPagesByChapterID получение страниц по ID главы
+// @router /chapters/{id}/pages [get]
+// @summary Получить страницы по ID главы
+// @description Извлекает страницы по ID главы
+// @tags Страницы
+// @produce  application/json
+// @param id path string true "ID главы"
+// @success 200 {array} models.Page
+// @failure 404 {object} config.HTTPError
+func (p *Controller) GetPagesByChapterID(c echo.Context, ctx context.Context) error {
+	id := c.Param("id")
+	pages, err := p.Service.GetPagesByChapterID(ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+	return c.JSON(http.StatusOK, pages)
 }

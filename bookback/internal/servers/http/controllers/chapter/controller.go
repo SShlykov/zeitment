@@ -23,6 +23,8 @@ func (ch *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 	e.GET("/api/v1/chapters/:id", func(c echo.Context) error { return ch.GetChapterByID(c, ctx) })
 	e.PUT("/api/v1/chapters/:id", func(c echo.Context) error { return ch.UpdateChapter(c, ctx) })
 	e.DELETE("/api/v1/chapters/:id", func(c echo.Context) error { return ch.DeleteChapter(c, ctx) })
+
+	e.GET("/api/v1/chapters/book/:id", func(c echo.Context) error { return ch.GetChapterByBookID(c, ctx) })
 }
 
 // ListChapters список глав

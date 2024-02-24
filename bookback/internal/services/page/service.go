@@ -10,7 +10,9 @@ type Service interface {
 	GetPageByID(ctx context.Context, id string) (*models.Page, error)
 	UpdatePage(ctx context.Context, id string, page *models.Page) (*models.Page, error)
 	DeletePage(ctx context.Context, id string) (*models.Page, error)
-	ListPages(ctx context.Context, chapterID string) ([]models.Page, error)
+	ListPages(ctx context.Context) ([]models.Page, error)
+
+	GetPagesByChapterID(ctx context.Context, chapterID string) ([]models.Page, error)
 }
 
 type service struct {
@@ -43,6 +45,10 @@ func (s *service) DeletePage(ctx context.Context, id string) (*models.Page, erro
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *service) ListPages(ctx context.Context, chapterID string) ([]models.Page, error) {
-	return s.repo.List(ctx, chapterID)
+func (s *service) ListPages(ctx context.Context) ([]models.Page, error) {
+	return s.repo.List(ctx)
+}
+
+func (s *service) GetPagesByChapterID(ctx context.Context, chapterID string) ([]models.Page, error) {
+	return s.repo.GetPagesByChapterID(ctx, chapterID)
 }
