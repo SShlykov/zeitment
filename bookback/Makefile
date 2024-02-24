@@ -12,6 +12,9 @@ docs:
 dock:
 	docker compose -f ./deployments/docker-compose.yml up --build
 
+lint:
+	golangci-lint run
+
 migration:
 ifeq ($(mn),)
 	$(error mn is not set)
