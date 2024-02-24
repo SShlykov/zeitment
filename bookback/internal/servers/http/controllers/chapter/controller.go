@@ -122,3 +122,21 @@ func (ch *Controller) DeleteChapter(c echo.Context, ctx context.Context) error {
 	}
 	return c.JSON(http.StatusOK, chapt)
 }
+
+// GetChapterByBookID получение глав по ID книги
+// @router /chapters/book/{id} [get]
+// @summary Получить главы по ID книги
+// @description Извлекает главы по ID книги
+// @tags Главы
+// @param id path string true "ID книги"
+// @produce application/json
+// @success 200 {array} models.Chapter
+// @failure 404 {object} config.HTTPError
+func (ch *Controller) GetChapterByBookID(c echo.Context, ctx context.Context) error {
+	id := c.Param("id")
+	chapters, err := ch.Service.GetChapterByBookID(ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+	return c.JSON(http.StatusOK, chapters)
+}

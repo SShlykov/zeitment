@@ -33,6 +33,8 @@ type Repository interface {
 	Update(ctx context.Context, id string, book *models.Chapter) (*models.Chapter, error)
 	Delete(ctx context.Context, id string) (*models.Chapter, error)
 	List(ctx context.Context) ([]models.Chapter, error)
+
+	GetChapterByBookID(ctx context.Context, bookID string) ([]models.Chapter, error)
 }
 
 type repository struct {
@@ -158,6 +160,42 @@ func (r *repository) List(ctx context.Context) ([]models.Chapter, error) {
 	}
 
 	q := db.Query{Name: "ChapterRepository.Delete", Raw: query}
+
+	var chapterList []models.Chapter
+	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, args...)
+	if err != nil {
+		return nil, errors.New("params error")
+	}
+
+	for rows.Next() {
+		var chapter models.Chapter
+		if err = rows.Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt, &chapter.Title, &chapter.Number,
+			&chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
+			return nil, errors.New("params error")
+		}
+		chapterList = append(chapterList, chapter)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("params error")
+	}
+
+	return chapterList, nil
+}
+
+func (r *repository) GetChapterByBookID(ctx context.Context, bookID string) ([]models.Chapter, error) {
+	query, args, err := sq.
+		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnNumber,
+			columnText, columnBookID, columnIsPublic).
+		From(tableName).
+		Where(sq.And{sq.Eq{columnBookID: bookID}, sq.Eq{columnDeletedAt: nil}}).
+		ToSql()
+
+	if err != nil {
+		return nil, errors.New("unknown error")
+	}
+
+	q := db.Query{Name: "ChapterRepository.GetChapterByBookID", Raw: query}
 
 	var chapterList []models.Chapter
 	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, args...)
