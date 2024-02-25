@@ -31,8 +31,7 @@ const menuList = () => [
     "link": "/",
     "type": "link",
     "name": "main",
-    "position": "top",
-    "a": "v"
+    "position": "bottom",
   }
 ]
 
