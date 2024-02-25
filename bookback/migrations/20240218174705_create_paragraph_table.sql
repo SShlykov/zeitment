@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS paragraphs (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     text TEXT NOT NULL,
     is_public BOOLEAN NOT NULL,
+    type VARCHAR(255),
     page_id UUID NOT NULL,
     deleted_at TIMESTAMP WITH TIME ZONE,
     FOREIGN KEY (page_id) REFERENCES pages(id) -- Assuming there is a pages table that paragraph relates to

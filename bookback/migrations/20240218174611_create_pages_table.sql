@@ -8,6 +8,7 @@ CREATE TABLE pages (
   text TEXT NOT NULL,
   chapter_id UUID NOT NULL,
   is_public BOOLEAN NOT NULL DEFAULT false,
+  map_params_id UUID,
   FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd

@@ -2,7 +2,6 @@ package book
 
 import (
 	"context"
-	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/book"
@@ -99,7 +98,6 @@ func (bc *Controller) GetBookByID(c echo.Context, ctx context.Context) error {
 func (bc *Controller) UpdateBook(c echo.Context, ctx context.Context) error {
 	var book models.Book
 	if err := c.Bind(&book); err != nil {
-		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
 	}
 	paramID := c.Param("id")

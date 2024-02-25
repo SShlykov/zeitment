@@ -90,7 +90,6 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.Book, err
 		Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt, &book.DeletedAt, &book.Title,
 			&book.Author, &book.Owner, &book.Description, &book.IsPublic,
 			&book.Publication); err != nil {
-		fmt.Println(err)
 		return nil, errors.New("params error")
 	}
 
@@ -139,7 +138,6 @@ func (r *repository) Delete(ctx context.Context, id string) (*models.Book, error
 	}
 
 	q := db.Query{Name: "BookRepository.Delete", Raw: query}
-	fmt.Println(q)
 
 	var book models.Book
 	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt,
