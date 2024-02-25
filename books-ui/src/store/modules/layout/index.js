@@ -1,15 +1,18 @@
+import menuList from "./menuList.js"
+
 const state = {
   height:      0,
   width:       0,
   inited:      false,
-  isOpenMenu:  false
+  isOpenMenu:  true
 };
 
 const getters = {
   height:                  (state) => state.height,
   width:                   (state) => state.width,
   isOpenMenu:              (state) => state.isOpenMenu,
-  menuWidth:               (state) => state.isOpenMenu ? 300 : 70
+  menuWidth:               (state) => state.isOpenMenu ? 300 : 70,
+  menuList:                ()      => menuList
 };
 
 const mutations = {

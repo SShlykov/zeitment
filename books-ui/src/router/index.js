@@ -31,15 +31,15 @@ const logout = (from, next) => {
   next()
 }
 
-router.beforeEach(async (to, from, next) => {
-  const token = localStorage.getItem('token')
-  return cond([
-    [() => to.name === "auth" && from.name === "auth", () => next()],
-    [() => to.name === "auth", () => logout(from, () => next())],
-    [() => !token, () => logout(from, () => next({name: "auth"}))],
-    [T, () => next()],
-  ])()
-})
+// router.beforeEach(async (to, from, next) => {
+//   const token = localStorage.getItem('token')
+//   return cond([
+//     [() => to.name === "auth" && from.name === "auth", () => next()],
+//     [() => to.name === "auth", () => logout(from, () => next())],
+//     [() => !token, () => logout(from, () => next({name: "auth"}))],
+//     [T, () => next()],
+//   ])()
+// })
 
 
 export {routes, dev_routes};
