@@ -10,7 +10,7 @@ CREATE TABLE books (
     owner INTEGER NOT NULL,
     description TEXT,
     is_public BOOLEAN NOT NULL DEFAULT false,
-    publication TIMESTAMP WITH TIME ZONE NOT NULL
+    publication TIMESTAMP WITH TIME ZONE
 );
 -- +goose StatementEnd
 
