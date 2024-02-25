@@ -1,13 +1,24 @@
 import {createRouter, createWebHistory} from "vue-router";
-import Main from "@pages/Main/index.vue"
 import Auth from "@pages/Auth/index.vue"
+import UserBooks from "@pages/UserBooks/UserBooks.vue"
+import NewBook from "@pages/NewBook/NewBook.vue"
+import UserSettings from "@pages/UserSettings/UserSettings.vue"
 import {cond, T} from 'ramda'
 
 const routes = [
   {
     path: "/",
-    name: "main",
-    component: Main,
+    name: "user_books",
+    component: UserBooks,
+  },
+  {
+    path: "/settings",
+    name: "setting",
+    component: UserSettings,
+  },  {
+    path: "/new_book",
+    name: "new_book",
+    component: NewBook,
   },
   {
     path: "/auth",
@@ -16,7 +27,7 @@ const routes = [
   },
 ];
 
-const dev_routes = ["user_manage", "offers", "form", "statistic"]
+const dev_routes = []
 
 const routerHistory = createWebHistory();
 

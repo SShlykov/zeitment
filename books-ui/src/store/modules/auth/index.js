@@ -10,7 +10,7 @@ const state = {
 };
 
 const getters = {
-    errorMsg: (state) => state.errorMsg
+  errorMsg: (state) => state.errorMsg
 };
 
 const mutations = {};

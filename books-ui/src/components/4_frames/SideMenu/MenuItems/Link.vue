@@ -30,6 +30,10 @@ export default {
       default: "",
       type: String
     },
+    name: {
+      default: "",
+      type: String
+    },
   },
   components: {},
   computed: {

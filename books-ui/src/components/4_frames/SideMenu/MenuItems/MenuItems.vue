@@ -8,6 +8,7 @@
         :icon="icon"
         :title="title"
         :link="link"
+        :name="name"
       />
       <Line v-if="type === 'line'" />
     </div>

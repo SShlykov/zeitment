@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'Book',
+  name: 'BooksCompendium',
   components: {},
   data() {},
   computed: {},
