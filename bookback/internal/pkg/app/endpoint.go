@@ -30,7 +30,7 @@ func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
 		app.logger.Info("HTTP server started")
 		err := httpServer.ListenAndServe()
 		if err != nil {
-			panic(err)
+			app.logger.Error("HTTP server stopped", slog.Group("err", err))
 		}
 	}()
 }
@@ -61,6 +61,8 @@ func (app *App) initRouter(_ context.Context) error {
 	router.SetChapterController(app.Echo, app.db, app.ctx)
 	router.SetPageController(app.Echo, app.db, app.ctx)
 	router.SetParagraphController(app.Echo, app.db, app.ctx)
+	router.SetBookEventController(app.Echo, app.db, app.ctx)
+	router.SetMapVariablesController(app.Echo, app.db, app.ctx)
 	router.SetSwagger(app.Echo, app.config.SwaggerEnabled)
 
 	return nil

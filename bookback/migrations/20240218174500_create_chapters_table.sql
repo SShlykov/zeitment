@@ -10,6 +10,8 @@ CREATE TABLE chapters (
    text TEXT NOT NULL,
    book_id UUID NOT NULL,
    is_public BOOLEAN NOT NULL DEFAULT false,
+   map_link TEXT,
+   map_params_id UUID,
    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd

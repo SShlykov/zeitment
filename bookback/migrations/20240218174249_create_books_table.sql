@@ -5,12 +5,16 @@ CREATE TABLE books (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     deleted_at TIMESTAMP WITH TIME ZONE,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255) NOT NULL,
     owner INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
     description TEXT,
-    is_public BOOLEAN NOT NULL DEFAULT false,
-    publication TIMESTAMP WITH TIME ZONE
+    is_public BOOLEAN NOT NULL,
+    publication TIMESTAMP WITH TIME ZONE,
+    image_link TEXT,
+    map_link TEXT,
+    map_params_id UUID,
+    variables TEXT[]
 );
 -- +goose StatementEnd
 
