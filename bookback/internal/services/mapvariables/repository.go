@@ -3,6 +3,7 @@ package mapvariables
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"strings"
 )
@@ -37,6 +38,11 @@ type Repository interface {
 	GetByChapterID(ctx context.Context, chapterID string) ([]models.MapVariable, error)
 	GetByPageID(ctx context.Context, pageID string) ([]models.MapVariable, error)
 	GetByParagraphID(ctx context.Context, paragraphID string) ([]models.MapVariable, error)
+
+	GetByMapLinkAndBookID(ctx context.Context, mapLink, bookID string) ([]models.MapVariable, error)
+	GetByMapLinkAndChapterID(ctx context.Context, mapLink, chapterID string) ([]models.MapVariable, error)
+	GetByMapLinkAndPageID(ctx context.Context, mapLink, pageID string) ([]models.MapVariable, error)
+	GetByMapLinkAndParagraphID(ctx context.Context, mapLink, paragraphID string) ([]models.MapVariable, error)
 }
 
 type repository struct {
@@ -75,7 +81,7 @@ func (r *repository) Create(ctx context.Context, variable *models.MapVariable) (
 }
 
 func (r *repository) FindByID(ctx context.Context, id string) (*models.MapVariable, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnID)
 
 	q := db.Query{Name: "MapVariableRepository.FindByID", Raw: query}
 
@@ -120,7 +126,7 @@ func (r *repository) Delete(ctx context.Context, id string) (*models.MapVariable
 }
 
 func (r *repository) GetByBookID(ctx context.Context, bookID string) ([]models.MapVariable, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnBookID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnBookID)
 
 	q := db.Query{Name: "MapVariableRepository.GetByBookID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, bookID)
@@ -132,7 +138,7 @@ func (r *repository) GetByBookID(ctx context.Context, bookID string) ([]models.M
 }
 
 func (r *repository) GetByChapterID(ctx context.Context, chapterID string) ([]models.MapVariable, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnChapterID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnChapterID)
 
 	q := db.Query{Name: "MapVariableRepository.GetByChapterID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, chapterID)
@@ -144,7 +150,7 @@ func (r *repository) GetByChapterID(ctx context.Context, chapterID string) ([]mo
 }
 
 func (r *repository) GetByPageID(ctx context.Context, pageID string) ([]models.MapVariable, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnPageID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnPageID)
 
 	q := db.Query{Name: "MapVariableRepository.GetByPageID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, pageID)
@@ -156,10 +162,58 @@ func (r *repository) GetByPageID(ctx context.Context, pageID string) ([]models.M
 }
 
 func (r *repository) GetByParagraphID(ctx context.Context, paragraphID string) ([]models.MapVariable, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnParagraphID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnParagraphID)
 
 	q := db.Query{Name: "MapVariableRepository.GetByParagraphID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, paragraphID)
+	if err != nil {
+		return nil, err
+	}
+
+	return readList(rows)
+}
+
+func (r *repository) GetByMapLinkAndBookID(ctx context.Context, mapLink, bookID string) ([]models.MapVariable, error) {
+	query := services.SelectWhere(allItems, tableName, columnMapLink, columnBookID)
+
+	q := db.Query{Name: "MapVariableRepository.GetByMapLinkAndBookID", Raw: query}
+	rows, err := r.db.DB().QueryContext(ctx, q, mapLink, bookID)
+	if err != nil {
+		return nil, err
+	}
+
+	return readList(rows)
+}
+
+func (r *repository) GetByMapLinkAndChapterID(ctx context.Context, mapLink, chapterID string) ([]models.MapVariable, error) {
+	query := services.SelectWhere(allItems, tableName, columnMapLink, columnChapterID)
+
+	q := db.Query{Name: "MapVariableRepository.GetByMapLinkAndChapterID", Raw: query}
+	rows, err := r.db.DB().QueryContext(ctx, q, mapLink, chapterID)
+	if err != nil {
+		return nil, err
+	}
+
+	return readList(rows)
+}
+
+func (r *repository) GetByMapLinkAndPageID(ctx context.Context, mapLink, pageID string) ([]models.MapVariable, error) {
+	query := services.SelectWhere(allItems, tableName, columnMapLink, columnPageID)
+
+	q := db.Query{Name: "MapVariableRepository.GetByMapLinkAndPageID", Raw: query}
+	rows, err := r.db.DB().QueryContext(ctx, q, mapLink, pageID)
+	if err != nil {
+		return nil, err
+	}
+
+	return readList(rows)
+}
+
+func (r *repository) GetByMapLinkAndParagraphID(ctx context.Context, mapLink, paragraphID string) ([]models.MapVariable, error) {
+	query := services.SelectWhere(allItems, tableName, columnMapLink, columnParagraphID)
+
+	q := db.Query{Name: "MapVariableRepository.GetByMapLinkAndParagraphID", Raw: query}
+	rows, err := r.db.DB().QueryContext(ctx, q, mapLink, paragraphID)
 	if err != nil {
 		return nil, err
 	}

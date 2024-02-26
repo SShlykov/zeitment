@@ -20,14 +20,30 @@ func NewController(service service.Service) *Controller {
 }
 
 func (mvc *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/mapvariables/:id", func(c echo.Context) error { return mvc.GetMapVariableByID(c, ctx) })
-	e.PUT("/api/v1/mapvariables/:id", func(c echo.Context) error { return mvc.UpdateMapVariable(c, ctx) })
-	e.DELETE("/api/v1/mapvariables/:id", func(c echo.Context) error { return mvc.DeleteMapVariable(c, ctx) })
-	e.POST("/api/v1/mapvariables", func(c echo.Context) error { return mvc.CreateMapVariable(c, ctx) })
-	e.GET("/api/v1/mapvariables/book/:id", func(c echo.Context) error { return mvc.GetMapVariablesByBookID(c, ctx) })
-	e.GET("/api/v1/mapvariables/chapter/:id", func(c echo.Context) error { return mvc.GetMapVariablesByChapterID(c, ctx) })
-	e.GET("/api/v1/mapvariables/page/:id", func(c echo.Context) error { return mvc.GetMapVariablesByPageID(c, ctx) })
-	e.GET("/api/v1/mapvariables/paragraph/:id", func(c echo.Context) error { return mvc.GetMapVariablesByParagraphID(c, ctx) })
+	e.GET("/api/v1/mapvariables/:id",
+		func(c echo.Context) error { return mvc.GetMapVariableByID(c, ctx) })
+	e.PUT("/api/v1/mapvariables/:id",
+		func(c echo.Context) error { return mvc.UpdateMapVariable(c, ctx) })
+	e.DELETE("/api/v1/mapvariables/:id",
+		func(c echo.Context) error { return mvc.DeleteMapVariable(c, ctx) })
+	e.POST("/api/v1/mapvariables",
+		func(c echo.Context) error { return mvc.CreateMapVariable(c, ctx) })
+	e.GET("/api/v1/mapvariables/book/:id",
+		func(c echo.Context) error { return mvc.GetMapVariablesByBookID(c, ctx) })
+	e.GET("/api/v1/mapvariables/chapter/:id",
+		func(c echo.Context) error { return mvc.GetMapVariablesByChapterID(c, ctx) })
+	e.GET("/api/v1/mapvariables/page/:id",
+		func(c echo.Context) error { return mvc.GetMapVariablesByPageID(c, ctx) })
+	e.GET("/api/v1/mapvariables/paragraph/:id",
+		func(c echo.Context) error { return mvc.GetMapVariablesByParagraphID(c, ctx) })
+	e.GET("/api/v1/bookevents/maplink/:link/book/:id/",
+		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndBookID(c, ctx) })
+	e.GET("/api/v1/bookevents/maplink/:link/chapter/:id/",
+		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndChapterID(c, ctx) })
+	e.GET("/api/v1/bookevents/maplink/:link/page/:id/",
+		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndPageID(c, ctx) })
+	e.GET("/api/v1/bookevents/maplink/:link/paragraph/:id/",
+		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndParagraphID(c, ctx) })
 }
 
 // GetMapVariableByID обрабатывает запросы на получение переменной карты по идентификатору.
@@ -190,4 +206,92 @@ func (mvc *Controller) CreateMapVariable(c echo.Context, ctx context.Context) er
 	}
 
 	return c.JSON(http.StatusCreated, createdVariable)
+}
+
+// GetMapVariablesByMapLinkAndBookID обрабатывает запросы на получение переменных карты по идентификатору карты
+// и идентификатору книги.
+// @router /bookevents/maplink/{link}/book/{id} [get]
+// @summary Получить переменные карты по идентификатору карты и идентификатору книги
+// @description Извлекает переменные карты по идентификатору карты и идентификатору книги
+// @tags Переменные карты
+// @produce application/json
+// @param link path string true "ID карты"
+// @param id path string true "ID книги"
+// @success 200 {array} models.MapVariable
+// @failure 404 {object} config.HTTPError
+func (mvc *Controller) GetMapVariablesByMapLinkAndBookID(c echo.Context, ctx context.Context) error {
+	link := c.Param("link")
+	id := c.Param("id")
+	variables, err := mvc.service.GetMapVariablesByMapLinkAndBookID(ctx, link, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+
+	return c.JSON(http.StatusOK, variables)
+}
+
+// GetMapVariablesByMapLinkAndChapterID обрабатывает запросы на получение переменных карты по идентификатору карты
+// и идентификатору главы.
+// @router /bookevents/maplink/{link}/chapter/{id} [get]
+// @summary Получить переменные карты по идентификатору карты и идентификатору главы
+// @description Извлекает переменные карты по идентификатору карты и идентификатору главы
+// @tags Переменные карты
+// @produce application/json
+// @param link path string true "ID карты"
+// @param id path string true "ID главы"
+// @success 200 {array} models.MapVariable
+// @failure 404 {object} config.HTTPError
+func (mvc *Controller) GetMapVariablesByMapLinkAndChapterID(c echo.Context, ctx context.Context) error {
+	link := c.Param("link")
+	id := c.Param("id")
+	variables, err := mvc.service.GetMapVariablesByMapLinkAndChapterID(ctx, link, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+
+	return c.JSON(http.StatusOK, variables)
+}
+
+// GetMapVariablesByMapLinkAndPageID обрабатывает запросы на получение переменных карты по идентификатору карты
+// и идентификатору страницы.
+// @router /bookevents/maplink/{link}/page/{id} [get]
+// @summary Получить переменные карты по идентификатору карты и идентификатору страницы
+// @description Извлекает переменные карты по идентификатору карты и идентификатору страницы
+// @tags Переменные карты
+// @produce application/json
+// @param link path string true "ID карты"
+// @param id path string true "ID страницы"
+// @success 200 {array} models.MapVariable
+// @failure 404 {object} config.HTTPError
+func (mvc *Controller) GetMapVariablesByMapLinkAndPageID(c echo.Context, ctx context.Context) error {
+	link := c.Param("link")
+	id := c.Param("id")
+	variables, err := mvc.service.GetMapVariablesByMapLinkAndPageID(ctx, link, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+
+	return c.JSON(http.StatusOK, variables)
+}
+
+// GetMapVariablesByMapLinkAndParagraphID обрабатывает запросы на получение переменных карты по идентификатору карты
+// и идентификатору параграфа.
+// @router /bookevents/maplink/{link}/paragraph/{id} [get]
+// @summary Получить переменные карты по идентификатору карты и идентификатору параграфа
+// @description Извлекает переменные карты по идентификатору карты и идентификатору параграфа
+// @tags Переменные карты
+// @produce application/json
+// @param link path string true "ID карты"
+// @param id path string true "ID параграфа"
+// @success 200 {array} models.MapVariable
+// @failure 404 {object} config.HTTPError
+func (mvc *Controller) GetMapVariablesByMapLinkAndParagraphID(c echo.Context, ctx context.Context) error {
+	link := c.Param("link")
+	id := c.Param("id")
+	variables, err := mvc.service.GetMapVariablesByMapLinkAndParagraphID(ctx, link, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	}
+
+	return c.JSON(http.StatusOK, variables)
 }

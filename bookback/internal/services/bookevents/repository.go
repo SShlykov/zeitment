@@ -3,6 +3,7 @@ package bookevents
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"strings"
 )
@@ -77,7 +78,7 @@ func (r *repository) Create(ctx context.Context, event *models.BookEvent) (strin
 }
 
 func (r *repository) FindByID(ctx context.Context, id string) (*models.BookEvent, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnID + " = $1"
+	query := services.SelectWhere(allItems, tableName, columnID)
 
 	q := db.Query{Name: "BookEventRepository.FindByID", Raw: query}
 	row := r.db.DB().QueryRowContext(ctx, q, id)
@@ -85,15 +86,11 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.BookEvent
 }
 
 func (r *repository) Update(ctx context.Context, id string, event *models.BookEvent) (*models.BookEvent, error) {
-	query := `UPDATE ` + tableName + ` SET ` +
-		columnBookID + ` = $1, ` + columnChapterID + ` = $2, ` + columnBookID + ` = $3, ` +
-		columnPageID + ` = $4, ` + columnParagraphID + ` = $5, ` + columnEventType + ` = $6, ` +
-		columnIsPublic + ` = $7, ` + columnKey + ` = $8, ` + columnValue + ` = $9, ` +
-		columnLink + ` = $10, ` + columnLinkText + ` = $11, ` + columnLinkType + ` = $12, ` +
-		columnLinkImage + ` = $13, ` + columnDescription + ` = $14 WHERE ` +
-		columnID + ` = $15` + `RETURNING ` + allItems()
+	query := `UPDATE ` + tableName + ` SET ` + services.ParamsToQuery(columnBookID, columnChapterID, columnPageID,
+		columnParagraphID, columnEventType, columnIsPublic, columnKey, columnValue, columnLink, columnLinkText,
+		columnLinkType, columnLinkImage, columnDescription) + ` WHERE ` + columnID + ` = $15` + `RETURNING ` + allItems()
 
-	args := []interface{}{event.ID, event.BookID, event.ChapterID,
+	args := []interface{}{event.ID, event.BookID, event.ChapterID, //nolint:gofmt
 		event.PageID, event.ParagraphID, event.EventType,
 		event.IsPublic, event.Key, event.Value,
 		event.Link, event.LinkText, event.LinkType,
@@ -107,7 +104,7 @@ func (r *repository) Update(ctx context.Context, id string, event *models.BookEv
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.BookEvent, error) {
-	query := `DELETE FROM` + " " + tableName + ` WHERE ` + columnID + ` = $1` + `RETURNING ` + allItems()
+	query := `DELETE FROM` + " " + tableName + ` WHERE ` + services.SelectWhere(allItems, tableName, columnID) + `RETURNING ` + allItems()
 
 	q := db.Query{Name: "BookEventRepository.Delete", Raw: query}
 	row := r.db.DB().QueryRowContext(ctx, q, id)
@@ -115,7 +112,7 @@ func (r *repository) Delete(ctx context.Context, id string) (*models.BookEvent, 
 }
 
 func (r *repository) GetByBookID(ctx context.Context, bookID string) ([]models.BookEvent, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnBookID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnBookID)
 
 	q := db.Query{Name: "BookEventRepository.GetByBookID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, bookID)
@@ -126,7 +123,7 @@ func (r *repository) GetByBookID(ctx context.Context, bookID string) ([]models.B
 }
 
 func (r *repository) GetByChapterID(ctx context.Context, chapterID string) ([]models.BookEvent, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnChapterID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnChapterID)
 
 	q := db.Query{Name: "BookEventRepository.GetByChapterID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, chapterID)
@@ -137,7 +134,7 @@ func (r *repository) GetByChapterID(ctx context.Context, chapterID string) ([]mo
 }
 
 func (r *repository) GetByPageID(ctx context.Context, pageID string) ([]models.BookEvent, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnPageID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnPageID)
 
 	q := db.Query{Name: "BookEventRepository.GetByPageID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, pageID)
@@ -148,7 +145,7 @@ func (r *repository) GetByPageID(ctx context.Context, pageID string) ([]models.B
 }
 
 func (r *repository) GetByParagraphID(ctx context.Context, paragraphID string) ([]models.BookEvent, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnParagraphID + ` = $1`
+	query := services.SelectWhere(allItems, tableName, columnParagraphID)
 
 	q := db.Query{Name: "BookEventRepository.GetByParagraphID", Raw: query}
 	rows, err := r.db.DB().QueryContext(ctx, q, paragraphID)
