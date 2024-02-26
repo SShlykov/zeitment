@@ -6,9 +6,9 @@ import (
 )
 
 type BookEvent struct {
-	ID         string    `json:"id"`
-	InsertedAt time.Time `json:"inserted_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 
 	BookID      string         `json:"book_id"`
 	ChapterID   sql.NullString `json:"chapter_id"`

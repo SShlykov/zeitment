@@ -24,3 +24,9 @@ endif
 
 migrate:
 	goose -dir migrations postgres "postgresql://admin:adX12@10.102.37.150:5432/book_dev?sslmode=disable" up
+
+gen_mock:
+	mockgen \
+ 	-source=pkg/db/db.go \
+ 	-destination=internal/mocks/db.go \
+ 	-package=mocks

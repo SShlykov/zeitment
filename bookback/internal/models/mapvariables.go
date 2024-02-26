@@ -6,8 +6,8 @@ import (
 )
 
 type MapVariable struct {
-	ID         string    `json:"id"`
-	InsertedAt time.Time `json:"inserted_at"`
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
 
 	BookID      string         `json:"book_id"`
 	ChapterID   sql.NullString `json:"chapter_id"`

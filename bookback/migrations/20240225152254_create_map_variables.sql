@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS map_variables (
     id UUID PRIMARY KEY,
-    inserted_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     book_id UUID NOT NULL,
     chapter_id UUID,
     page_id UUID,
