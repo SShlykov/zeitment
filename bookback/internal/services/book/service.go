@@ -24,13 +24,18 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateBook(ctx context.Context, book *models.Book) (*models.Book, error) {
+	var newBook *models.Book
 	id, err := s.repo.Create(ctx, book)
 	if err != nil {
 		return nil, err
 	}
-	book.ID = id
 
-	return book, err
+	newBook, err = s.GetBookByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return newBook, err
 }
 
 func (s *service) GetBookByID(ctx context.Context, id string) (*models.Book, error) {

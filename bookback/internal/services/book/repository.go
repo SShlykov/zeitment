@@ -3,12 +3,10 @@ package book
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
-	"github.com/SShlykov/zeitment/bookback/pkg/db/sq"
-	"github.com/google/uuid"
-	"time"
+	"strings"
 )
 
 const (
@@ -18,13 +16,18 @@ const (
 	columnCreatedAt   = "created_at"
 	columnUpdatedAt   = "updated_at"
 	columnDeletedAt   = "deleted_at"
+	columnOwner       = "owner"
 	columnTitle       = "title"
 	columnAuthor      = "author"
-	columnOwner       = "owner"
 	columnDescription = "description"
 	columnIsPublic    = "is_public"
 	columnPublication = "publication"
-	Returning         = "RETURNING "
+	columnImageLink   = "image_link"
+	columnMapLink     = "map_link"
+	columnMapParamsID = "map_params_id"
+	columnVariables   = "variables"
+	Returning         = " RETURNING "
+	Where             = " WHERE "
 )
 
 // Repository определяет интерфейс для взаимодействия с хранилищем книг.
@@ -40,30 +43,40 @@ type repository struct {
 	db db.Client
 }
 
+func allItems() string {
+	cols := []string{columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnOwner, columnTitle,
+		columnAuthor, columnDescription, columnIsPublic, columnPublication, columnImageLink, columnMapLink,
+		columnMapParamsID, columnVariables}
+
+	return strings.Join(cols, ", ")
+}
+
+func insertItems() string {
+	cols := []string{columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic,
+		columnPublication, columnImageLink, columnMapLink, columnMapParamsID, columnVariables}
+
+	return strings.Join(cols, ", ")
+}
+
 // NewRepository создает новый экземпляр репозитория для книг.
 func NewRepository(database db.Client) Repository {
 	return &repository{database}
 }
 
 func (r *repository) Create(ctx context.Context, book *models.Book) (string, error) {
-	query, args, err :=
-		sq.SQ.Insert(tableName).
-			Columns(columnID, columnTitle, columnAuthor, columnOwner,
-				columnDescription, columnIsPublic, columnPublication).
-			Values(uuid.New().String(), book.Title, book.Author, book.Owner,
-				book.Description, book.IsPublic, book.Publication).
-			Suffix("RETURNING " + columnID).
-			ToSql()
+	query := "INSERT INTO" + " " + tableName + ` (` + insertItems() +
+		`) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ` + Returning + columnID
 
-	if err != nil {
-		return "", err
+	if book.Variables == nil {
+		book.Variables = []string{}
 	}
 
+	args := []interface{}{book.Title, book.Author, book.Owner, book.Description, book.IsPublic, //nolint:gofmt
+		book.Publication, book.ImageLink, book.MapLink, book.MapParamsID, book.Variables}
 	q := db.Query{Name: "BookRepository.Insert", Raw: query}
 
 	var id string
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id); err != nil {
-		fmt.Println(err)
+	if err := r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id); err != nil {
 		return "", err
 	}
 
@@ -71,118 +84,51 @@ func (r *repository) Create(ctx context.Context, book *models.Book) (string, err
 }
 
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Book, error) {
-	query, args, err := sq.
-		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnAuthor, columnOwner,
-			columnDescription, columnIsPublic, columnPublication).
-		From(tableName).
-		Where(sq.And{sq.Eq{columnID: id}, sq.Eq{columnDeletedAt: nil}}).
-		Limit(1).
-		ToSql()
-
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	query := `SELECT ` + allItems() + ` FROM ` + tableName + Where + columnID + ` = $1 AND ` +
+		columnDeletedAt + ` IS NULL LIMIT 1`
 
 	q := db.Query{Name: "BookRepository.FindById", Raw: query}
 
-	var book models.Book
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).
-		Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt, &book.DeletedAt, &book.Title,
-			&book.Author, &book.Owner, &book.Description, &book.IsPublic,
-			&book.Publication); err != nil {
-		return nil, errors.New("params error")
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	return &book, nil
+	return readItem(row)
 }
 
 func (r *repository) Update(ctx context.Context, id string, updBook *models.Book) (*models.Book, error) {
-	query, args, err := sq.Update(tableName).
-		Where(sq.And{sq.Eq{columnID: id}, sq.Eq{columnDeletedAt: nil}}).
-		Set(columnUpdatedAt, time.Now()).
-		Set(columnTitle, updBook.Title).
-		Set(columnAuthor, updBook.Author).
-		Set(columnOwner, updBook.Owner).
-		Set(columnDescription, updBook.Description).
-		Set(columnIsPublic, updBook.IsPublic).
-		Set(columnPublication, updBook.Publication).
-		Suffix(Returning + fmt.Sprintf("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-			columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic, columnPublication)).
-		ToSql()
+	query := "Update " + tableName + " SET " +
+		services.ParamsToQuery(columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic,
+			columnPublication, columnImageLink, columnMapLink, columnMapParamsID, columnVariables) +
+		" WHERE " + columnID + " = $11" + Returning + allItems()
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	args := []interface{}{updBook.Title, updBook.Author, updBook.Owner, updBook.Description, //nolint:gofmt
+		updBook.IsPublic, updBook.Publication, updBook.ImageLink, updBook.MapLink, updBook.MapParamsID,
+		updBook.Variables, id}
 
 	q := db.Query{Name: "BookRepository.Update", Raw: query}
+	row := r.db.DB().QueryRowContext(ctx, q, args...)
 
-	var book models.Book
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt,
-		&book.DeletedAt, &book.Title, &book.Author, &book.Owner, &book.Description, &book.IsPublic,
-		&book.Publication); err != nil {
-		return nil, errors.New("params error")
-	}
-
-	return &book, nil
+	return readItem(row)
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.Book, error) {
-	query, args, err := sq.SQ.Delete(tableName).
-		Where(sq.Eq{columnID: id}).
-		Suffix(Returning + fmt.Sprintf("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-			columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic, columnPublication)).
-		ToSql()
-
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	query := `DELETE FROM` + " " + tableName + Where + columnID + ` = $1 RETURNING ` + allItems()
 
 	q := db.Query{Name: "BookRepository.Delete", Raw: query}
 
-	var book models.Book
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt,
-		&book.DeletedAt, &book.Title, &book.Author, &book.Owner, &book.Description, &book.IsPublic,
-		&book.Publication); err != nil {
-		fmt.Println(err)
-		return nil, errors.New("params error")
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	return &book, nil
+	return readItem(row)
 }
 
 func (r *repository) List(ctx context.Context) ([]models.Book, error) {
-	query, args, err := sq.
-		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnAuthor,
-			columnOwner, columnDescription, columnIsPublic, columnPublication).
-		From(tableName).
-		Where(sq.Eq{columnDeletedAt: nil}).
-		ToSql()
+	query := `SELECT ` + allItems() + ` FROM ` + tableName + Where + columnDeletedAt + ` IS NULL`
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	q := db.Query{Name: "BookRepository.List", Raw: query}
 
-	q := db.Query{Name: "BookRepository.Delete", Raw: query}
-
-	var booksList []models.Book
-	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, args...)
+	rows, err := r.db.DB().QueryRawContextMulti(ctx, q)
 	if err != nil {
 		return nil, errors.New("params error")
 	}
 
-	for rows.Next() {
-		var book models.Book
-		if err = rows.Scan(&book.ID, &book.CreatedAt, &book.UpdatedAt, &book.DeletedAt, &book.Title,
-			&book.Author, &book.Owner, &book.Description, &book.IsPublic,
-			&book.Publication); err != nil {
-			return nil, errors.New("params error")
-		}
-		booksList = append(booksList, book)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, errors.New("params error")
-	}
-
-	return booksList, nil
+	return readList(rows)
 }

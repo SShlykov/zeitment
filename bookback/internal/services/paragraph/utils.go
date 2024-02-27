@@ -6,7 +6,7 @@ import (
 )
 
 func readList(rows pgx.Rows) ([]models.Paragraph, error) {
-	var paragraphs []models.Paragraph
+	paragraphs := make([]models.Paragraph, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
 		if err != nil {

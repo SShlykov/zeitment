@@ -40,8 +40,6 @@ func (app *App) initEndpoint(_ context.Context) error {
 	cb := circuitbreaker.NewCircuitBreaker(app.config.RequestLimit, app.config.MinRequests, app.config.ErrorThresholdPercentage,
 		app.config.IntervalDuration, app.config.OpenStateTimeout)
 
-	e.Use(middleware.Recover())
-
 	middlewares := []echo.MiddlewareFunc{
 		loggerConfiguration(app.logger),
 		middleware.Recover(),

@@ -4,8 +4,7 @@ import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
-	"github.com/SShlykov/zeitment/bookback/pkg/db/sq"
-	"github.com/google/uuid"
+	"strings"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 	columnDeletedAt = "deleted_at"
 	columnText      = "text"
 	columnIsPublic  = "is_public"
-	Returning       = "RETURNING "
+	Returning       = " RETURNING "
 )
 
 // Repository определяет интерфейс для взаимодействия с хранилищем книг.
@@ -35,6 +34,12 @@ type repository struct {
 	db db.Client
 }
 
+func allItems() string {
+	cols := []string{columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnText, columnIsPublic}
+
+	return strings.Join(cols, ", ")
+}
+
 // NewRepository создает новый экземпляр репозитория для книг.
 func NewRepository(database db.Client) Repository {
 	return &repository{database}
@@ -42,21 +47,13 @@ func NewRepository(database db.Client) Repository {
 
 // Create inserts a new Paragraph into the database
 func (r *repository) Create(ctx context.Context, paragraph *models.Paragraph) (string, error) {
-	paragraph.ID = uuid.New().String() // Generate a new UUID for the paragraph
-	query, args, err := sq.SQ.Insert(tableName).
-		Columns(columnID, columnText, columnIsPublic).
-		Values(paragraph.ID, paragraph.Text, paragraph.IsPublic).
-		Suffix("RETURNING id").
-		ToSql()
-	if err != nil {
-		return "", err
-	}
+	query := "INSERT INTO paragraphs (text, is_public, page_id) VALUES ($1, $2, $3) RETURNING id"
 
 	q := db.Query{Name: "ParagraphRepository.Create", Raw: query}
 
-	row := r.db.DB().QueryRowContext(ctx, q, args...)
+	row := r.db.DB().QueryRowContext(ctx, q, paragraph.Text, paragraph.IsPublic, paragraph.PageID)
 	var id string
-	if err = row.Scan(&id); err != nil {
+	if err := row.Scan(&id); err != nil {
 		return "", err
 	}
 
@@ -65,61 +62,39 @@ func (r *repository) Create(ctx context.Context, paragraph *models.Paragraph) (s
 
 // FindByID retrieves a paragraph by its ID
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Paragraph, error) {
-	query, args, err := sq.SQ.Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnText, columnIsPublic).
-		From(tableName).
-		Where(sq.Eq{"id": id, "deleted_at": nil}).
-		Limit(1).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := "SELECT " + allItems() + " FROM " + tableName + " WHERE id = $1 AND deleted_at IS NULL"
 
 	q := db.Query{Name: "ParagraphRepository.FindByID", Raw: query}
 
-	row := r.db.DB().QueryRowContext(ctx, q, args...)
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
 	return readItem(row)
 }
 
 // Update modifies an existing paragraph's data
 func (r *repository) Update(ctx context.Context, id string, updParagraph *models.Paragraph) (*models.Paragraph, error) {
-	query, args, err := sq.Update(tableName).
-		Set(columnText, updParagraph.Text).
-		Set(columnIsPublic, updParagraph.IsPublic).
-		Where(sq.Eq{"id": id}).
-		Suffix("RETURNING id, created_at, updated_at, deleted_at, text, is_public").
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := "UPDATE paragraphs SET text = $1, is_public = $2 WHERE id = $3" + Returning + allItems()
 
 	q := db.Query{Name: "ParagraphRepository.Update", Raw: query}
 
-	row := r.db.DB().QueryRowContext(ctx, q, args...)
+	row := r.db.DB().QueryRowContext(ctx, q, updParagraph.Text, updParagraph.IsPublic, id)
 
 	return readItem(row)
 }
 
 // Delete removes a paragraph from the database
 func (r *repository) Delete(ctx context.Context, id string) (*models.Paragraph, error) {
-	query, args, err := sq.SQ.Delete(tableName).
-		Where(sq.Eq{"id": id}).
-		Suffix("RETURNING id").
-		ToSql()
+	paragraph, err := r.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	var paragraph *models.Paragraph
-	paragraph, err = r.FindByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+	query := "DELETE FROM" + " " + tableName + " WHERE id = $1" + Returning + "id"
 
 	q := db.Query{Name: "ParagraphRepository.Delete", Raw: query}
 
 	var deletedID string
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&deletedID); err != nil {
+	if err = r.db.DB().QueryRowContext(ctx, q, id).Scan(&deletedID); err != nil {
 		return nil, err
 	}
 
@@ -128,17 +103,11 @@ func (r *repository) Delete(ctx context.Context, id string) (*models.Paragraph, 
 
 // List retrieves all paragraphs (adjust based on your needs, e.g., by parent Page or Chapter ID)
 func (r *repository) List(ctx context.Context) ([]models.Paragraph, error) {
-	query, args, err := sq.SQ.Select("id", "created_at", "updated_at", "deleted_at", "text", "is_public").
-		From(tableName).
-		Where(sq.Eq{"deleted_at": nil}).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := "SELECT " + allItems() + " FROM " + tableName + " WHERE deleted_at IS NULL"
 
 	q := db.Query{Name: "ParagraphRepository.List", Raw: query}
 
-	rows, err := r.db.DB().QueryContext(ctx, q, args...)
+	rows, err := r.db.DB().QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -148,17 +117,11 @@ func (r *repository) List(ctx context.Context) ([]models.Paragraph, error) {
 }
 
 func (r *repository) GetParagraphsByPageID(ctx context.Context, pageID string) ([]models.Paragraph, error) {
-	query, args, err := sq.SQ.Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnText, columnIsPublic).
-		From(tableName).
-		Where(sq.Eq{"page_id": pageID, "deleted_at": nil}).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := "SELECT " + allItems() + " FROM " + tableName + " WHERE page_id = $1 AND deleted_at IS NULL"
 
 	q := db.Query{Name: "ParagraphRepository.GetParagraphsByPageID", Raw: query}
 
-	rows, err := r.db.DB().QueryContext(ctx, q, args...)
+	rows, err := r.db.DB().QueryContext(ctx, q, pageID)
 	if err != nil {
 		return nil, err
 	}

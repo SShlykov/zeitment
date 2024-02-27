@@ -6,7 +6,7 @@ import (
 )
 
 func readList(rows pgx.Rows) ([]models.BookEvent, error) {
-	var events []models.BookEvent
+	events := make([]models.BookEvent, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
 		if err != nil {
@@ -23,7 +23,7 @@ func readList(rows pgx.Rows) ([]models.BookEvent, error) {
 
 func readItem(row pgx.Row) (*models.BookEvent, error) {
 	var event models.BookEvent
-	if err := row.Scan(&event.ID, &event.InsertedAt, &event.UpdatedAt, &event.BookID, &event.ChapterID,
+	if err := row.Scan(&event.ID, &event.CreatedAt, &event.UpdatedAt, &event.BookID, &event.ChapterID,
 		&event.PageID, &event.ParagraphID, &event.EventType, &event.IsPublic, &event.Key, &event.Value,
 		&event.Link, &event.LinkText, &event.LinkType, &event.LinkImage, &event.Description); err != nil {
 		return nil, err

@@ -14,7 +14,7 @@ func ParamsToQuery(args ...string) (sql string) {
 	for i, arg := range args {
 		sql += arg + ` = $` + strconv.Itoa(i+1)
 		if i < len(args)-1 {
-			sql += " AND "
+			sql += ", "
 		}
 	}
 	return

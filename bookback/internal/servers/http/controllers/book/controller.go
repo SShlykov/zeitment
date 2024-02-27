@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/book"
@@ -39,6 +40,7 @@ func (bc *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 func (bc *Controller) ListBooks(c echo.Context, ctx context.Context) error {
 	books, err := bc.Service.ListBooks(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
 	return c.JSON(http.StatusOK, books)
@@ -103,6 +105,7 @@ func (bc *Controller) UpdateBook(c echo.Context, ctx context.Context) error {
 	paramID := c.Param("id")
 	updatedBook, err := bc.Service.UpdateBook(ctx, paramID, &book)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotUpdated)
 	}
 	return c.JSON(http.StatusOK, updatedBook)
