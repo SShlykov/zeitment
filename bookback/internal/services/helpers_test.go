@@ -63,13 +63,13 @@ func TestParamsToQuery(t *testing.T) {
 		{
 			name: "Multiple parameters",
 			args: []string{"id", "name"},
-			want: "id = $1 AND name = $2",
+			want: "id = $1, name = $2",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ParamsToQuery(tt.args...)
+			got := ParamsToQuery(", ", tt.args...)
 			assert.Equal(t, tt.want, got)
 		})
 	}

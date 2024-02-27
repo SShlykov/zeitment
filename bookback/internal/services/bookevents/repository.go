@@ -86,9 +86,10 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.BookEvent
 }
 
 func (r *repository) Update(ctx context.Context, id string, event *models.BookEvent) (*models.BookEvent, error) {
-	query := `UPDATE ` + tableName + ` SET ` + services.ParamsToQuery(columnBookID, columnChapterID, columnPageID,
-		columnParagraphID, columnEventType, columnIsPublic, columnKey, columnValue, columnLink, columnLinkText,
-		columnLinkType, columnLinkImage, columnDescription) + ` WHERE ` + columnID + ` = $15` + `RETURNING ` + allItems()
+	query := `UPDATE ` + tableName + ` SET ` + services.ParamsToQuery(", ", columnBookID, columnChapterID,
+		columnPageID, columnParagraphID, columnEventType, columnIsPublic, columnKey, columnValue,
+		columnLink, columnLinkText, columnLinkType, columnLinkImage, columnDescription) + ` WHERE ` +
+		columnID + ` = $15` + `RETURNING ` + allItems()
 
 	args := []interface{}{event.ID, event.BookID, event.ChapterID, //nolint:gofmt
 		event.PageID, event.ParagraphID, event.EventType,

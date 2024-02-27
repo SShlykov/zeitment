@@ -4,7 +4,7 @@ bin:
 	go build -o ./bin/bookback ./cmd/bookback/main.go
 
 run:
-	DSN="host=10.102.37.150 user=admin password=adX12 dbname=book_dev sslmode=disable" go run ./cmd/bookback/main.go
+	DSN="host=77.91.126.204 port=5429 user=postgres password=secret dbname=book_dev sslmode=disable" go run ./cmd/bookback/main.go
 
 docs:
 	swag init -g ./cmd/bookback/main.go
@@ -23,7 +23,7 @@ endif
 	goose -dir migrations create $(mn) sql
 
 migrate:
-	goose -dir migrations postgres "postgresql://admin:adX12@10.102.37.150:5432/book_dev?sslmode=disable" up
+	goose -dir migrations postgres "postgresql://postgres:secret@77.91.126.204:5429/book_dev?sslmode=disable" up
 
 gen_mock:
 	mockgen \

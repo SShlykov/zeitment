@@ -96,7 +96,7 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.Book, err
 
 func (r *repository) Update(ctx context.Context, id string, updBook *models.Book) (*models.Book, error) {
 	query := "Update " + tableName + " SET " +
-		services.ParamsToQuery(columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic,
+		services.ParamsToQuery(", ", columnTitle, columnAuthor, columnOwner, columnDescription, columnIsPublic,
 			columnPublication, columnImageLink, columnMapLink, columnMapParamsID, columnVariables) +
 		" WHERE " + columnID + " = $11" + Returning + allItems()
 
