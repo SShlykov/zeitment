@@ -3,6 +3,7 @@ package paragraph
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"strings"
 )
@@ -62,7 +63,7 @@ func (r *repository) Create(ctx context.Context, paragraph *models.Paragraph) (s
 
 // FindByID retrieves a paragraph by its ID
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Paragraph, error) {
-	query := "SELECT " + allItems() + " FROM " + tableName + " WHERE id = $1 AND deleted_at IS NULL"
+	query := services.SelectWhere(allItems, tableName, columnID) + " AND deleted_at IS NULL"
 
 	q := db.Query{Name: "ParagraphRepository.FindByID", Raw: query}
 
