@@ -65,7 +65,7 @@ func (r *repository) Create(ctx context.Context, variable *models.MapVariable) (
 	query := `INSERT INTO` + " " + tableName + ` (` + allItems() +
 		`) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`
 
-	args := []interface{}{variable.ID, variable.InsertedAt, variable.BookID, variable.ChapterID, //nolint:gofmt
+	args := []interface{}{variable.ID, variable.CreatedAt, variable.BookID, variable.ChapterID, //nolint:gofmt
 		variable.PageID, variable.ParagraphID, variable.MapLink, variable.Lat, variable.Lng,
 		variable.Zoom, variable.Date, variable.Description, variable.Link, variable.LinkText,
 		variable.LinkType, variable.LinkImage, variable.Image}
@@ -85,15 +85,9 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.MapVariab
 
 	q := db.Query{Name: "MapVariableRepository.FindByID", Raw: query}
 
-	var variable models.MapVariable
-	if err := r.db.DB().QueryRowContext(ctx, q, id).Scan(&variable.ID, &variable.InsertedAt, &variable.BookID,
-		&variable.ChapterID, &variable.PageID, &variable.ParagraphID, &variable.MapLink, &variable.Lat,
-		&variable.Lng, &variable.Zoom, &variable.Date, &variable.Description, &variable.Link, &variable.LinkText,
-		&variable.LinkType, &variable.LinkImage, &variable.Image); err != nil {
-		return nil, err
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	return &variable, nil
+	return readItem(row)
 }
 
 func (r *repository) Update(ctx context.Context, id string, variable *models.MapVariable) (*models.MapVariable, error) {
@@ -105,7 +99,7 @@ func (r *repository) Update(ctx context.Context, id string, variable *models.Map
 		columnLinkText + ` = $13, ` + columnLinkType + ` = $14, ` + columnLinkImage + ` = $15, ` +
 		columnImage + ` = $16 WHERE ` + columnID + ` = $17 RETURNING ` + allItems()
 
-	args := []interface{}{variable.InsertedAt, variable.BookID, variable.ChapterID, variable.PageID, //nolint:gofmt
+	args := []interface{}{variable.CreatedAt, variable.BookID, variable.ChapterID, variable.PageID, //nolint:gofmt
 		variable.ParagraphID, variable.MapLink, variable.Lat, variable.Lng, variable.Zoom,
 		variable.Date, variable.Description, variable.Link, variable.LinkText, variable.LinkType,
 		variable.LinkImage, variable.Image, id}

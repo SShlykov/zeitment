@@ -29,3 +29,28 @@ func (nt *NullTime) UnmarshalJSON(data []byte) error {
 	nt.Valid = err == nil
 	return err
 }
+
+// NullString обертка вокруг sql.NullString для корректной работы с JSON
+type NullString struct {
+	sql.NullString
+}
+
+// MarshalJSON метод для сериализация в JSON.
+// Возвращает значение в формате JSON или null.
+func (ns *NullString) MarshalJSON() ([]byte, error) {
+	if ns.Valid {
+		return json.Marshal(ns.String)
+	}
+	return json.Marshal(nil)
+}
+
+// UnmarshalJSON метод для десериализации из JSON.
+func (ns *NullString) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		ns.Valid = false
+		return nil
+	}
+	err := json.Unmarshal(data, &ns.String)
+	ns.Valid = err == nil
+	return err
+}
