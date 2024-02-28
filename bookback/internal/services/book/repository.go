@@ -59,8 +59,8 @@ func insertItems() string {
 }
 
 // NewRepository создает новый экземпляр репозитория для книг.
-func NewRepository(database db.Client) Repository {
-	return &repository{database}
+func NewRepository(client db.Client) Repository {
+	return &repository{db: client}
 }
 
 func (r *repository) Create(ctx context.Context, book *models.Book) (string, error) {
