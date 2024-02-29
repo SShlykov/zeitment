@@ -4,6 +4,10 @@ type HTTPError struct {
 	Message string `json:"message"`
 }
 
+func (e HTTPError) Error() string {
+	return e.Message
+}
+
 type repoError struct {
 	Error string `json:"error"`
 }

@@ -3,11 +3,17 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 )
 
 // NullTime обертка вокруг sql.NullTime для корректной работы с JSON
 type NullTime struct {
 	sql.NullTime
+}
+
+// NewNullTime создает новый экземпляр NullTime.
+func NewNullTime(t time.Time, valid bool) NullTime {
+	return NullTime{sql.NullTime{Time: t, Valid: valid}}
 }
 
 // MarshalJSON метод для сериализация в JSON.
@@ -33,6 +39,11 @@ func (nt *NullTime) UnmarshalJSON(data []byte) error {
 // NullString обертка вокруг sql.NullString для корректной работы с JSON
 type NullString struct {
 	sql.NullString
+}
+
+// NewNullString создает новый экземпляр NullString.
+func NewNullString(str string, valid bool) NullString {
+	return NullString{sql.NullString{String: str, Valid: valid}}
 }
 
 // MarshalJSON метод для сериализация в JSON.

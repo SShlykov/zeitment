@@ -59,7 +59,9 @@ func SetPageController(e *echo.Echo, database db.Client, ctx context.Context) {
 }
 
 func SetChapterController(e *echo.Echo, database db.Client, ctx context.Context) {
-	chapter.NewController(chapterrepo.NewService(chapterrepo.NewRepository(database))).RegisterRoutes(e, ctx)
+	chapterRepo := chapterrepo.NewRepository(database)
+	bookRepo := bookrepo.NewRepository(database)
+	chapter.NewController(chapterrepo.NewService(chapterRepo, bookRepo)).RegisterRoutes(e, ctx)
 }
 
 func SetParagraphController(e *echo.Echo, database db.Client, ctx context.Context) {

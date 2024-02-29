@@ -9,7 +9,7 @@ type Book struct {
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   NullTime   `json:"deleted_at"`
-	Owner       int        `json:"owner"`
+	Owner       string     `json:"owner"`
 	Title       string     `json:"title"`
 	Author      string     `json:"author"`
 	Description string     `json:"description"`

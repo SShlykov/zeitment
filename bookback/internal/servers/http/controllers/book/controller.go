@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
@@ -63,6 +64,7 @@ func (bc *Controller) CreateBook(c echo.Context, ctx context.Context) error {
 	}
 	createdBook, err := bc.Service.CreateBook(ctx, &book)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotCreated)
 	}
 	return c.JSON(http.StatusCreated, createdBook)
@@ -105,7 +107,9 @@ func (bc *Controller) UpdateBook(c echo.Context, ctx context.Context) error {
 	paramID := c.Param("id")
 	updatedBook, err := bc.Service.UpdateBook(ctx, paramID, &book)
 	if err != nil {
-		fmt.Println(err)
+		if errors.Is(err, config.ErrorNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+		}
 		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotUpdated)
 	}
 	return c.JSON(http.StatusOK, updatedBook)
@@ -121,8 +125,9 @@ func (bc *Controller) UpdateBook(c echo.Context, ctx context.Context) error {
 // @failure 404 {object} config.HTTPError
 func (bc *Controller) DeleteBook(c echo.Context, ctx context.Context) error {
 	id := c.Param("id")
-	if _, err := bc.Service.DeleteBook(ctx, id); err != nil {
+	book, err := bc.Service.DeleteBook(ctx, id)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
 	}
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, book)
 }
