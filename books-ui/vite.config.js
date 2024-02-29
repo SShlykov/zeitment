@@ -20,5 +20,9 @@ export default defineConfig({
       '@pages': fileURLToPath(new URL('./src/components/5_pages', import.meta.url)),
     }
   },
+  test: {
+    globals:true,
+    environment: 'happy-dom',
+  }
 })
 
