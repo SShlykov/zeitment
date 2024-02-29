@@ -5,25 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
-	"github.com/SShlykov/zeitment/bookback/pkg/db/sq"
-	"github.com/google/uuid"
-	"time"
+	"strings"
 )
 
 const (
-	// model fields and table name for books table
-	tableName       = "chapters"
-	columnID        = "id"
-	columnCreatedAt = "created_at"
-	columnUpdatedAt = "updated_at"
-	columnDeletedAt = "deleted_at"
-	columnTitle     = "title"
-	columnNumber    = "number"
-	columnText      = "text"
-	columnBookID    = "book_id"
-	columnIsPublic  = "is_public"
-	Returning       = "RETURNING "
+	tableName         = "chapters"
+	columnID          = "id"
+	columnCreatedAt   = "created_at"
+	columnUpdatedAt   = "updated_at"
+	columnDeletedAt   = "deleted_at"
+	columnTitle       = "title"
+	columnNumber      = "number"
+	columnText        = "text"
+	columnBookID      = "book_id"
+	columnIsPublic    = "is_public"
+	columnMapLink     = "map_link"
+	columnMapParamsID = "map_params_id"
+	Returning         = " RETURNING "
+	WHERE             = " WHERE "
+	FromTable         = " FROM " + tableName + " "
+	NotDeleted        = " " + columnDeletedAt + " IS NULL "
 )
 
 // Repository определяет интерфейс для взаимодействия с хранилищем глав.
@@ -46,22 +49,30 @@ func NewRepository(database db.Client) Repository {
 	return &repository{database}
 }
 
+func allItems() string {
+	cols := []string{columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnNumber,
+		columnText, columnBookID, columnIsPublic, columnMapLink, columnMapParamsID}
+
+	return strings.Join(cols, ", ")
+}
+
+func insertItems() string {
+	cols := []string{columnTitle, columnNumber, columnText, columnBookID, columnIsPublic, columnMapLink,
+		columnMapParamsID}
+
+	return strings.Join(cols, ", ")
+}
+
 func (r *repository) Create(ctx context.Context, chapter *models.Chapter) (string, error) {
-	query, args, err :=
-		sq.SQ.Insert(tableName).
-			Columns(columnID, columnTitle, columnNumber, columnText, columnBookID, columnIsPublic).
-			Values(uuid.New().String(), chapter.Title, chapter.Number, chapter.Text, chapter.BookID, chapter.IsPublic).
-			Suffix("RETURNING " + columnID).
-			ToSql()
+	query := "INSERT INTO" + " " + tableName + ` (` + insertItems() +
+		`) VALUES ($1, $2, $3, $4, $5, $6, $7) ` + Returning + columnID
 
-	if err != nil {
-		return "", err
-	}
-
-	q := db.Query{Name: "ChapterRepository.Insert", Raw: query}
+	q := db.Query{Name: "ChapterRepository.Create", Raw: query}
+	row := r.db.DB().QueryRowContext(ctx, q, chapter.Title, chapter.Number, chapter.Text, chapter.BookID,
+		chapter.IsPublic, chapter.MapLink, chapter.MapParamsID)
 
 	var id string
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id); err != nil {
+	if err := row.Scan(&id); err != nil {
 		return "", err
 	}
 
@@ -69,152 +80,62 @@ func (r *repository) Create(ctx context.Context, chapter *models.Chapter) (strin
 }
 
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Chapter, error) {
-	query, args, err := sq.
-		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnNumber,
-			columnText, columnBookID, columnIsPublic).
-		From(tableName).
-		Where(sq.And{sq.Eq{columnID: id}, sq.Eq{columnDeletedAt: nil}}).
-		Limit(1).
-		ToSql()
+	query := services.SelectWhere(allItems, tableName, columnID) + " AND" + NotDeleted
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	fmt.Println(query)
 
-	q := db.Query{Name: "ChapterRepository.FindById", Raw: query}
+	q := db.Query{Name: "ChapterRepository.FindByID", Raw: query}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	var chapter models.Chapter
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).
-		Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt, &chapter.Title, &chapter.Number,
-			&chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
-		fmt.Println(err)
-		return nil, errors.New("params error")
-	}
-
-	return &chapter, nil
+	return readItem(row)
 }
 
 func (r *repository) Update(ctx context.Context, id string, updChapter *models.Chapter) (*models.Chapter, error) {
-	query, args, err := sq.Update(tableName).
-		Where(sq.And{sq.Eq{columnID: id}, sq.Eq{columnDeletedAt: nil}}).
-		Set(columnUpdatedAt, time.Now()).
-		Set(columnTitle, updChapter.Title).
-		Set(columnNumber, updChapter.IsPublic).
-		Set(columnText, updChapter.Title).
-		Set(columnBookID, updChapter.IsPublic).
-		Set(columnIsPublic, updChapter.IsPublic).
-		Suffix(Returning +
-			fmt.Sprintf("%s, %s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-				columnTitle, columnIsPublic)).
-		ToSql()
+	query := "Update " + tableName + " SET " +
+		services.ParamsToQuery(", ", columnTitle, columnNumber, columnText, columnBookID,
+			columnIsPublic, columnMapLink, columnMapParamsID) +
+		" WHERE " + columnID + " = $8" + Returning + allItems()
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	args := []interface{}{updChapter.Title, updChapter.Number, updChapter.Text, updChapter.BookID,
+		updChapter.IsPublic, updChapter.MapLink, updChapter.MapParamsID, id}
 
-	q := db.Query{Name: "ChapterRepository.Update", Raw: query}
+	q := db.Query{Name: "BookRepository.Update", Raw: query}
+	row := r.db.DB().QueryRowContext(ctx, q, args...)
 
-	var chapter models.Chapter
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt,
-		&chapter.Title, &chapter.Number, &chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
-		return nil, errors.New("params error")
-	}
-
-	return &chapter, nil
+	return readItem(row)
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.Chapter, error) {
-	query, args, err := sq.SQ.Delete(tableName).
-		Where(sq.Eq{columnID: id}).
-		Suffix(Returning +
-			fmt.Sprintf("%s, %s, %s, %s, %s", columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-				columnTitle)).
-		ToSql()
+	query := `DELETE ` + FromTable + WHERE + columnID + ` = $1` + Returning + allItems()
+	q := db.Query{Name: "BookRepository.Delete", Raw: query}
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	q := db.Query{Name: "ChapterRepository.Delete", Raw: query}
-	fmt.Println(q)
-
-	var chapter models.Chapter
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt,
-		&chapter.Title, &chapter.Number, &chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
-		fmt.Println(err)
-		return nil, errors.New("params error")
-	}
-
-	return &chapter, nil
+	return readItem(row)
 }
 
 func (r *repository) List(ctx context.Context) ([]models.Chapter, error) {
-	query, args, err := sq.
-		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnIsPublic).
-		From(tableName).
-		Where(sq.Eq{columnDeletedAt: nil}).
-		ToSql()
+	query := `SELECT ` + allItems() + FromTable + WHERE + NotDeleted
 
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	q := db.Query{Name: "ChapterRepository.List", Raw: query}
 
-	q := db.Query{Name: "ChapterRepository.Delete", Raw: query}
-
-	var chapterList []models.Chapter
-	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, args...)
+	rows, err := r.db.DB().QueryRawContextMulti(ctx, q)
 	if err != nil {
 		return nil, errors.New("params error")
 	}
 
-	for rows.Next() {
-		var chapter models.Chapter
-		if err = rows.Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt, &chapter.Title, &chapter.Number,
-			&chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
-			return nil, errors.New("params error")
-		}
-		chapterList = append(chapterList, chapter)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, errors.New("params error")
-	}
-
-	return chapterList, nil
+	return readList(rows)
 }
 
 func (r *repository) GetChapterByBookID(ctx context.Context, bookID string) ([]models.Chapter, error) {
-	query, args, err := sq.
-		Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnNumber,
-			columnText, columnBookID, columnIsPublic).
-		From(tableName).
-		Where(sq.And{sq.Eq{columnBookID: bookID}, sq.Eq{columnDeletedAt: nil}}).
-		ToSql()
-
-	if err != nil {
-		return nil, errors.New("unknown error")
-	}
+	query := services.SelectWhere(allItems, tableName, columnBookID) + " AND" + NotDeleted
 
 	q := db.Query{Name: "ChapterRepository.GetChapterByBookID", Raw: query}
 
-	var chapterList []models.Chapter
-	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, args...)
+	rows, err := r.db.DB().QueryRawContextMulti(ctx, q, bookID)
 	if err != nil {
 		return nil, errors.New("params error")
 	}
 
-	for rows.Next() {
-		var chapter models.Chapter
-		if err = rows.Scan(&chapter.ID, &chapter.CreatedAt, &chapter.UpdatedAt, &chapter.DeletedAt, &chapter.Title, &chapter.Number,
-			&chapter.Text, &chapter.BookID, &chapter.IsPublic); err != nil {
-			return nil, errors.New("params error")
-		}
-		chapterList = append(chapterList, chapter)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, errors.New("params error")
-	}
-
-	return chapterList, nil
+	return readList(rows)
 }

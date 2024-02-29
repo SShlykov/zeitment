@@ -5,7 +5,7 @@ CREATE TABLE books (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     deleted_at TIMESTAMP WITH TIME ZONE,
-    owner INTEGER NOT NULL,
+    owner UUID NOT NULL,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     description TEXT,

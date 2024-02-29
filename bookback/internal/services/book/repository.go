@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	// model fields and table name for books table
 	tableName         = "books"
 	columnID          = "id"
 	columnCreatedAt   = "created_at"

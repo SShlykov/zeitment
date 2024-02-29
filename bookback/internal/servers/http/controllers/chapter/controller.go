@@ -2,6 +2,7 @@ package chapter
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	"github.com/SShlykov/zeitment/bookback/internal/services/chapter"
@@ -38,6 +39,7 @@ func (ch *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 func (ch *Controller) ListChapters(c echo.Context, ctx context.Context) error {
 	chapters, err := ch.Service.ListChapters(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
 	return c.JSON(http.StatusOK, chapters)
@@ -56,10 +58,12 @@ func (ch *Controller) ListChapters(c echo.Context, ctx context.Context) error {
 func (ch *Controller) CreateChapter(c echo.Context, ctx context.Context) error {
 	var chap models.Chapter
 	if err := c.Bind(&chap); err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
 	}
 	createdChapter, err := ch.Service.CreateChapter(ctx, &chap)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotCreated)
 	}
 	return c.JSON(http.StatusCreated, createdChapter)
@@ -78,6 +82,7 @@ func (ch *Controller) GetChapterByID(c echo.Context, ctx context.Context) error 
 	id := c.Param("id")
 	chapt, err := ch.Service.GetChapterByID(ctx, id)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
 	}
 	return c.JSON(http.StatusOK, chapt)
