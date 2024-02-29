@@ -4,7 +4,10 @@
     :class="{'w-[300px]': isOpenMenu, 'w-[70px]': !isOpenMenu}"
   >
     <div class="pl-1 flex items-center mb-8 justify-between">
-      <div class="flex items-center" v-if="isOpenMenu">
+      <div
+        v-if="isOpenMenu"
+        class="flex items-center"
+      >
         <img
           class="mr-2"
           height="25"
@@ -52,7 +55,6 @@
 
 <script>
 import {mapGetters, mapMutations} from "vuex";
-import {dev_routes} from "@router"
 
 export default {
   name: 'App',

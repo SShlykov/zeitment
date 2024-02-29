@@ -32,8 +32,8 @@ const dev_routes = []
 const routerHistory = createWebHistory();
 
 const router = createRouter({
-    history: routerHistory,
-    routes
+  history: routerHistory,
+  routes
 });
 
 const logout = (from, next) => {

@@ -13,16 +13,16 @@ export default {
   data() {
     return {}
   },
-         computed: {
+  computed: {
     pageName() {
-               if (!this.$route) return "pending"
+      if (!this.$route) return "pending"
       return this.$route.name
     }
   },
   mounted()     {
     this.initScreenSizeRecalc()
   },
-       methods: {
+  methods: {
     ...mapActions('layout', ['initScreenSizeRecalc'])
   }
 }

@@ -1,40 +1,43 @@
 /**
+ * Каллбек изменнеия, ожидает что вернется измененный объект
  *
- * @param {Object}   targetObject
- * @param {Object}   config - oldKey: newKey
- * @param {Object}   options
- * @param {Array}    options.listExcluded
+ * @callback adapterCallback
+ * @param   {Object} modifiedObject - новый объект
+ * @param   {Object} originalObject - изначальный объект
+ * @returns {Object} измененный коллбэком объект
+ */
+
+/**
+ *
+ *  Если у newKey значение отстутсвует - null, '', false, 0, то oldKey удаляется из объекта
+ *
+ * @param {Object}                        targetObject
+ * @param {Object}                        params
+ * @param {Object}                        params.config     - oldKey: null // delete oldKey
+ * @param {adapterCallback | undefined}   params.callback
  * @returns {Object}
  */
-const convertObject = (_targetObject, config, {listExcluded = []}) => {
-  const targetObject = {..._targetObject}
-  let configList = Object.entries(config)
-
-  let newObject = configList.reduce((mutationObject, [oldKey, newKey]) => {
-    mutationObject[newKey] = mutationObject[oldKey]
-    delete mutationObject[oldKey]
-    return mutationObject
-  }, targetObject)
-
-  listExcluded.forEach((removedKey) => {
-    delete newObject[removedKey]
-  })
-
-  return newObject
+const convertObject = (targetObject, {config, callback = (v) => v}) => {
+  let newObject = {}
+  for (const key in config) {
+    newObject[config[key]] = targetObject[key]
+  }
+  return callback(newObject, targetObject)
 }
 
 /**
  *
- * @param {Array}   targetList
- * @param {Object}   config - oldKey: newKey
- * @param {Object}   options
- * @param {Array}    options.listExcluded
- * @param {Function}    options.callback
+ * Если у newKey значение отстутсвует - null, '', false, 0, то oldKey удаляется из объекта
+ *
+ * @param {Array}                       targetList
+ * @param {Object}                      options           - oldKey: null // delete oldKey
+ * @param {Object}                      options.config    - oldKey: null // delete oldKey
+ * @param {adapterCallback | undefined} options.callback
  * @returns {Object}
  */
-const covertList = (targetList, config, {listExcluded = [], callback = (v) => v}) => {
-  return targetList.map((targetObject) => callback(convertObject(targetObject, config, {listExcluded}), targetObject))
+const convertList = (targetList, {config, callback = (v) => v}) => {
+  return targetList.map((targetObject) => convertObject(targetObject, {config, callback}))
 }
 
 
-export {covertList, convertObject}
+export {convertList, convertObject}

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { convertObject, convertList } from '@helpers/server-routes/adapter/adapter.js'
+import { convertObject, convertList } from '@helpers/adapter/adapter.js'
 
 test('parse object from api', () => {
   const targetObject = {

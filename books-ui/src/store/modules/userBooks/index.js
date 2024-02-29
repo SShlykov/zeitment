@@ -1,43 +1,33 @@
-import menuList from "./menuList.js"
+import BooksApi from "@apiServices/BooksApi.js"
+
+const BooksService = new BooksApi()
+
+const initialState = {
+  booksList: [],
+}
 
 const state = {
-  height:      0,
-  width:       0,
-  inited:      false,
-  isOpenMenu:  true
+  ...initialState
 };
 
 const getters = {
-  height:                  (state) => state.height,
-  width:                   (state) => state.width,
-  isOpenMenu:              (state) => state.isOpenMenu,
-  menuWidth:               (state) => state.isOpenMenu ? 300 : 70,
-  menuList:                ()      => menuList
+  booksList: state => state.booksList,
 };
 
 const mutations = {
-  enableScreenListener: (state) => {
-    state.height = window.innerHeight
-        state.width = window.innerWidth
-    const acc = !!state.inited
-    if (!acc) {
-      window.addEventListener("resize", (e) => {
-        state.height= e.target.innerHeight
-        state.width = e.target.innerWidth
-      });
-      state.inited = true
-    }
+  resetStore(state) {
+    Object.assign(state, initialState);
   },
-  toggleMenu: (state) => {
-    state.isOpenMenu = !state.isOpenMenu
-  }
+  setBooksList(state, booksList) {
+    state.booksList = booksList;
+  },
 };
 
 const actions = {
-  initScreenSizeRecalc: ({commit}) => {
-    commit("enableScreenListener")
+  async fetchBooks({ commit }) {
+    const booksList = await BooksService.getBooks()
+    commit('setBooksList', booksList)
   },
-
 };
 
 export const store = {

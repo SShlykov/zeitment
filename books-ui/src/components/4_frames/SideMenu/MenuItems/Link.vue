@@ -13,10 +13,11 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations} from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
   name: 'MenuLink',
+  components: {},
   props: {
     icon: {
       default: "",
@@ -35,7 +36,6 @@ export default {
       type: String
     },
   },
-  components: {},
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
     pageName() {
