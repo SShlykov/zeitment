@@ -3,9 +3,10 @@ import Auth from "@pages/Auth/index.vue"
 import UserBooks from "@pages/UserBooks/UserBooks.vue"
 import NewBook from "@pages/NewBook/NewBook.vue"
 import UserSettings from "@pages/UserSettings/UserSettings.vue"
-import {cond, T} from 'ramda'
+import TestsPage from "@pages/Tests/TestsPage.vue"
 
-const routes = [
+
+const prod_routes = [
   {
     path: "/",
     name: "user_books",
@@ -27,7 +28,23 @@ const routes = [
   },
 ];
 
-const dev_routes = []
+const dev_routes = [
+  {
+    path: "/tests",
+    name: "tests",
+    component: TestsPage,
+  },
+]
+
+const makeRoutes = () => {
+  if (import.meta.env.VITE_ROUTES_MODE === "dev") {
+    return [...prod_routes, ...dev_routes]
+  } else {
+    return prod_routes
+  }
+}
+
+const routes = makeRoutes()
 
 const routerHistory = createWebHistory();
 
@@ -36,11 +53,12 @@ const router = createRouter({
   routes
 });
 
-const logout = (from, next) => {
-  localStorage.removeItem("token")
-  sessionStorage.setItem("pathname", from.fullPath)
-  next()
-}
+
+// const logout = (from, next) => {
+//   localStorage.removeItem("token")
+//   sessionStorage.setItem("pathname", from.fullPath)
+//   next()
+// }
 
 // router.beforeEach(async (to, from, next) => {
 //   const token = localStorage.getItem('token')

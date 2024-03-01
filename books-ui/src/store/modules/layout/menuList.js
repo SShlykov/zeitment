@@ -80,6 +80,29 @@ const menuList = () => [
   },
 ]
 
-const list = menuList()
+/**
+ *
+ * @returns {Array<MenuItem>}
+ */
+const devMenuList = () => [
+  {
+    "title": "Тесты",
+    "icon": "test-tube-line",
+    "link": "/tests",
+    "type": "link",
+    "name": "tests",
+    "position": "bottom",
+  },
+]
+
+const makeMenuList = () => {
+  if (import.meta.env.VITE_ROUTES_MODE === "dev") {
+    return [...devMenuList(), ...menuList()]
+  } else {
+    return menuList()
+  }
+}
+
+const list = makeMenuList()
 
 export default list

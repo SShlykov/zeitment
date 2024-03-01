@@ -33,6 +33,7 @@ class BooksApi {
    * @returns {Promise<Book>}
    */
   async updateBook(book) {
+    console.log(`/books/${book.id}`, book)
     return await put(`/books/${book.id}`, book)
   }
 
@@ -62,6 +63,35 @@ class BooksApi {
    */
   async deleteBookById(id) {
     return await remove(`/books/${id}`)
+  }
+
+  /**
+   * @param {Function} logFunction
+   * @returns {Promise<null>}
+   */
+  async integrationTests(logFunction) {
+    logFunction("Список книг")
+    const books = await this.getBooks()
+    logFunction(books)
+    logFunction("Создание книги")
+    const newBook = await this.createBook({
+      "title": "Тестовая книга",
+      "author": "Васильев А.В.",
+      "owner": "e75aae0d-c1eb-4199-a1d8-2177f57d6a1e",
+      "description": "test description",
+      "is_public": false,
+      "publication": null
+    })
+    logFunction(newBook)
+    logFunction("Получение книги по id(Созданной)")
+    const bookById = await this.getBookById(newBook.id)
+    logFunction(bookById)
+    logFunction("Обновление книги")
+    const updatedBook = await this.updateBook({id: bookById.id, title: "Обновленная книга"})
+    logFunction(updatedBook)
+    logFunction("Удаление книги")
+    const deletedBook = await this.deleteBookById(bookById.id)
+    logFunction(deletedBook)
   }
 }
 

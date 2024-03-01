@@ -18,7 +18,7 @@ const getters = {
 const mutations = {
   enableScreenListener: (state) => {
     state.height = window.innerHeight
-        state.width = window.innerWidth
+    state.width = window.innerWidth
     const acc = !!state.inited
     if (!acc) {
       window.addEventListener("resize", (e) => {

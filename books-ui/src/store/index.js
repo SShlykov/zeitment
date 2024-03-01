@@ -2,6 +2,7 @@ import { createStore, createLogger } from 'vuex';
 import { store as layout } from '@/store/modules/layout';
 import { store as auth } from '@/store/modules/auth';
 import { store as userBooks } from '@/store/modules/userBooks';
+import { store as test } from '@/store/modules/test';
 
 
 // eslint-disable-next-line no-undef
@@ -15,7 +16,8 @@ export const store = createStore({
   modules: {
     layout,
     auth,
-    userBooks
+    userBooks,
+    test
   },
 });
 
