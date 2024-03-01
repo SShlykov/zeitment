@@ -33,7 +33,6 @@ export default {
   <div
     v-if="pageName && pageName !== 'auth'"
     class="flex h-[99.9vh]"
-    @click="check"
   >
     <SideMenu />
     <div class="flex flex-col flex-grow">
