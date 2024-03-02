@@ -1,0 +1,60 @@
+name: go
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  GO111MODULE: "on"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.ref, 'calendar') }}
+    steps:
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.22
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Linters
+        uses: golangci/golangci-lint-action@v4.0.0
+        with:
+          version: latest
+          skip-build-cache: true
+          skip-pkg-cache: true
+          working-directory: ./bookback
+
+  tests:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.ref, 'calendar') }}
+    steps:
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.22
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Unit tests
+        run: go test -v -count=1 -race -timeout=1m ./...
+        working-directory: ./bookback
+
+      - name: Optimization tests
+        run: go test -v -count=1 -timeout=1m -tags bench ./...
+        if: env.BRANCH == 'hw10_program_optimization'
+        working-directory: ./bookback
