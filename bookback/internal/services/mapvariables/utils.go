@@ -6,6 +6,7 @@ import (
 )
 
 func readList(rows pgx.Rows) ([]models.MapVariable, error) {
+	defer rows.Close()
 	variables := make([]models.MapVariable, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
@@ -18,7 +19,7 @@ func readList(rows pgx.Rows) ([]models.MapVariable, error) {
 		return nil, err
 	}
 
-	return variables, nil
+	return variables, rows.Err()
 }
 
 func readItem(row pgx.Row) (*models.MapVariable, error) {

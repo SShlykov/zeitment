@@ -106,7 +106,7 @@ func (r *repository) Update(ctx context.Context, id string, updChapter *models.C
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.Chapter, error) {
-	query := `DELETE ` + FromTable + WHERE + columnID + ` = $1` + Returning + allItems()
+	query := services.DeleteQuery(tableName, columnID) + ` RETURNING ` + allItems()
 	q := db.Query{Name: "BookRepository.Delete", Raw: query}
 
 	row := r.db.DB().QueryRowContext(ctx, q, id)

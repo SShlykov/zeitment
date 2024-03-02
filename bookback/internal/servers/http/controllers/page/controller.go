@@ -2,6 +2,7 @@ package page
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/page"
@@ -38,6 +39,7 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 func (p *Controller) ListPages(c echo.Context, ctx context.Context) error {
 	pages, err := p.Service.ListPages(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
 	return c.JSON(http.StatusOK, pages)
@@ -102,6 +104,7 @@ func (p *Controller) UpdatePage(c echo.Context, ctx context.Context) error {
 	}
 	updatedPage, err := p.Service.UpdatePage(ctx, id, &page)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotUpdated)
 	}
 	return c.JSON(http.StatusOK, updatedPage)
@@ -120,6 +123,7 @@ func (p *Controller) DeletePage(c echo.Context, ctx context.Context) error {
 	id := c.Param("id")
 	deletedPage, err := p.Service.DeletePage(ctx, id)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotDeleted)
 	}
 	return c.JSON(http.StatusOK, deletedPage)

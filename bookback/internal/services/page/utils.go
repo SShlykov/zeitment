@@ -6,6 +6,7 @@ import (
 )
 
 func readList(rows pgx.Rows) ([]models.Page, error) {
+	defer rows.Close()
 	pages := make([]models.Page, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
@@ -14,17 +15,14 @@ func readList(rows pgx.Rows) ([]models.Page, error) {
 		}
 		pages = append(pages, *item)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
 
-	return pages, nil
+	return pages, rows.Err()
 }
 
 func readItem(row pgx.Row) (*models.Page, error) {
 	var page models.Page
-	if err := row.Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt, &page.DeletedAt, &page.Text, &page.ChapterID,
-		&page.IsPublic); err != nil {
+	if err := row.Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt, &page.DeletedAt, &page.Title, &page.Text, &page.ChapterID,
+		&page.IsPublic, &page.MapParamsID); err != nil {
 		return nil, err
 	}
 
