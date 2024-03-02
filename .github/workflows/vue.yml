@@ -15,7 +15,12 @@ jobs:
   lint-books-ui:
     runs-on: ubuntu-latest
     steps:
+      - name: log
+        uses: echo github.ref
+
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4.1.1
-
 
