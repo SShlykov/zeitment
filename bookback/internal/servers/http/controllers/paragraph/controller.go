@@ -2,6 +2,7 @@ package paragraph
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/paragraph"
@@ -23,6 +24,8 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 	e.GET("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.GetParagraphByID(c, ctx) })
 	e.PUT("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.UpdateParagraph(c, ctx) })
 	e.DELETE("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.DeleteParagraph(c, ctx) })
+
+	e.GET("/api/v1/pages/:id/paragraphs", func(c echo.Context) error { return p.GetParagraphsByPageID(c, ctx) })
 }
 
 // ListParagraphs список параграфов
@@ -36,6 +39,7 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 func (p *Controller) ListParagraphs(c echo.Context, ctx context.Context) error {
 	paragraphs, err := p.Service.ListParagraphs(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
 	return c.JSON(http.StatusOK, paragraphs)
@@ -58,6 +62,7 @@ func (p *Controller) CreateParagraph(c echo.Context, ctx context.Context) error 
 	}
 	createdParagraph, err := p.Service.CreateParagraph(ctx, &paragraph)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotCreated)
 	}
 	return c.JSON(http.StatusCreated, createdParagraph)
