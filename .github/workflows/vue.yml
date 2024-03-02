@@ -16,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: log
-        uses: echo github.ref
-
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
@@ -33,9 +30,6 @@ jobs:
 
   test-books-ui:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
 
     steps:
       - Checkout
