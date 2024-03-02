@@ -16,6 +16,7 @@
     "axios": "^1.6.7",
     "flowbite": "^2.3.0",
     "flowbite-vue": "^0.1.2",
+    "moment": "^2.30.1",
     "postcss-import": "^16.0.1",
     "ramda": "^0.29.1",
     "socket.io-client": "^4.7.4",

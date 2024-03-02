@@ -24,7 +24,7 @@ const mutations = {
 };
 
 const actions = {
-  async fetchBooks({ commit }) {
+  async fetchUserBooks({ commit }) {
     const booksList = await BooksService.getBooks()
     commit('setBooksList', booksList)
   },

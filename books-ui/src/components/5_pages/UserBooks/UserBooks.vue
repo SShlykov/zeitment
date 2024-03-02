@@ -1,7 +1,9 @@
 <script>
+import BooksViewer from '@organisms/BooksViewer/BooksViewer.vue';
+
 export default {
   name: 'UserBooks',
-  components: {},
+  components: {BooksViewer},
   data() {},
   computed: {},
   mounted() {},
@@ -11,7 +13,7 @@ export default {
 </script>
 
 <template>
-  <div class="">
-    template
+  <div class="p-6">
+    <BooksViewer />
   </div>
 </template>

@@ -87,7 +87,7 @@ class BooksApi {
     const bookById = await this.getBookById(newBook.id)
     logFunction(bookById)
     logFunction("Обновление книги")
-    const updatedBook = await this.updateBook({id: bookById.id, title: "Обновленная книга"})
+    const updatedBook = await this.updateBook({...bookById, title: "Обновленная книга"})
     logFunction(updatedBook)
     logFunction("Удаление книги")
     const deletedBook = await this.deleteBookById(bookById.id)

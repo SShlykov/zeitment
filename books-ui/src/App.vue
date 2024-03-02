@@ -4,6 +4,7 @@ import SideMenu from '@frames/SideMenu/SideMenu.vue';
 import {mapActions} from "vuex";
 
 
+
 export default {
   name: 'App',
   components: {
