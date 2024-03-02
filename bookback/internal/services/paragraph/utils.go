@@ -22,7 +22,7 @@ func readList(rows pgx.Rows) ([]models.Paragraph, error) {
 func readItem(row pgx.Row) (*models.Paragraph, error) {
 	var paragraph models.Paragraph
 	if err := row.Scan(&paragraph.ID, &paragraph.CreatedAt, &paragraph.UpdatedAt, &paragraph.DeletedAt,
-		&paragraph.Text, &paragraph.PageID, &paragraph.IsPublic); err != nil {
+		&paragraph.Title, &paragraph.Text, &paragraph.Type, &paragraph.IsPublic, &paragraph.PageID); err != nil {
 		return nil, err
 	}
 
