@@ -32,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - Checkout
+      - name: Checkout
       - uses: actions/checkout@v4
 
-      - cd books-ui
+      - name: cd books-ui
       - run: cd books-ui
 
       - name: 'Install Node'
