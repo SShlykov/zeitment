@@ -17,10 +17,10 @@ type MapVariable struct {
 	Lng         float64    `json:"lng"`
 	Zoom        int        `json:"zoom"`
 	Date        time.Time  `json:"date"`
-	Description string     `json:"description"`
-	Link        string     `json:"link"`
-	LinkText    string     `json:"link_text"`
-	LinkType    string     `json:"link_type"`
-	LinkImage   string     `json:"link_image"`
-	Image       string     `json:"image"`
+	Description NullString `json:"description"`
+	Link        NullString `json:"link"`
+	LinkText    NullString `json:"link_text"`
+	LinkType    NullString `json:"link_type"`
+	LinkImage   NullString `json:"link_image"`
+	Image       NullString `json:"image"`
 }
