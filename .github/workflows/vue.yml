@@ -14,17 +14,8 @@ on:
 jobs:
   lint-books-ui:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
-      - name: cd books-ui
-        run:  cd books-ui
-
-      - name: lint
-      - uses: stefanoeb/eslint-action@1.0.2
-        with:
-          files: src/
-  
 
