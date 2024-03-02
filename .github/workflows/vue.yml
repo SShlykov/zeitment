@@ -1,60 +1,56 @@
-name: go
+name: vue
 
 on:
   push:
     branches:
       - main
+      - books-ui
   pull_request:
     branches:
       - main
+      - books-ui
 
-env:
-  GO111MODULE: "on"
 
 jobs:
-  lint:
+  lint-books-ui:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'calendar') }}
+
     steps:
-      - name: Extract branch name
-        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      - name: log
+        uses: echo github.ref
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: cd books-ui
+        run: cd books-ui
+
+      - name: lint
+      - uses: stefanoeb/eslint-action@1.0.2
         with:
-          go-version: ~1.22
+          files: src/
+  
 
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      - name: Linters
-        uses: golangci/golangci-lint-action@v4.0.0
-        with:
-          version: latest
-          skip-build-cache: true
-          skip-pkg-cache: true
-          working-directory: ./bookback
-
-  tests:
+  test-books-ui:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'calendar') }}
+
+    permissions:
+      contents: read
+
     steps:
-      - name: Extract branch name
-        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      - Checkout
+      - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - cd books-ui
+      - run: cd books-ui
+
+      - name: 'Install Node'
+        uses: actions/setup-node@v4
         with:
-          go-version: ^1.22
+          node-version: '20.x'
 
-      - name: Check out code
-        uses: actions/checkout@v3
+      - name: 'Install Deps'
+        run: npm install
 
-      - name: Unit tests
-        run: go test -v -count=1 -race -timeout=1m ./...
-        working-directory: ./bookback
-
-      - name: Optimization tests
-        run: go test -v -count=1 -timeout=1m -tags bench ./...
-        if: env.BRANCH == 'hw10_program_optimization'
-        working-directory: ./bookback
+      - name: 'Test'
+        run: npx vitest
