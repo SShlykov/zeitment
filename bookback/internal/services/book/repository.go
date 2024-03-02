@@ -83,8 +83,7 @@ func (r *repository) Create(ctx context.Context, book *models.Book) (string, err
 }
 
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Book, error) {
-	query := `SELECT ` + allItems() + ` FROM ` + tableName + Where + columnID + ` = $1 AND ` +
-		columnDeletedAt + ` IS NULL LIMIT 1`
+	query := services.SelectWhere(allItems, tableName, columnID) + " AND " + columnDeletedAt + ` IS NULL` + " LIMIT 1"
 
 	q := db.Query{Name: "BookRepository.FindById", Raw: query}
 
@@ -110,7 +109,7 @@ func (r *repository) Update(ctx context.Context, id string, updBook *models.Book
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.Book, error) {
-	query := `DELETE FROM` + " " + tableName + Where + columnID + ` = $1 RETURNING ` + allItems()
+	query := services.DeleteQuery(tableName, columnID) + ` RETURNING ` + allItems()
 
 	q := db.Query{Name: "BookRepository.Delete", Raw: query}
 

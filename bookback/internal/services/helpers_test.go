@@ -10,6 +10,29 @@ func mockAllItems() string {
 	return "*"
 }
 
+func TestDeleteQuery(t *testing.T) {
+	tests := []struct {
+		name      string
+		tableName string
+		idName    string
+		want      string
+	}{
+		{
+			name:      "Single WHERE condition",
+			tableName: "books",
+			idName:    "id",
+			want:      "DELETE FROM books WHERE id = $1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := DeleteQuery(tt.tableName, tt.idName)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestSelectWhere(t *testing.T) {
 	tests := []struct {
 		name      string

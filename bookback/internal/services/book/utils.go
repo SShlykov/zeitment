@@ -5,7 +5,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// readList reads a list of books from the database.
+// It returns a slice of books and an error if any.
 func readList(rows pgx.Rows) ([]models.Book, error) {
+	defer rows.Close()
 	books := make([]models.Book, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
@@ -18,7 +21,7 @@ func readList(rows pgx.Rows) ([]models.Book, error) {
 		return nil, err
 	}
 
-	return books, nil
+	return books, rows.Err()
 }
 
 func readItem(row pgx.Row) (*models.Book, error) {

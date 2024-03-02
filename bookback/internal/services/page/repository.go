@@ -3,22 +3,23 @@ package page
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/services"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
-	"github.com/SShlykov/zeitment/bookback/pkg/db/sq"
-	"github.com/google/uuid"
+	"strings"
 )
 
 const (
-	// model fields and table name for books table
-	tableName       = "pages"
-	columnID        = "id"
-	columnCreatedAt = "created_at"
-	columnUpdatedAt = "updated_at"
-	columnDeletedAt = "deleted_at"
-	columnText      = "text"
-	columnChapterID = "chapter_id"
-	columnIsPublic  = "is_public"
-	Returning       = "RETURNING "
+	tableName         = "pages"
+	columnID          = "id"
+	columnCreatedAt   = "created_at"
+	columnUpdatedAt   = "updated_at"
+	columnDeletedAt   = "deleted_at"
+	columnTitle       = "title"
+	columnText        = "text"
+	columnChapterID   = "chapter_id"
+	columnIsPublic    = "is_public"
+	columnMapParamsID = "map_params_id"
+	Returning         = " RETURNING "
 )
 
 // Repository определяет интерфейс для взаимодействия с хранилищем книг.
@@ -41,23 +42,30 @@ func NewRepository(database db.Client) Repository {
 	return &repository{database}
 }
 
+func allItems() string {
+	cols := []string{columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnTitle, columnText, columnChapterID,
+		columnIsPublic, columnMapParamsID}
+
+	return strings.Join(cols, ", ")
+}
+
+func insertItems() string {
+	cols := []string{columnTitle, columnText, columnChapterID, columnIsPublic, columnMapParamsID}
+
+	return strings.Join(cols, ", ")
+}
+
 // Create inserts a new page into the database and returns its ID.
 func (r *repository) Create(ctx context.Context, page *models.Page) (string, error) {
-	page.ID = uuid.New().String()
-	query, args, err := sq.Insert(tableName).
-		Columns(columnID, columnText, columnChapterID, columnIsPublic).
-		Values(page.ID, page.Text, page.ChapterID, page.IsPublic).
-		Suffix("RETURNING id").
-		ToSql()
-	if err != nil {
-		return "", err
-	}
+	query := `INSERT INTO` + " " + tableName + ` (` + insertItems() + `) VALUES ($1, $2, $3, $4, $5) ` +
+		Returning + columnID
+	args := []interface{}{page.Title, page.Text, page.ChapterID, page.IsPublic, page.MapParamsID}
 
 	q := db.Query{Name: "PageRepository.Create", Raw: query}
 
 	row := r.db.DB().QueryRowContext(ctx, q, args...)
 	var id string
-	if err = row.Scan(&id); err != nil {
+	if err := row.Scan(&id); err != nil {
 		return "", err
 	}
 
@@ -66,38 +74,21 @@ func (r *repository) Create(ctx context.Context, page *models.Page) (string, err
 
 // FindByID retrieves a page by its ID.
 func (r *repository) FindByID(ctx context.Context, id string) (*models.Page, error) {
-	query, args, err := sq.Select(columnID, columnCreatedAt, columnUpdatedAt, columnDeletedAt, columnText,
-		columnChapterID, columnIsPublic).
-		From("pages").
-		Where(sq.Eq{"id": id, "deleted_at": nil}).
-		Limit(1).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
-
+	query := services.SelectWhere(allItems, tableName, columnID)
 	q := db.Query{Name: "PageRepository.FindByID", Raw: query}
 
-	var page models.Page
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt,
-		&page.DeletedAt, &page.Text, &page.ChapterID, &page.IsPublic); err != nil {
-		return nil, err
-	}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	return &page, nil
+	return readItem(row)
 }
 
 // Update modifies an existing page's data.
 func (r *repository) Update(ctx context.Context, id string, updPage *models.Page) (*models.Page, error) {
-	query, args, err := sq.Update(tableName).
-		Set(columnText, updPage.Text).
-		Set(columnIsPublic, updPage.IsPublic).
-		Where(sq.Eq{"id": id}).
-		Suffix("RETURNING id, created_at, updated_at, deleted_at, text, chapter_id, is_public").
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := "Update " + tableName + " SET " +
+		services.ParamsToQuery(", ", columnTitle, columnText, columnChapterID, columnIsPublic, columnMapParamsID) +
+		" WHERE " + columnID + " = $6" + Returning + allItems()
+
+	args := []interface{}{updPage.Title, updPage.Text, updPage.ChapterID, updPage.IsPublic, updPage.MapParamsID, id}
 
 	q := db.Query{Name: "PageRepository.Update", Raw: query}
 
@@ -108,48 +99,30 @@ func (r *repository) Update(ctx context.Context, id string, updPage *models.Page
 
 // Delete removes a page from the database.
 func (r *repository) Delete(ctx context.Context, id string) (*models.Page, error) {
-	query, args, err := sq.SQ.Delete(tableName).
-		Where(sq.Eq{"id": id}).
-		Suffix("RETURNING id").
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
+	query := services.DeleteQuery(tableName, columnID) + Returning + allItems()
 
 	q := db.Query{Name: "PageRepository.Delete", Raw: query}
+	row := r.db.DB().QueryRowContext(ctx, q, id)
 
-	var deletedID string
-	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&deletedID); err != nil {
-		return nil, err
-	}
-
-	return &models.Page{ID: deletedID}, nil
+	return readItem(row)
 }
 
 // List retrieves all pages for a given chapter ID.
 func (r *repository) List(ctx context.Context) ([]models.Page, error) {
-	query :=
-		`SELECT id, created_at, updated_at, deleted_at, text, chapter_id, is_public 
-		 FROM pages 
-		 WHERE deleted_at IS NULL`
+	query := `Select ` + allItems() + ` FROM ` + tableName + ` WHERE ` + columnDeletedAt + ` IS NULL`
 
 	q := db.Query{Name: "PageRepository.List", Raw: query}
-
 	rows, err := r.db.DB().QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	return readList(rows)
 }
 
 // GetPagesByChapterID retrieves all pages for a given chapter ID.
 func (r *repository) GetPagesByChapterID(ctx context.Context, chapterID string) ([]models.Page, error) {
-	query :=
-		`SELECT id, created_at, updated_at, deleted_at, text, chapter_id, is_public 
-		 FROM pages 
-		 WHERE chapter_id = $1 AND deleted_at IS NULL`
+	query := services.SelectWhere(allItems, tableName, columnChapterID) + ` AND ` + columnDeletedAt + ` IS NULL`
 
 	q := db.Query{Name: "PageRepository.GetPagesByChapterID", Raw: query}
 
@@ -157,7 +130,6 @@ func (r *repository) GetPagesByChapterID(ctx context.Context, chapterID string) 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	return readList(rows)
 }

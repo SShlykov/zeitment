@@ -6,6 +6,7 @@ import (
 )
 
 func readList(rows pgx.Rows) ([]models.BookEvent, error) {
+	defer rows.Close()
 	events := make([]models.BookEvent, 0)
 	for rows.Next() {
 		item, err := readItem(rows)
@@ -18,7 +19,7 @@ func readList(rows pgx.Rows) ([]models.BookEvent, error) {
 		return nil, err
 	}
 
-	return events, nil
+	return events, rows.Err()
 }
 
 func readItem(row pgx.Row) (*models.BookEvent, error) {
