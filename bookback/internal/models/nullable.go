@@ -27,7 +27,7 @@ func (nt *NullTime) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON метод для десериализации из JSON.
 func (nt *NullTime) UnmarshalJSON(data []byte) error {
-	if string(data) == `null` {
+	if isNull(data) {
 		nt.Valid = false
 		return nil
 	}
@@ -57,7 +57,7 @@ func (ns *NullString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON метод для десериализации из JSON.
 func (ns *NullString) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
+	if isNull(data) {
 		ns.Valid = false
 		return nil
 	}
@@ -85,11 +85,15 @@ func (ni *NullInt) MarshalJSON() ([]byte, error) {
 }
 
 func (ni *NullInt) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
+	if isNull(data) {
 		ni.Valid = false
 		return nil
 	}
 	err := json.Unmarshal(data, &ni.Int64)
 	ni.Valid = err == nil
 	return err
+}
+
+func isNull(data []byte) bool {
+	return string(data) == "null"
 }
