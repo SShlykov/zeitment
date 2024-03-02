@@ -34,3 +34,4 @@ jobs:
 
       - name: lint
         run: yarn lint
+        working-directory: ./books-ui
