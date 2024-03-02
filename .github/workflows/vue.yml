@@ -32,6 +32,10 @@ jobs:
         with:
           node-version: '20.x'
 
+      - name: install node_modules
+        run: yarn
+        working-directory: ./books-ui
+
       - name: lint
         run: yarn lint
         working-directory: ./books-ui
