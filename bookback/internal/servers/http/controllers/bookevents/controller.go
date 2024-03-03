@@ -2,6 +2,7 @@ package bookevents
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/bookevents"
@@ -69,6 +70,7 @@ func (bec *Controller) UpdateBookEvent(c echo.Context, ctx context.Context) erro
 	id := c.Param("id")
 	updatedEvent, err := bec.service.UpdateBookEvent(ctx, id, &event)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
 	}
 
@@ -86,11 +88,13 @@ func (bec *Controller) UpdateBookEvent(c echo.Context, ctx context.Context) erro
 // @failure 404 {object} config.HTTPError
 func (bec *Controller) DeleteBookEvent(c echo.Context, ctx context.Context) error {
 	id := c.Param("id")
-	if _, err := bec.service.DeleteBookEvent(ctx, id); err != nil {
+	deletedEvent, err := bec.service.DeleteBookEvent(ctx, id)
+	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, deletedEvent)
 }
 
 // CreateBookEvent обрабатывает запросы на создание события книги.
@@ -110,6 +114,7 @@ func (bec *Controller) CreateBookEvent(c echo.Context, ctx context.Context) erro
 	}
 	createdEvent, err := bec.service.CreateBookEvent(ctx, &event)
 	if err != nil {
+		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotCreated)
 	}
 	return c.JSON(http.StatusCreated, createdEvent)

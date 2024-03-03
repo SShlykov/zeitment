@@ -13,13 +13,13 @@ type BookEvent struct {
 	ChapterID   NullString `json:"chapter_id"`
 	PageID      NullString `json:"page_id"`
 	ParagraphID NullString `json:"paragraph_id"`
-	EventType   string     `json:"event_type"` // Тип события (начало главы, начало страницы, начало параграфа...)
+	EventType   NullString `json:"event_type"` // Тип события (начало главы, начало страницы, начало параграфа...)
 	IsPublic    bool       `json:"is_public"`
 	Key         string     `json:"key"`
 	Value       string     `json:"value"`
-	Link        string     `json:"link"`
-	LinkText    string     `json:"link_text"`
-	LinkType    string     `json:"link_type"`
-	LinkImage   string     `json:"link_image"`
-	Description string     `json:"description"`
+	Link        NullString `json:"link"`
+	LinkText    NullString `json:"link_text"`
+	LinkType    NullString `json:"link_type"`
+	LinkImage   NullString `json:"link_image"`
+	Description NullString `json:"description"`
 }
