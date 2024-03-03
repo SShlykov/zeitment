@@ -39,8 +39,7 @@ prehook:
 	@echo "Pre-push hook set successfully."
 
 
-// feat():
-// git add . && git commit -m "feat():" && git push
+
 push:
 ifeq ($(commit),)
 	$(error mn is not set)

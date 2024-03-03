@@ -1,10 +1,8 @@
 <script>
-import BackgroundImage from '@atoms/BackgroundImage.vue';
 import moment from 'moment';
 
 export default {
   name: 'BooksViewerCard',
-  components: {BackgroundImage},
   props: {
     id: {
       type: String,
@@ -26,34 +24,34 @@ export default {
       type: String,
       required: true
     },
-    is_public: {
-      type: Boolean,
-      required: true
-    },
-    publication: {
-      type: String,
-      required: false
-    },
-    image_link: {
-      type: String,
-      required: false
-    },
-    map_link: {
-      type: String,
-      required: false
-    },
-    map_params_id: {
-      type: String,
-      required: false
-    },
-    variables: {
-      type: Array,
-      required: false
-    },
-    updated_at: {
-      type: String,
-      required: true
-    }
+    // is_public: {
+    //   type: Boolean,
+    //   required: true
+    // },
+    // publication: {
+    //   type: String,
+    //   required: false
+    // },
+    // image_link: {
+    //   type: String,
+    //   required: false
+    // },
+    // map_link: {
+    //   type: String,
+    //   required: false
+    // },
+    // map_params_id: {
+    //   type: String,
+    //   required: false
+    // },
+    // variables: {
+    //   type: Array,
+    //   required: false
+    // },
+    // updated_at: {
+    //   type: String,
+    //   required: true
+    // }
   },
   data() {},
   computed: {
