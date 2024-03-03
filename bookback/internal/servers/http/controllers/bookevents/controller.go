@@ -121,7 +121,6 @@ func (bec *Controller) CreateBookEvent(c echo.Context) error {
 
 	createdEvent, err := bec.Service.CreateBookEvent(bec.Ctx, request.BookEvents)
 	if err != nil {
-		fmt.Println(err)
 		return ErrorBookEventNotCreated
 	}
 	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", BookEvent: createdEvent})

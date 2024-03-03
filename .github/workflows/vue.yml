@@ -1,0 +1,70 @@
+name: vue
+
+on:
+  push:
+    branches:
+      - main
+      - books-ui
+  pull_request:
+    branches:
+      - main
+      - books-ui
+
+
+jobs:
+  lint-books-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: log
+        run: echo github.ref
+
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: cd books-ui
+        run:  cd books-ui
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: install node_modules
+        run: yarn
+        working-directory: ./books-ui
+
+      - name: lint
+        run: yarn lint
+        working-directory: ./books-ui
+
+
+  test-books-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: log
+        run: echo github.ref
+
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: cd books-ui
+        run: cd books-ui
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: install node_modules
+        run: yarn
+        working-directory: ./books-ui
+
+      - name: tests
+        run: yarn test_ones
+        working-directory: ./books-ui
