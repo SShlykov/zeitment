@@ -31,13 +31,13 @@ export default {
         :title="item.title"
         :author="item.author"
         :description="item.description"
-        :is_public="item.is_public"
+        :isPublic="item.isPublic"
         :publication="item.publication"
-        :image_link="item.image_link"
-        :map_link="item.map_link"
-        :map_params_id="item.map_params_id"
+        :imageLink="item.imageLink"
+        :mapLink="item.mapLink"
+        :mapParamsId="item.mapParamsId"
         :variables="item.variables"
-        :updated_at="item.updated_at"
+        :updatedAt="item.updatedAt"
       />
     </BooksViewerContainer>
   </div>

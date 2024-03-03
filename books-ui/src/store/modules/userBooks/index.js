@@ -1,6 +1,7 @@
 import BooksApi from "@apiServices/BooksApi.js"
+import {adapterConfig} from "./StaticData.js";
 
-const BooksService = new BooksApi()
+const BooksService = new BooksApi(adapterConfig)
 
 const initialState = {
   booksList: [],

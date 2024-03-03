@@ -1,4 +1,27 @@
 import {get, post, put, remove} from './apiHelpers.js'
+import {convertList, convertObject} from '@helpers/adapter/adapter.js'
+import {reverseObject} from '@helpers/objectUtils'
+import {path} from 'ramda'
+
+/**
+ *
+ * @param {Object} adapterFromApiConfig
+ * @param {Object | undefined} params
+ * @returns {Object | null | undefined}
+ */
+const adapterToApiFromParams = (adapterFromApiConfig, params) => {
+  let adapterToApiConfig = path(['adapterToApiConfig'], params)
+
+  if (adapterToApiConfig) {
+    return adapterToApiConfig
+  } else if (adapterFromApiConfig) {
+    adapterToApiConfig = reverseObject(adapterFromApiConfig)
+  } else {
+    adapterToApiConfig = {}
+  }
+
+  return adapterToApiConfig
+}
 
 /**
  * @deftypes Book
@@ -18,51 +41,83 @@ import {get, post, put, remove} from './apiHelpers.js'
  */
 
 class BooksApi {
+
+  /**
+   * @constructor
+   * @param {Object | null} adapterFromApiConfig - конфигурация адаптера для преобразования объектов из API
+   * @param {Object | undefined} params - параметры
+   * @param {Object} params.adapterToApiConfig - конфигурация адаптера для преобразования объектов в API, по дефолту преобразование происходит в обратном порядке из adapterFromApiConfig
+   */
+  constructor(adapterFromApiConfig = {}, params) {
+    this.adapterFromApiConfig = adapterFromApiConfig
+    this.adapterToApiConfig = adapterToApiFromParams(adapterFromApiConfig, params)
+  }
+
   /**
    *
-   * @param {Number} id
-   * @returns {Promise<Array<Book>>}
+   * @returns {Promise<Object[]>}
    */
   async getBooks() {
-    return await get('/books')
+    const books = await get('/books')
+    if (this.adapterFromApiConfig) {
+      return convertList(books, {config: this.adapterFromApiConfig})
+    }
+    return books
   }
 
   /**
    *
-   * @param {Book} book
-   * @returns {Promise<Book>}
+   * @param {Object} book
+   * @returns {Promise<*|void|Object>}
    */
   async updateBook(book) {
-    console.log(`/books/${book.id}`, book)
-    return await put(`/books/${book.id}`, book)
+    const bookToApi = convertObject(book, {config: this.adapterToApiConfig})
+    const bookFromApi = await put(`/books/${book.id}`, bookToApi)
+    if (this.adapterFromApiConfig) {
+      return convertObject(bookFromApi, {config: this.adapterFromApiConfig})
+    }
+    return bookFromApi
   }
 
   /**
    *
-   * @param {Book} book
-   * @returns {Promise<Book>}
+   * @param {Object} book
+   * @returns {Promise<*|void|Object>}
    */
   async createBook(book) {
-    return await post('/books', book)
+    const bookToApi = convertObject(book, {config: this.adapterToApiConfig})
+    const bookFromApi = await post('/books', bookToApi)
+    if (this.adapterFromApiConfig) {
+      return convertObject(bookFromApi, {config: this.adapterFromApiConfig})
+    }
+    return bookFromApi
   }
 
 
   /**
    *
    * @param {Number} id
-   * @returns {Promise<Book>}
+   * @returns {Promise<Object>}
    */
   async getBookById(id) {
-    return await get(`/books/${id}`)
+    const book = await get(`/books/${id}`)
+    if (this.adapterFromApiConfig) {
+      return convertObject(book, {config: this.adapterFromApiConfig})
+    }
+    return book
   }
 
   /**
    *
    * @param {Number} id
-   * @returns {Promise<Book>}
+   * @returns {Promise<Object>}
    */
   async deleteBookById(id) {
-    return await remove(`/books/${id}`)
+    const book = await remove(`/books/${id}`)
+    if (this.adapterFromApiConfig) {
+      return convertObject(book, {config: this.adapterFromApiConfig})
+    }
+    return book
   }
 
   /**
@@ -97,4 +152,4 @@ class BooksApi {
 
 const BooksInstance = new BooksApi()
 export default BooksApi
-export {BooksInstance}
+export {BooksInstance, adapterToApiFromParams}

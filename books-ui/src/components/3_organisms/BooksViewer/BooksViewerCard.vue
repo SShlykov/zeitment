@@ -48,19 +48,19 @@ export default {
     //   type: Array,
     //   required: false
     // },
-    // updated_at: {
-    //   type: String,
-    //   required: true
-    // }
+    updatedAt: {
+      type: String,
+      required: true
+    }
   },
   data() {},
   computed: {
     formattedUpdatedAt() {
-      return moment(this.updated_at).format('MMMM Do YYYY, h:mm:ss a');
+      return moment(this.updatedAt).format('MMMM Do YYYY, h:mm:ss a');
     },
     lastUpdated() {
       moment.locale("ru");
-      return moment(this.updated_at).fromNow();
+      return moment(this.updatedAt).fromNow();
     }
   },
   mounted() {},
