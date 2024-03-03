@@ -3,7 +3,6 @@ package bookevents
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/bookevents"
