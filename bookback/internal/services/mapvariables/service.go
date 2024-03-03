@@ -14,11 +14,6 @@ type Service interface {
 	GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]models.MapVariable, error)
 	GetMapVariablesByPageID(ctx context.Context, pageID string) ([]models.MapVariable, error)
 	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]models.MapVariable, error)
-
-	GetMapVariablesByMapLinkAndBookID(ctx context.Context, mapLink, bookID string) ([]models.MapVariable, error)
-	GetMapVariablesByMapLinkAndChapterID(ctx context.Context, mapLink, chapterID string) ([]models.MapVariable, error)
-	GetMapVariablesByMapLinkAndPageID(ctx context.Context, mapLink, pageID string) ([]models.MapVariable, error)
-	GetMapVariablesByMapLinkAndParagraphID(ctx context.Context, mapLink, paragraphID string) ([]models.MapVariable, error)
 }
 
 type service struct {
@@ -65,20 +60,4 @@ func (s *service) GetMapVariablesByPageID(ctx context.Context, pageID string) ([
 
 func (s *service) GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]models.MapVariable, error) {
 	return s.repo.GetByParagraphID(ctx, paragraphID)
-}
-
-func (s *service) GetMapVariablesByMapLinkAndBookID(ctx context.Context, mapLink, bookID string) ([]models.MapVariable, error) {
-	return s.repo.GetByMapLinkAndBookID(ctx, mapLink, bookID)
-}
-
-func (s *service) GetMapVariablesByMapLinkAndChapterID(ctx context.Context, mapLink, chapterID string) ([]models.MapVariable, error) {
-	return s.repo.GetByMapLinkAndChapterID(ctx, mapLink, chapterID)
-}
-
-func (s *service) GetMapVariablesByMapLinkAndPageID(ctx context.Context, mapLink, pageID string) ([]models.MapVariable, error) {
-	return s.repo.GetByMapLinkAndPageID(ctx, mapLink, pageID)
-}
-
-func (s *service) GetMapVariablesByMapLinkAndParagraphID(ctx context.Context, mapLink, paragraphID string) ([]models.MapVariable, error) {
-	return s.repo.GetByMapLinkAndParagraphID(ctx, mapLink, paragraphID)
 }

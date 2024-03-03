@@ -2,30 +2,26 @@ package chapter
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/services/chapter"
 	"github.com/labstack/echo/v4"
+	"log/slog"
 	"net/http"
 )
 
 type Controller struct {
 	Service chapter.Service
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
 }
 
-func NewController(srv chapter.Service) *Controller {
-	return &Controller{Service: srv}
-}
-
-func (ch *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/chapters", func(c echo.Context) error { return ch.ListChapters(c, ctx) })
-	e.POST("/api/v1/chapters", func(c echo.Context) error { return ch.CreateChapter(c, ctx) })
-	e.GET("/api/v1/chapters/:id", func(c echo.Context) error { return ch.GetChapterByID(c, ctx) })
-	e.PUT("/api/v1/chapters/:id", func(c echo.Context) error { return ch.UpdateChapter(c, ctx) })
-	e.DELETE("/api/v1/chapters/:id", func(c echo.Context) error { return ch.DeleteChapter(c, ctx) })
-
-	e.GET("/api/v1/chapters/book/:id", func(c echo.Context) error { return ch.GetChapterByBookID(c, ctx) })
+// NewController создает новый экземпляр Controller.
+func NewController(srv chapter.Service, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *Controller {
+	return &Controller{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
 // ListChapters список глав
@@ -36,13 +32,12 @@ func (ch *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @produce  application/json
 // @success 200 {array} models.Chapter
 // @failure 500 {object} config.HTTPError
-func (ch *Controller) ListChapters(c echo.Context, ctx context.Context) error {
-	chapters, err := ch.Service.ListChapters(ctx)
+func (ch *Controller) ListChapters(c echo.Context) error {
+	chapters, err := ch.Service.ListChapters(ch.Ctx)
 	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, chapters)
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Chapters: chapters})
 }
 
 // CreateChapter создание новой главы
@@ -55,18 +50,17 @@ func (ch *Controller) ListChapters(c echo.Context, ctx context.Context) error {
 // @param chapter body models.Chapter true "Chapter object"
 // @success 201 {object} models.Chapter
 // @failure 400 {object} config.HTTPError
-func (ch *Controller) CreateChapter(c echo.Context, ctx context.Context) error {
-	var chap models.Chapter
+func (ch *Controller) CreateChapter(c echo.Context) error {
+	var chap requestModel
 	if err := c.Bind(&chap); err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+		return ErrorValidationFailed
 	}
-	createdChapter, err := ch.Service.CreateChapter(ctx, &chap)
+
+	createdChapter, err := ch.Service.CreateChapter(ch.Ctx, chap.Chapter)
 	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotCreated)
+		return ErrorChapterNotCreated
 	}
-	return c.JSON(http.StatusCreated, createdChapter)
+	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", Chapter: createdChapter})
 }
 
 // GetChapterByID получение главы по ID
@@ -78,14 +72,17 @@ func (ch *Controller) CreateChapter(c echo.Context, ctx context.Context) error {
 // @produce application/json
 // @success 200 {object} models.Chapter
 // @failure 404 {object} config.HTTPError
-func (ch *Controller) GetChapterByID(c echo.Context, ctx context.Context) error {
+func (ch *Controller) GetChapterByID(c echo.Context) error {
 	id := c.Param("id")
-	chapt, err := ch.Service.GetChapterByID(ctx, id)
-	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, chapt)
+
+	chapt, err := ch.Service.GetChapterByID(ch.Ctx, id)
+	if err != nil {
+		return ErrorChapterNotFound
+	}
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "ok", Chapter: chapt})
 }
 
 // UpdateChapter обновление главы
@@ -99,17 +96,26 @@ func (ch *Controller) GetChapterByID(c echo.Context, ctx context.Context) error 
 // @param chapter body models.Chapter true "Chapter object"
 // @success 200 {object} models.Chapter
 // @failure 400 {object} config.HTTPError
-func (ch *Controller) UpdateChapter(c echo.Context, ctx context.Context) error {
+func (ch *Controller) UpdateChapter(c echo.Context) error {
 	id := c.Param("id")
-	var chap models.Chapter
-	if err := c.Bind(&chap); err != nil {
+	if id == "" {
+		return ErrorValidationFailed
+	}
+
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
 	}
-	updatedChapter, err := ch.Service.UpdateChapter(ctx, id, &chap)
+
+	updatedChapter, err := ch.Service.UpdateChapter(ch.Ctx, id, request.Chapter)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotUpdated)
+		if errors.Is(err, config.ErrorNotFound) {
+			return ErrorChapterNotFound
+		}
+		fmt.Println(err)
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, updatedChapter)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Chapter: updatedChapter})
 }
 
 // DeleteChapter удаление главы
@@ -121,13 +127,17 @@ func (ch *Controller) UpdateChapter(c echo.Context, ctx context.Context) error {
 // @produce application/json
 // @success 200 {object} models.Chapter
 // @failure 406 {object} config.HTTPError
-func (ch *Controller) DeleteChapter(c echo.Context, ctx context.Context) error {
+func (ch *Controller) DeleteChapter(c echo.Context) error {
 	id := c.Param("id")
-	chapt, err := ch.Service.DeleteChapter(ctx, id)
+	if id == "" {
+		return ErrorValidationFailed
+	}
+
+	chapt, err := ch.Service.DeleteChapter(ch.Ctx, id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotDeleted)
 	}
-	return c.JSON(http.StatusOK, chapt)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", Chapter: chapt})
 }
 
 // GetChapterByBookID получение глав по ID книги
@@ -139,11 +149,15 @@ func (ch *Controller) DeleteChapter(c echo.Context, ctx context.Context) error {
 // @produce application/json
 // @success 200 {array} models.Chapter
 // @failure 404 {object} config.HTTPError
-func (ch *Controller) GetChapterByBookID(c echo.Context, ctx context.Context) error {
+func (ch *Controller) GetChapterByBookID(c echo.Context) error {
 	id := c.Param("id")
-	chapters, err := ch.Service.GetChapterByBookID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, chapters)
+
+	chapters, err := ch.Service.GetChapterByBookID(ch.Ctx, id)
+	if err != nil {
+		return ErrorDeleteChapter
+	}
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Chapters: chapters})
 }

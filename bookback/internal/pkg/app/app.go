@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"github.com/labstack/echo/v4"
 	"log/slog"
@@ -17,6 +18,7 @@ type App struct {
 	config     *cfg.Config
 	db         db.Client
 	Echo       *echo.Echo
+	metrics    metrics.Metrics
 
 	ctx      context.Context
 	closeCtx func()
@@ -29,6 +31,7 @@ func NewApp(configPath string) (*App, error) {
 	inits := []func(ctx context.Context) error{
 		app.initConfig,
 		app.initLogger,
+		app.initMetrics,
 		app.initDB,
 		app.initEndpoint,
 		app.initRouter,

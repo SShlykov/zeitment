@@ -2,33 +2,26 @@ package bookevents
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/bookevents"
 	"github.com/labstack/echo/v4"
+	"log/slog"
 	"net/http"
 )
 
 type Controller struct {
-	service service.Service
+	Service service.Service
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
 }
 
-func NewController(service service.Service) *Controller {
-	return &Controller{
-		service: service,
-	}
-}
-
-func (bec *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/bookevents/:id", func(c echo.Context) error { return bec.GetBookEventByID(c, ctx) })
-	e.PUT("/api/v1/bookevents/:id", func(c echo.Context) error { return bec.UpdateBookEvent(c, ctx) })
-	e.DELETE("/api/v1/bookevents/:id", func(c echo.Context) error { return bec.DeleteBookEvent(c, ctx) })
-	e.POST("/api/v1/bookevents", func(c echo.Context) error { return bec.CreateBookEvent(c, ctx) })
-	e.GET("/api/v1/bookevents/book/:id", func(c echo.Context) error { return bec.GetBookEventsByBookID(c, ctx) })
-	e.GET("/api/v1/bookevents/chapter/:id", func(c echo.Context) error { return bec.GetBookEventsByChapterID(c, ctx) })
-	e.GET("/api/v1/bookevents/page/:id", func(c echo.Context) error { return bec.GetBookEventsByPageID(c, ctx) })
-	e.GET("/api/v1/bookevents/paragraph/:id", func(c echo.Context) error { return bec.GetBookEventsByParagraphID(c, ctx) })
+// NewController создает новый экземпляр Controller.
+func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *Controller {
+	return &Controller{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
 // GetBookEventByID обрабатывает запросы на получение события книги по идентификатору.
@@ -40,14 +33,18 @@ func (bec *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @param id path string true "ID события книги"
 // @success 200 {object} models.BookEvent
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) GetBookEventByID(c echo.Context, ctx context.Context) error {
+func (bec *Controller) GetBookEventByID(c echo.Context) error {
 	id := c.Param("id")
-	event, err := bec.service.GetBookEventByID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, event)
+	event, err := bec.Service.GetBookEventByID(bec.Ctx, id)
+	if err != nil {
+		return ErrorBookEventNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "ok", BookEvent: event})
 }
 
 // UpdateBookEvent обрабатывает запросы на обновление события книги.
@@ -61,20 +58,26 @@ func (bec *Controller) GetBookEventByID(c echo.Context, ctx context.Context) err
 // @param event body models.BookEvent true "BookEvent object"
 // @success 200 {object} models.BookEvent
 // @failure 400 {object} config.HTTPError
-func (bec *Controller) UpdateBookEvent(c echo.Context, ctx context.Context) error {
-	var event models.BookEvent
-	if err := c.Bind(&event); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+func (bec *Controller) UpdateBookEvent(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
 	}
 
 	id := c.Param("id")
-	updatedEvent, err := bec.service.UpdateBookEvent(ctx, id, &event)
-	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, updatedEvent)
+	updatedEvent, err := bec.Service.UpdateBookEvent(bec.Ctx, id, request.BookEvents)
+	if err != nil {
+		if errors.Is(err, config.ErrorNotFound) {
+			return ErrorBookEventNotFound
+		}
+		return ErrorUnknown
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", BookEvent: updatedEvent})
 }
 
 // DeleteBookEvent обрабатывает запросы на удаление события книги.
@@ -86,15 +89,18 @@ func (bec *Controller) UpdateBookEvent(c echo.Context, ctx context.Context) erro
 // @param id path string true "ID события книги"
 // @success 204
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) DeleteBookEvent(c echo.Context, ctx context.Context) error {
+func (bec *Controller) DeleteBookEvent(c echo.Context) error {
 	id := c.Param("id")
-	deletedEvent, err := bec.service.DeleteBookEvent(ctx, id)
-	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, deletedEvent)
+	deletedEvent, err := bec.Service.DeleteBookEvent(bec.Ctx, id)
+	if err != nil {
+		return ErrorDeleteBookEvent
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", BookEvent: deletedEvent})
 }
 
 // CreateBookEvent обрабатывает запросы на создание события книги.
@@ -107,17 +113,18 @@ func (bec *Controller) DeleteBookEvent(c echo.Context, ctx context.Context) erro
 // @param event body models.BookEvent true "BookEvent object"
 // @success 201 {object} models.BookEvent
 // @failure 400 {object} config.HTTPError
-func (bec *Controller) CreateBookEvent(c echo.Context, ctx context.Context) error {
-	var event models.BookEvent
-	if err := c.Bind(&event); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+func (bec *Controller) CreateBookEvent(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
 	}
-	createdEvent, err := bec.service.CreateBookEvent(ctx, &event)
+
+	createdEvent, err := bec.Service.CreateBookEvent(bec.Ctx, request.BookEvents)
 	if err != nil {
 		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotCreated)
+		return ErrorBookEventNotCreated
 	}
-	return c.JSON(http.StatusCreated, createdEvent)
+	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", BookEvent: createdEvent})
 }
 
 // GetBookEventsByBookID обрабатывает запросы на получение событий книги по ID книги.
@@ -129,13 +136,17 @@ func (bec *Controller) CreateBookEvent(c echo.Context, ctx context.Context) erro
 // @param id path string true "ID книги"
 // @success 200 {object} []models.BookEvent
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) GetBookEventsByBookID(c echo.Context, ctx context.Context) error {
+func (bec *Controller) GetBookEventsByBookID(c echo.Context) error {
 	id := c.Param("id")
-	events, err := bec.service.GetBookEventsByBookID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, events)
+
+	events, err := bec.Service.GetBookEventsByBookID(bec.Ctx, id)
+	if err != nil {
+		return ErrorBookEventNotFound
+	}
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", BookEvents: events})
 }
 
 // GetBookEventsByChapterID обрабатывает запросы на получение событий книги по ID главы.
@@ -147,13 +158,18 @@ func (bec *Controller) GetBookEventsByBookID(c echo.Context, ctx context.Context
 // @param id path string true "ID главы"
 // @success 200 {object} []models.BookEvent
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) GetBookEventsByChapterID(c echo.Context, ctx context.Context) error {
+func (bec *Controller) GetBookEventsByChapterID(c echo.Context) error {
 	id := c.Param("id")
-	events, err := bec.service.GetBookEventsByChapterID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, events)
+
+	events, err := bec.Service.GetBookEventsByChapterID(bec.Ctx, id)
+	if err != nil {
+		return ErrorBookEventNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", BookEvents: events})
 }
 
 // GetBookEventsByPageID обрабатывает запросы на получение событий книги по ID страницы.
@@ -165,13 +181,18 @@ func (bec *Controller) GetBookEventsByChapterID(c echo.Context, ctx context.Cont
 // @param id path string true "ID страницы"
 // @success 200 {object} []models.BookEvent
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) GetBookEventsByPageID(c echo.Context, ctx context.Context) error {
+func (bec *Controller) GetBookEventsByPageID(c echo.Context) error {
 	id := c.Param("id")
-	events, err := bec.service.GetBookEventsByPageID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, events)
+
+	events, err := bec.Service.GetBookEventsByPageID(bec.Ctx, id)
+	if err != nil {
+		return ErrorBookEventNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", BookEvents: events})
 }
 
 // GetBookEventsByParagraphID обрабатывает запросы на получение событий книги по ID параграфа.
@@ -183,11 +204,16 @@ func (bec *Controller) GetBookEventsByPageID(c echo.Context, ctx context.Context
 // @param id path string true "ID параграфа"
 // @success 200 {object} []models.BookEvent
 // @failure 404 {object} config.HTTPError
-func (bec *Controller) GetBookEventsByParagraphID(c echo.Context, ctx context.Context) error {
+func (bec *Controller) GetBookEventsByParagraphID(c echo.Context) error {
 	id := c.Param("id")
-	events, err := bec.service.GetBookEventsByParagraphID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, events)
+
+	events, err := bec.Service.GetBookEventsByParagraphID(bec.Ctx, id)
+	if err != nil {
+		return ErrorBookEventNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", BookEvents: events})
 }

@@ -1,8 +1,8 @@
 package paragraph
 
 import (
-	"github.com/SShlykov/zeitment/bookback/internal/mocks"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	mocks2 "github.com/SShlykov/zeitment/bookback/tests/mocks"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -23,14 +23,14 @@ func newTestParagraph() *models.Paragraph {
 	}
 }
 
-func rowFromParagraph(paragraph *models.Paragraph) *mocks.ScanResult {
-	return mocks.NewScanResult([]interface{}{paragraph.ID, paragraph.CreatedAt, paragraph.UpdatedAt, paragraph.DeletedAt,
+func rowFromParagraph(paragraph *models.Paragraph) *mocks2.ScanResult {
+	return mocks2.NewScanResult([]interface{}{paragraph.ID, paragraph.CreatedAt, paragraph.UpdatedAt, paragraph.DeletedAt,
 		paragraph.Title, paragraph.Text, paragraph.Type, paragraph.IsPublic, paragraph.PageID})
 }
 
 func initParagraphs(ctrl *gomock.Controller) (Repository, *models.Paragraph) {
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testParagraph := newTestParagraph()
 	row := rowFromParagraph(testParagraph)
@@ -59,12 +59,12 @@ func TestRepository_Create(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testParagraph := &models.Paragraph{}
 
-	row := mocks.NewScanResult([]interface{}{faker.UUIDHyphenated()})
+	row := mocks2.NewScanResult([]interface{}{faker.UUIDHyphenated()})
 
 	client.EXPECT().DB().Return(db)
 	db.EXPECT().QueryRowContext(gomock.Any(), gomock.Any(), gomock.Any()).Return(row)
