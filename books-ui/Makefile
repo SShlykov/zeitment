@@ -21,7 +21,8 @@ prehook:
 	@echo "Setting up pre-push hook..."
 	@rm -f $(HOOK_PATH)
 	@echo '#!/bin/sh'								>> $(HOOK_PATH)
-	@echo 'echo "Running lint for proxy-ui"'		>> $(HOOK_PATH)
+	@echo 'echo "Running lint for books-ui"'		>> $(HOOK_PATH)
+	@echo 'cd ./books-ui'							>> $(HOOK_PATH)
 	@echo 'yarn lint'						    	>> $(HOOK_PATH)
 	@echo 'if [ $$? -ne 0 ]; then'					>> $(HOOK_PATH)
 	@echo '  echo "Tests failed, push aborted."'	>> $(HOOK_PATH)
