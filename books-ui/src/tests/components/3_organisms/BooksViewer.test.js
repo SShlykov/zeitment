@@ -14,14 +14,11 @@ describe("tests of BooksViewer", () => {
           booksList: []
         },
         mutations: {
-          setBooksList() {
-          },
-          resetStore() {
-          }
+          setBooksList() { },
+          resetStore() { }
         },
         actions: {
-          async fetchBooks() {
-          }
+          async fetchBooks() { }
         },
         getters: {
           booksList: () => []
@@ -47,7 +44,6 @@ describe("tests of BooksViewer", () => {
   })
 })
 
-
 describe("tests of BooksViewerContainer", () => {
   test('mount test of BooksViewerContainer', async () => {
 
@@ -64,8 +60,7 @@ describe("tests of BooksViewerCard", () => {
 
     const wrapper = mount(BooksViewerCard, {
       shallow: true,
-      props: {
-      }
+      props: { }
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -138,7 +133,5 @@ describe("tests of BooksViewerCard", () => {
 
     expect(el.text()).toBe('Обновлено год назад')
   })
-
-
 })
 

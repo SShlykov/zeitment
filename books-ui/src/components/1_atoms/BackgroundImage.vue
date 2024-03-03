@@ -2,7 +2,7 @@
 export default {
   name: 'BackgroundImage',
   props: {
-    image_link: {
+    imageLink: {
       type: String,
       required: true
     },
@@ -18,7 +18,11 @@ export default {
 <template>
   <div class="absolute inset-0 overflow-hidden transition-all">
     <figure class="h-full w-full overflow-hidden">
-      <img class="object-cover w-full h-full" :src="image_link" :alt="alt">
+      <img
+        class="object-cover w-full h-full"
+        :src="imageLink"
+        :alt="alt"
+      >
     </figure>
   </div>
 </template>
