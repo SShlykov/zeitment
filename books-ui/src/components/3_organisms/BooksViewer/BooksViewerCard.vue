@@ -51,6 +51,10 @@ export default {
     updatedAt: {
       type: String,
       required: true
+    },
+    bookLink: {
+      type: String,
+      required: true
     }
   },
   data() {},
@@ -70,7 +74,8 @@ export default {
 </script>
 
 <template>
-  <div
+  <a
+    :href="bookLink"
     class="relative shadow group border border-slate-300 rounded-md cursor-pointer transition-all
               hover:rounded-xl hover:border-slate-500 hover:shadow-md
                overflow-hidden
@@ -95,5 +100,5 @@ export default {
         </div>
       </div>
     </div>
-  </div>
+  </a>
 </template>

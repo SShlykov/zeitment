@@ -38,6 +38,7 @@ export default {
         :mapParamsId="item.mapParamsId"
         :variables="item.variables"
         :updatedAt="item.updatedAt"
+        :bookLink="`/book/${item.id}`"
       />
     </BooksViewerContainer>
   </div>

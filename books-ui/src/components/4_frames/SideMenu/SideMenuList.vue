@@ -6,14 +6,18 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
 import MenuItems from './MenuItems/MenuItems.vue'
 
 export default {
   name: 'MenuList',
   components: {MenuItems},
+  props: {
+    menuList: {
+      default: () => [],
+      type: Array
+    }
+  },
   computed: {
-    ...mapGetters('layout', ['menuList']),
     topMenuList(){
       return this.menuList.filter(({position}) => position !== 'bottom')
     },

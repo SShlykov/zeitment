@@ -1,7 +1,7 @@
 <script>
 import Head from '@frames/Head.vue';
 import SideMenu from '@frames/SideMenu/SideMenu.vue';
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 
 export default {
@@ -14,16 +14,19 @@ export default {
     return {}
   },
   computed: {
+    ...mapGetters('userBooks', ['booksList']),
     pageName() {
       if (!this.$route) return "pending"
       return this.$route.name
     }
   },
-  mounted()     {
+  mounted() {
+    this.fetchBooks()
     this.initScreenSizeRecalc()
   },
   methods: {
-    ...mapActions('layout', ['initScreenSizeRecalc'])
+    ...mapActions('layout', ['initScreenSizeRecalc']),
+    ...mapActions('userBooks', ['fetchBooks']),
   }
 }
 </script>

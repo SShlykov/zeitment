@@ -44,8 +44,8 @@ class BooksApi {
 
   /**
    * @constructor
-   * @param {Object | null} adapterFromApiConfig - конфигурация адаптера для преобразования объектов из API
-   * @param {Object | undefined} params - параметры
+   * @param {Object | undefined } adapterFromApiConfig - конфигурация адаптера для преобразования объектов из API
+   * @param {Object | undefined | any} params - параметры
    * @param {Object} params.adapterToApiConfig - конфигурация адаптера для преобразования объектов в API, по дефолту преобразование происходит в обратном порядке из adapterFromApiConfig
    */
   constructor(adapterFromApiConfig = {}, params) {
