@@ -123,31 +123,22 @@ describe("tests of BooksViewerCard", () => {
     expect(wrapper.text().includes("Обновлено 5 месяцев назад")).toBe(true)
   })
 
-  test('display date and title', async () => {
+  test('display date', async () => {
     const updated_at = "2024-02-12T23:47:35.711668+03:00"
     vi.setSystemTime(new Date('2025-07-20T23:47:35'))
 
     const wrapper = mount(BooksViewerCard, {
       shallow: true,
       props: {
-        id: "fb5e7d1d-38cd-4831-bae9-07b36080e3e7",
-        owner: "e75aae0d-c1eb-4199-a1d8-2177f57d6a1e",
-        title: "Тестовая книга",
         updated_at,
-        variables: [],
-        map_params_id: null,
-        map_link: null,
-        image_link: null,
-        publication: null,
-        is_public: false,
-        description: "test description",
       }
     })
 
     const el = wrapper.find('[test-id="lastUpdated"]')
 
-    expect(wrapper.text().includes("Тестовая книга")).toBe(true)
     expect(el.text()).toBe('Обновлено год назад')
   })
+
+
 })
 

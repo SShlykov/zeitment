@@ -79,16 +79,21 @@ export default {
   "
   >
     <div class="card text-slate-500">
-      <BackgroundImage 
-        :image_link="'https://cdn.britannica.com/45/5645-050-B9EC0205/head-treasure-flower-disk-flowers-inflorescence-ray.jpg'" 
-        class="opacity-0 group-hover:opacity-5 transition-all"
-        :alt="title"
-        v-if="false"
-      />
       <div class="h-full w-full p-4">
         <div>
-          <h3 class="text-lg font-bold mb-1">{{title}}</h3>
-          <p test-id="lastUpdated" class="text-xs">Обновлено {{lastUpdated}}</p>
+          <h3
+            v-tippy="{ content: title }"
+            test-id="title"
+            class="text-lg font-bold mb-1 truncate transition-all group-hover:text-slate-700"
+          >
+            {{ title }}
+          </h3>
+          <p
+            test-id="lastUpdated"
+            class="text-xs group-hover:text-slate-600 transition-all"
+          >
+            Обновлено {{ lastUpdated }}
+          </p>
         </div>
       </div>
     </div>
