@@ -2,30 +2,24 @@ package page
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/page"
 	"github.com/labstack/echo/v4"
+	"log/slog"
 	"net/http"
 )
 
 type Controller struct {
 	Service service.Service
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
 }
 
-func NewController(srv service.Service) *Controller {
-	return &Controller{Service: srv}
-}
-
-func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/pages", func(c echo.Context) error { return p.ListPages(c, ctx) })
-	e.POST("/api/v1/pages", func(c echo.Context) error { return p.CreatePage(c, ctx) })
-	e.GET("/api/v1/pages/:id", func(c echo.Context) error { return p.GetPageByID(c, ctx) })
-	e.PUT("/api/v1/pages/:id", func(c echo.Context) error { return p.UpdatePage(c, ctx) })
-	e.DELETE("/api/v1/pages/:id", func(c echo.Context) error { return p.DeletePage(c, ctx) })
-
-	e.GET("/api/v1/chapters/:id/pages", func(c echo.Context) error { return p.GetPagesByChapterID(c, ctx) })
+func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *Controller {
+	return &Controller{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
 // ListPages список страниц
@@ -36,13 +30,12 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @produce  application/json
 // @success 200 {array} models.Page
 // @failure 500 {object} config.HTTPError
-func (p *Controller) ListPages(c echo.Context, ctx context.Context) error {
-	pages, err := p.Service.ListPages(ctx)
+func (p *Controller) ListPages(c echo.Context) error {
+	pages, err := p.Service.ListPages(p.Ctx)
 	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, pages)
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Pages: pages})
 }
 
 // CreatePage создание новой страницы
@@ -55,16 +48,17 @@ func (p *Controller) ListPages(c echo.Context, ctx context.Context) error {
 // @param page body models.Page true "Page object"
 // @success 201 {object} models.Page
 // @failure 400 {object} config.HTTPError
-func (p *Controller) CreatePage(c echo.Context, ctx context.Context) error {
-	var page models.Page
-	if err := c.Bind(&page); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+func (p *Controller) CreatePage(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
 	}
-	createdPage, err := p.Service.CreatePage(ctx, &page)
+
+	createdPage, err := p.Service.CreatePage(p.Ctx, request.Page)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotCreated)
+		return ErrorPageNotCreated
 	}
-	return c.JSON(http.StatusCreated, createdPage)
+	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", Page: createdPage})
 }
 
 // GetPageByID получение страницы по ID
@@ -76,13 +70,18 @@ func (p *Controller) CreatePage(c echo.Context, ctx context.Context) error {
 // @param id path string true "ID страницы"
 // @success 200 {object} models.Page
 // @failure 404 {object} config.HTTPError
-func (p *Controller) GetPageByID(c echo.Context, ctx context.Context) error {
+func (p *Controller) GetPageByID(c echo.Context) error {
 	id := c.Param("id")
-	page, err := p.Service.GetPageByID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, page)
+
+	page, err := p.Service.GetPageByID(p.Ctx, id)
+	if err != nil {
+		return ErrorPageNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "ok", Page: page})
 }
 
 // UpdatePage обновление страницы
@@ -96,18 +95,25 @@ func (p *Controller) GetPageByID(c echo.Context, ctx context.Context) error {
 // @param page body models.Page true "Page object"
 // @success 200 {object} models.Page
 // @failure 400 {object} config.HTTPError
-func (p *Controller) UpdatePage(c echo.Context, ctx context.Context) error {
+func (p *Controller) UpdatePage(c echo.Context) error {
 	id := c.Param("id")
-	var page models.Page
-	if err := c.Bind(&page); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	updatedPage, err := p.Service.UpdatePage(ctx, id, &page)
+
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
+	}
+
+	updatedPage, err := p.Service.UpdatePage(p.Ctx, id, request.Page)
 	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotUpdated)
+		if errors.Is(err, config.ErrorNotFound) {
+			return ErrorPageNotFound
+		}
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, updatedPage)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Page: updatedPage})
 }
 
 // DeletePage удаление страницы
@@ -119,14 +125,17 @@ func (p *Controller) UpdatePage(c echo.Context, ctx context.Context) error {
 // @produce application/json
 // @success 200 {object} models.Page
 // @failure 500 {object} config.HTTPError
-func (p *Controller) DeletePage(c echo.Context, ctx context.Context) error {
+func (p *Controller) DeletePage(c echo.Context) error {
 	id := c.Param("id")
-	deletedPage, err := p.Service.DeletePage(ctx, id)
-	if err != nil {
-		fmt.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotDeleted)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, deletedPage)
+
+	deletedPage, err := p.Service.DeletePage(p.Ctx, id)
+	if err != nil {
+		return ErrorDeletePage
+	}
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", Page: deletedPage})
 }
 
 // GetPagesByChapterID получение страниц по ID главы
@@ -138,11 +147,15 @@ func (p *Controller) DeletePage(c echo.Context, ctx context.Context) error {
 // @param id path string true "ID главы"
 // @success 200 {array} models.Page
 // @failure 404 {object} config.HTTPError
-func (p *Controller) GetPagesByChapterID(c echo.Context, ctx context.Context) error {
+func (p *Controller) GetPagesByChapterID(c echo.Context) error {
 	id := c.Param("id")
-	pages, err := p.Service.GetPagesByChapterID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, pages)
+
+	pages, err := p.Service.GetPagesByChapterID(p.Ctx, id)
+	if err != nil {
+		return ErrorPageNotFound
+	}
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Pages: pages})
 }
