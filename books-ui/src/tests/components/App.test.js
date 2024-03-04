@@ -104,6 +104,7 @@ describe("tests of App", async () => {
     // await wrapper.vm.fetchBooks()
     // const userBooksList = store.getters['userBooks/booksList']
     // expect(userBooksList).toEqual([expectedBook])
+    // test lint
 
     expect(wrapper.vm.booksList).toEqual([expectedBook])
   })
