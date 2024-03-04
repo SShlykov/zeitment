@@ -31,7 +31,6 @@ export default {
 }
 </script>
 
-
 <template>
   <div
     v-if="pageName && pageName !== 'auth'"
