@@ -3,13 +3,13 @@ name: vue
 on:
   push:
     paths:
-      - books-ui/**
+      - /books-ui/**
     branches:
       - main
       - books-ui
   pull_request:
     paths:
-      - books-ui/**
+      - /books-ui/**
     branches:
       - main
       - books-ui
