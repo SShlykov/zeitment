@@ -1,8 +1,8 @@
 package page
 
 import (
-	"github.com/SShlykov/zeitment/bookback/internal/mocks"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	mocks2 "github.com/SShlykov/zeitment/bookback/tests/mocks"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -23,14 +23,14 @@ func newTestPage() *models.Page {
 	}
 }
 
-func rowFromPage(page *models.Page) *mocks.ScanResult {
-	return mocks.NewScanResult([]interface{}{page.ID, page.CreatedAt, page.UpdatedAt, page.DeletedAt,
+func rowFromPage(page *models.Page) *mocks2.ScanResult {
+	return mocks2.NewScanResult([]interface{}{page.ID, page.CreatedAt, page.UpdatedAt, page.DeletedAt,
 		page.Title, page.Text, page.ChapterID, page.IsPublic, page.MapParamsID})
 }
 
 func initPages(ctrl *gomock.Controller) (Repository, *models.Page) {
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testPage := newTestPage()
 	row := rowFromPage(testPage)
@@ -59,12 +59,12 @@ func TestRepository_Create(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testPage := &models.Page{}
 
-	row := mocks.NewScanResult([]interface{}{faker.UUIDHyphenated()})
+	row := mocks2.NewScanResult([]interface{}{faker.UUIDHyphenated()})
 
 	client.EXPECT().DB().Return(db)
 	db.EXPECT().QueryRowContext(gomock.Any(), gomock.Any(), gomock.Any()).Return(row)

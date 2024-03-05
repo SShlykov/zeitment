@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-ALTER table pages ADD COLUMN title text;
+ALTER table pages ADD COLUMN title VARCHAR(255);
 -- +goose StatementEnd
 
 -- +goose Down

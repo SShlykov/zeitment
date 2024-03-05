@@ -2,27 +2,25 @@ package paragraph
 
 import (
 	"context"
+	"errors"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/paragraph"
 	"github.com/labstack/echo/v4"
+	"log/slog"
 	"net/http"
 )
 
 type Controller struct {
 	Service service.Service
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
 }
 
-func NewController(srv service.Service) *Controller {
-	return &Controller{Service: srv}
-}
-
-func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/paragraphs", func(c echo.Context) error { return p.ListParagraphs(c, ctx) })
-	e.POST("/api/v1/paragraphs", func(c echo.Context) error { return p.CreateParagraph(c, ctx) })
-	e.GET("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.GetParagraphByID(c, ctx) })
-	e.PUT("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.UpdateParagraph(c, ctx) })
-	e.DELETE("/api/v1/paragraphs/:id", func(c echo.Context) error { return p.DeleteParagraph(c, ctx) })
+// NewController создает новый экземпляр Controller.
+func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *Controller {
+	return &Controller{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
 // ListParagraphs список параграфов
@@ -33,12 +31,12 @@ func (p *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @produce  application/json
 // @success 200 {array} models.Paragraph
 // @failure 500 {object} config.HTTPError
-func (p *Controller) ListParagraphs(c echo.Context, ctx context.Context) error {
-	paragraphs, err := p.Service.ListParagraphs(ctx)
+func (p *Controller) ListParagraphs(c echo.Context) error {
+	paragraphs, err := p.Service.ListParagraphs(p.Ctx)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadGateway, config.ErrorForbidden)
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, paragraphs)
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Paragraphs: paragraphs})
 }
 
 // CreateParagraph создание нового параграфа
@@ -51,16 +49,17 @@ func (p *Controller) ListParagraphs(c echo.Context, ctx context.Context) error {
 // @param paragraph body models.Paragraph true "Paragraph object"
 // @success 201 {object} models.Paragraph
 // @failure 400 {object} config.HTTPError
-func (p *Controller) CreateParagraph(c echo.Context, ctx context.Context) error {
-	var paragraph models.Paragraph
-	if err := c.Bind(&paragraph); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+func (p *Controller) CreateParagraph(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
 	}
-	createdParagraph, err := p.Service.CreateParagraph(ctx, &paragraph)
+
+	createdParagraph, err := p.Service.CreateParagraph(p.Ctx, request.Paragraph)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotCreated)
+		return ErrorParagraphNotFound
 	}
-	return c.JSON(http.StatusCreated, createdParagraph)
+	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", Paragraph: createdParagraph})
 }
 
 // GetParagraphByID получение параграфа по идентификатору
@@ -72,13 +71,18 @@ func (p *Controller) CreateParagraph(c echo.Context, ctx context.Context) error 
 // @produce application/json
 // @success 200 {object} models.Paragraph
 // @failure 404 {object} config.HTTPError
-func (p *Controller) GetParagraphByID(c echo.Context, ctx context.Context) error {
+func (p *Controller) GetParagraphByID(c echo.Context) error {
 	id := c.Param("id")
-	paragraph, err := p.Service.GetParagraphByID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, paragraph)
+
+	paragraph, err := p.Service.GetParagraphByID(p.Ctx, id)
+	if err != nil {
+		return ErrorParagraphNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "ok", Paragraph: paragraph})
 }
 
 // UpdateParagraph обновление параграфа
@@ -92,17 +96,25 @@ func (p *Controller) GetParagraphByID(c echo.Context, ctx context.Context) error
 // @param paragraph body models.Paragraph true "Paragraph object"
 // @success 200 {object} models.Paragraph
 // @failure 400 {object} config.HTTPError
-func (p *Controller) UpdateParagraph(c echo.Context, ctx context.Context) error {
+func (p *Controller) UpdateParagraph(c echo.Context) error {
 	id := c.Param("id")
-	var paragraph models.Paragraph
-	if err := c.Bind(&paragraph); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	updatedParagraph, err := p.Service.UpdateParagraph(ctx, id, &paragraph)
+
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
+	}
+
+	updatedParagraph, err := p.Service.UpdateParagraph(p.Ctx, id, request.Paragraph)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotUpdated)
+		if errors.Is(err, config.ErrorNotFound) {
+			return ErrorParagraphNotFound
+		}
+		return ErrorUnknown
 	}
-	return c.JSON(http.StatusOK, updatedParagraph)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Paragraph: updatedParagraph})
 }
 
 // DeleteParagraph удаление параграфа
@@ -113,17 +125,21 @@ func (p *Controller) UpdateParagraph(c echo.Context, ctx context.Context) error 
 // @param id path string true "ID параграфа"
 // @success 200 {object} models.Paragraph
 // @failure 500 {object} config.HTTPError
-func (p *Controller) DeleteParagraph(c echo.Context, ctx context.Context) error {
+func (p *Controller) DeleteParagraph(c echo.Context) error {
 	id := c.Param("id")
-	deletedParagraph, err := p.Service.DeleteParagraph(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorNotDeleted)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, deletedParagraph)
+
+	deletedParagraph, err := p.Service.DeleteParagraph(p.Ctx, id)
+	if err != nil {
+		return ErrorDeleteParagraph
+	}
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", Paragraph: deletedParagraph})
 }
 
 // GetParagraphsByPageID получение параграфов по ID страницы
-// @router /pages/{id}/paragraphs [get]
+// @router /paragraphs/pages/{id} [get]
 // @summary Получить параграфы по ID страницы
 // @description Извлекает параграфы по ID страницы
 // @tags Параграфы
@@ -131,11 +147,15 @@ func (p *Controller) DeleteParagraph(c echo.Context, ctx context.Context) error 
 // @produce application/json
 // @success 200 {array} models.Paragraph
 // @failure 404 {object} config.HTTPError
-func (p *Controller) GetParagraphsByPageID(c echo.Context, ctx context.Context) error {
+func (p *Controller) GetParagraphsByPageID(c echo.Context) error {
 	id := c.Param("id")
-	paragraphs, err := p.Service.GetParagraphsByPageID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
-	return c.JSON(http.StatusOK, paragraphs)
+
+	paragraphs, err := p.Service.GetParagraphsByPageID(p.Ctx, id)
+	if err != nil {
+		return ErrorParagraphNotFound
+	}
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", Paragraphs: paragraphs})
 }

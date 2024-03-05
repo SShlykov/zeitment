@@ -13,7 +13,6 @@ const (
 	columnID          = "id"
 	columnCreatedAt   = "created_at"
 	columnUpdatedAt   = "updated_at"
-	columnDeletedAt   = "deleted_at"
 	columnBookID      = "book_id"
 	columnChapterID   = "chapter_id"
 	columnPageID      = "page_id"
@@ -44,27 +43,34 @@ type repository struct {
 	db db.Client
 }
 
+func NewRepository(database db.Client) Repository {
+	return &repository{database}
+}
+
 func allItems() string {
-	cols := []string{columnID, columnBookID, columnCreatedAt, columnUpdatedAt, columnDeletedAt,
-		columnChapterID, columnPageID, columnParagraphID, columnEventType, columnIsPublic,
-		columnKey, columnValue, columnLink, columnLinkText, columnLinkType, columnLinkImage,
+	cols := []string{columnID, columnCreatedAt, columnUpdatedAt, columnBookID, columnChapterID,
+		columnPageID, columnParagraphID, columnEventType, columnIsPublic, columnKey,
+		columnValue, columnLink, columnLinkText, columnLinkType, columnLinkImage,
 		columnDescription}
 
 	return strings.Join(cols, ", ")
 }
 
-func NewRepository(database db.Client) Repository {
-	return &repository{database}
+func insertItems() string {
+	cols := []string{columnBookID, columnChapterID, columnPageID, columnParagraphID, columnEventType,
+		columnIsPublic, columnKey, columnValue, columnLink, columnLinkText,
+		columnLinkType, columnLinkImage, columnDescription}
+
+	return strings.Join(cols, ", ")
 }
 
 func (r *repository) Create(ctx context.Context, event *models.BookEvent) (string, error) {
-	query := `INSERT INTO` + " " + tableName + ` (` + allItems() +
+	query := `INSERT INTO` + " " + tableName + ` (` + insertItems() +
 		`) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING ` +
 		columnID
 
-	args := []interface{}{event.ID, event.BookID, event.ChapterID, event.PageID, event.ParagraphID, event.EventType, //nolint:gofmt
-		event.IsPublic, event.Key, event.Value,
-		event.Link, event.LinkText, event.LinkType,
+	args := []interface{}{event.BookID, event.ChapterID, event.PageID, event.ParagraphID, event.EventType, //nolint:gofmt
+		event.IsPublic, event.Key, event.Value, event.Link, event.LinkText, event.LinkType,
 		event.LinkImage, event.Description}
 
 	q := db.Query{Name: "BookEventRepository.Insert", Raw: query}
@@ -86,16 +92,16 @@ func (r *repository) FindByID(ctx context.Context, id string) (*models.BookEvent
 }
 
 func (r *repository) Update(ctx context.Context, id string, event *models.BookEvent) (*models.BookEvent, error) {
-	query := `UPDATE ` + tableName + ` SET ` + services.ParamsToQuery(", ", columnBookID, columnChapterID,
-		columnPageID, columnParagraphID, columnEventType, columnIsPublic, columnKey, columnValue,
-		columnLink, columnLinkText, columnLinkType, columnLinkImage, columnDescription) + ` WHERE ` +
-		columnID + ` = $15` + `RETURNING ` + allItems()
+	query := `UPDATE ` + tableName + ` SET ` +
+		services.ParamsToQuery(", ",
+			columnBookID, columnChapterID, columnPageID, columnParagraphID, columnEventType,
+			columnIsPublic, columnKey, columnValue, columnLink, columnLinkText,
+			columnLinkType, columnLinkImage, columnDescription) + ` WHERE ` +
+		columnID + ` = $14` + ` RETURNING ` + allItems()
 
-	args := []interface{}{event.ID, event.BookID, event.ChapterID, //nolint:gofmt
-		event.PageID, event.ParagraphID, event.EventType,
-		event.IsPublic, event.Key, event.Value,
-		event.Link, event.LinkText, event.LinkType,
-		event.LinkImage, event.Description, id}
+	args := []interface{}{event.BookID, event.ChapterID, event.PageID, event.ParagraphID, event.EventType, //nolint:gofmt
+		event.IsPublic, event.Key, event.Value, event.Link, event.LinkText,
+		event.LinkType, event.LinkImage, event.Description, id}
 
 	q := db.Query{Name: "BookEventRepository.Update", Raw: query}
 
@@ -105,7 +111,7 @@ func (r *repository) Update(ctx context.Context, id string, event *models.BookEv
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (*models.BookEvent, error) {
-	query := `DELETE FROM` + " " + tableName + ` WHERE ` + services.SelectWhere(allItems, tableName, columnID) + `RETURNING ` + allItems()
+	query := services.DeleteQuery(tableName, columnID) + ` RETURNING ` + allItems()
 
 	q := db.Query{Name: "BookEventRepository.Delete", Raw: query}
 	row := r.db.DB().QueryRowContext(ctx, q, id)

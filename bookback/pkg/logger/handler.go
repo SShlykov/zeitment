@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"strings"
 )
 
 type PrettyHandlerOptions struct {
@@ -39,23 +40,21 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		return true
 	})
 
-	b, err := json.MarshalIndent(fields, "", "  ")
+	b, err := json.MarshalIndent(fields, "", "")
 	if err != nil {
 		return err
 	}
+	opts := strings.Replace(string(b), "\n", " ", -1)
 
 	timeStr := r.Time.Format("[15:05:05.000]")
 	msg := color.CyanString(r.Message)
 
-	h.l.Println(timeStr, level, msg, color.WhiteString(string(b)))
+	h.l.Println(timeStr, level, msg, color.WhiteString(opts))
 
 	return nil
 }
 
-func NewPrettyHandler(
-	out io.Writer,
-	opts PrettyHandlerOptions,
-) *PrettyHandler {
+func NewPrettyHandler(out io.Writer, opts PrettyHandlerOptions) *PrettyHandler {
 	h := &PrettyHandler{
 		Handler: slog.NewJSONHandler(out, &opts.SlogOpts),
 		l:       log.New(out, "", 0),

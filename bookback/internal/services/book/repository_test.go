@@ -1,8 +1,8 @@
 package book
 
 import (
-	"github.com/SShlykov/zeitment/bookback/internal/mocks"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	mocks2 "github.com/SShlykov/zeitment/bookback/tests/mocks"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -26,16 +26,16 @@ func newTestBook() *models.Book {
 	}
 }
 
-func rowFromBook(book *models.Book) *mocks.ScanResult {
-	return mocks.NewScanResult([]interface{}{book.ID, book.CreatedAt, book.UpdatedAt, book.DeletedAt, book.Owner, //nolint:gofmt
+func rowFromBook(book *models.Book) *mocks2.ScanResult {
+	return mocks2.NewScanResult([]interface{}{book.ID, book.CreatedAt, book.UpdatedAt, book.DeletedAt, book.Owner, //nolint:gofmt
 		book.Title, book.Author, book.Description, book.IsPublic, book.Publication, book.ImageLink, book.MapLink,
 		book.MapParamsID, book.Variables,
 	})
 }
 
 func inits(ctrl *gomock.Controller) (Repository, *models.Book) {
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testBook := newTestBook()
 	row := rowFromBook(testBook)
@@ -63,12 +63,12 @@ func TestRepository_Create(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	client := mocks.NewMockClient(ctrl)
-	db := mocks.NewMockDB(ctrl)
+	client := mocks2.NewMockClient(ctrl)
+	db := mocks2.NewMockDB(ctrl)
 
 	testBook := &models.Book{}
 
-	row := mocks.NewScanResult([]interface{}{faker.UUIDHyphenated()})
+	row := mocks2.NewScanResult([]interface{}{faker.UUIDHyphenated()})
 
 	client.EXPECT().DB().Return(db)
 	db.EXPECT().QueryRowContext(gomock.Any(), gomock.Any(), gomock.Any()).Return(row)

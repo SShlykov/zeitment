@@ -2,10 +2,18 @@ package app
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"github.com/SShlykov/zeitment/bookback/internal/circuitbreaker"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/router"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/circuitbreaker"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/book"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/bookevents"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/chapter"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/health"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/mapvariables"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/page"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/paragraph"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/swagger"
+	"github.com/SShlykov/zeitment/bookback/internal/servers/http/httpmiddlewares"
+	"github.com/SShlykov/zeitment/bookback/pkg/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log/slog"
@@ -14,16 +22,15 @@ import (
 )
 
 func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
-	wg.Add(1)
-
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		httpServer := &http.Server{
 			ReadHeaderTimeout: app.config.Timeout,
 			ReadTimeout:       app.config.Timeout,
 			WriteTimeout:      app.config.Timeout,
 			IdleTimeout:       app.config.IddleTimeout,
-			Addr:              fmt.Sprintf(app.config.Address),
+			Addr:              app.config.Address,
 			Handler:           app.Echo,
 		}
 
@@ -37,13 +44,22 @@ func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
 
 func (app *App) initEndpoint(_ context.Context) error {
 	e := echo.New()
-	cb := circuitbreaker.NewCircuitBreaker(app.config.RequestLimit, app.config.MinRequests, app.config.ErrorThresholdPercentage,
-		app.config.IntervalDuration, app.config.OpenStateTimeout)
+	cb := circuitbreaker.NewCircuitBreaker(
+		app.config.RequestLimit,
+		app.config.MinRequests,
+		app.config.ErrorThresholdPercentage,
+		app.config.IntervalDuration,
+		app.config.OpenStateTimeout,
+	)
 
 	middlewares := []echo.MiddlewareFunc{
-		loggerConfiguration(app.logger),
+		httpmiddlewares.LoggerConfiguration(app.logger),
 		middleware.Recover(),
-		createCircuitBreakerMiddleware(cb),
+		httpmiddlewares.CreateCircuitBreakerMiddleware(cb),
+	}
+
+	if app.config.CorsEnabled {
+		middlewares = append(middlewares, httpmiddlewares.CORS())
 	}
 
 	e.Use(middlewares...)
@@ -53,59 +69,21 @@ func (app *App) initEndpoint(_ context.Context) error {
 }
 
 func (app *App) initRouter(_ context.Context) error {
-	router.SetCORSConfig(app.Echo, app.config.CorsEnabled)
-	router.SetHealthController(app.Echo, app.ctx)
-	router.SetBookController(app.Echo, app.db, app.ctx)
-	router.SetChapterController(app.Echo, app.db, app.ctx)
-	router.SetPageController(app.Echo, app.db, app.ctx)
-	router.SetParagraphController(app.Echo, app.db, app.ctx)
-	router.SetBookEventController(app.Echo, app.db, app.ctx)
-	router.SetMapVariablesController(app.Echo, app.db, app.ctx)
-	router.SetSwagger(app.Echo, app.config.SwaggerEnabled)
+	controllers := []func(e *echo.Echo, database db.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context){
+		health.SetHealthController,
+		book.SetBookController,
+		chapter.SetChapterController,
+		page.SetPageController,
+		paragraph.SetParagraphController,
+		bookevents.SetBookEventController,
+		mapvariables.SetMapVariablesController,
+	}
+
+	for _, controller := range controllers {
+		controller(app.Echo, app.db, app.metrics, app.logger, app.ctx)
+	}
+
+	swagger.SetSwagger(app.Echo, app.config.SwaggerEnabled)
 
 	return nil
-}
-
-func createCircuitBreakerMiddleware(cb *circuitbreaker.CircuitBreaker) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			err := cb.Execute(func() error {
-				return next(c)
-			})
-
-			if err != nil {
-				if errors.Is(err, circuitbreaker.ErrorCb) {
-					return c.JSON(http.StatusUnavailableForLegalReasons,
-						map[string]string{"error": "Server is overloaded, please try again later.", "status": "error"})
-				}
-				return err
-			}
-
-			return nil
-		}
-	}
-}
-
-func loggerConfiguration(logger *slog.Logger) echo.MiddlewareFunc {
-	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogStatus:   true,
-		LogURI:      true,
-		LogError:    true,
-		HandleError: true,
-		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-			if v.Error == nil {
-				logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
-				)
-			} else {
-				logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
-					slog.String("err", v.Error.Error()),
-				)
-			}
-			return nil
-		},
-	})
 }

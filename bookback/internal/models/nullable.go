@@ -27,7 +27,7 @@ func (nt *NullTime) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON метод для десериализации из JSON.
 func (nt *NullTime) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
+	if isNull(data) {
 		nt.Valid = false
 		return nil
 	}
@@ -57,11 +57,43 @@ func (ns *NullString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON метод для десериализации из JSON.
 func (ns *NullString) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
+	if isNull(data) {
 		ns.Valid = false
 		return nil
 	}
 	err := json.Unmarshal(data, &ns.String)
 	ns.Valid = err == nil
 	return err
+}
+
+// NullInt обертка вокруг sql.NullInt64 для корректной работы с JSON
+type NullInt struct {
+	sql.NullInt64
+}
+
+// NewNullInt создает новый экземпляр NullInt.
+func NewNullInt(i int64, valid bool) NullInt {
+	return NullInt{sql.NullInt64{Int64: i, Valid: valid}}
+}
+
+// MarshalJSON метод для сериализация в JSON.
+func (ni *NullInt) MarshalJSON() ([]byte, error) {
+	if ni.Valid {
+		return json.Marshal(ni.Int64)
+	}
+	return json.Marshal(nil)
+}
+
+func (ni *NullInt) UnmarshalJSON(data []byte) error {
+	if isNull(data) {
+		ni.Valid = false
+		return nil
+	}
+	err := json.Unmarshal(data, &ni.Int64)
+	ni.Valid = err == nil
+	return err
+}
+
+func isNull(data []byte) bool {
+	return string(data) == "null"
 }

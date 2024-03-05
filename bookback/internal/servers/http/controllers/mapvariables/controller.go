@@ -2,48 +2,27 @@ package mapvariables
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	service "github.com/SShlykov/zeitment/bookback/internal/services/mapvariables"
 	"github.com/labstack/echo/v4"
+	"log/slog"
 	"net/http"
 )
 
+// Controller структура для HTTP-контроллера книг.
 type Controller struct {
-	service service.Service
+	Service service.Service
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
 }
 
-func NewController(service service.Service) *Controller {
-	return &Controller{
-		service: service,
-	}
-}
-
-func (mvc *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
-	e.GET("/api/v1/mapvariables/:id",
-		func(c echo.Context) error { return mvc.GetMapVariableByID(c, ctx) })
-	e.PUT("/api/v1/mapvariables/:id",
-		func(c echo.Context) error { return mvc.UpdateMapVariable(c, ctx) })
-	e.DELETE("/api/v1/mapvariables/:id",
-		func(c echo.Context) error { return mvc.DeleteMapVariable(c, ctx) })
-	e.POST("/api/v1/mapvariables",
-		func(c echo.Context) error { return mvc.CreateMapVariable(c, ctx) })
-	e.GET("/api/v1/mapvariables/book/:id",
-		func(c echo.Context) error { return mvc.GetMapVariablesByBookID(c, ctx) })
-	e.GET("/api/v1/mapvariables/chapter/:id",
-		func(c echo.Context) error { return mvc.GetMapVariablesByChapterID(c, ctx) })
-	e.GET("/api/v1/mapvariables/page/:id",
-		func(c echo.Context) error { return mvc.GetMapVariablesByPageID(c, ctx) })
-	e.GET("/api/v1/mapvariables/paragraph/:id",
-		func(c echo.Context) error { return mvc.GetMapVariablesByParagraphID(c, ctx) })
-	e.GET("/api/v1/bookevents/maplink/:link/book/:id/",
-		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndBookID(c, ctx) })
-	e.GET("/api/v1/bookevents/maplink/:link/chapter/:id/",
-		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndChapterID(c, ctx) })
-	e.GET("/api/v1/bookevents/maplink/:link/page/:id/",
-		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndPageID(c, ctx) })
-	e.GET("/api/v1/bookevents/maplink/:link/paragraph/:id/",
-		func(c echo.Context) error { return mvc.GetMapVariablesByMapLinkAndParagraphID(c, ctx) })
+// NewController создает новый экземпляр Controller.
+func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *Controller {
+	return &Controller{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
 // GetMapVariableByID обрабатывает запросы на получение переменной карты по идентификатору.
@@ -55,14 +34,19 @@ func (mvc *Controller) RegisterRoutes(e *echo.Echo, ctx context.Context) {
 // @param id path string true "ID переменной карты"
 // @success 200 {object} models.MapVariable
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariableByID(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) GetMapVariableByID(c echo.Context) error {
 	id := c.Param("id")
-	variable, err := mvc.service.GetMapVariableByID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, variable)
+	variable, err := mvc.Service.GetMapVariableByID(mvc.Ctx, id)
+	if err != nil {
+		fmt.Println(err)
+		return ErrorMapVariableNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "ok", MapVariable: variable})
 }
 
 // UpdateMapVariable обрабатывает запросы на обновление переменной карты.
@@ -76,19 +60,26 @@ func (mvc *Controller) GetMapVariableByID(c echo.Context, ctx context.Context) e
 // @param variable body models.MapVariable true "MapVariable object"
 // @success 200 {object} models.MapVariable
 // @failure 400 {object} config.HTTPError
-func (mvc *Controller) UpdateMapVariable(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) UpdateMapVariable(c echo.Context) error {
 	id := c.Param("id")
-	var variable models.MapVariable
-	if err := c.Bind(&variable); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	updatedVariable, err := mvc.service.UpdateMapVariable(ctx, id, &variable)
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
+	}
+
+	updatedVariable, err := mvc.Service.UpdateMapVariable(mvc.Ctx, id, request.MapVariables)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorForbidden)
+		if errors.Is(err, config.ErrorNotFound) {
+			return ErrorMapVariableNotFound
+		}
+		return ErrorUnknown
 	}
 
-	return c.JSON(http.StatusOK, updatedVariable)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", MapVariable: updatedVariable})
 }
 
 // DeleteMapVariable обрабатывает запросы на удаление переменной карты.
@@ -99,13 +90,18 @@ func (mvc *Controller) UpdateMapVariable(c echo.Context, ctx context.Context) er
 // @param id path string true "ID переменной карты"
 // @success 204
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) DeleteMapVariable(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) DeleteMapVariable(c echo.Context) error {
 	id := c.Param("id")
-	if _, err := mvc.service.DeleteMapVariable(ctx, id); err != nil {
+	if id == "" {
+		return ErrorValidationFailed
+	}
+
+	mapVariable, err := mvc.Service.DeleteMapVariable(mvc.Ctx, id)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", MapVariable: mapVariable})
 }
 
 // GetMapVariablesByBookID обрабатывает запросы на получение переменных карты по идентификатору книги.
@@ -117,14 +113,18 @@ func (mvc *Controller) DeleteMapVariable(c echo.Context, ctx context.Context) er
 // @param id path string true "ID книги"
 // @success 200 {array} models.MapVariable
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByBookID(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) GetMapVariablesByBookID(c echo.Context) error {
 	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByBookID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, variables)
+	variables, err := mvc.Service.GetMapVariablesByBookID(mvc.Ctx, id)
+	if err != nil {
+		return ErrorMapVariableNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", MapVariables: variables})
 }
 
 // GetMapVariablesByChapterID обрабатывает запросы на получение переменных карты по идентификатору главы.
@@ -136,14 +136,18 @@ func (mvc *Controller) GetMapVariablesByBookID(c echo.Context, ctx context.Conte
 // @param id path string true "ID главы"
 // @success 200 {array} models.MapVariable
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByChapterID(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) GetMapVariablesByChapterID(c echo.Context) error {
 	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByChapterID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, variables)
+	variables, err := mvc.Service.GetMapVariablesByChapterID(mvc.Ctx, id)
+	if err != nil {
+		return ErrorMapVariableNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", MapVariables: variables})
 }
 
 // GetMapVariablesByPageID обрабатывает запросы на получение переменных карты по идентификатору страницы.
@@ -155,14 +159,18 @@ func (mvc *Controller) GetMapVariablesByChapterID(c echo.Context, ctx context.Co
 // @param id path string true "ID страницы"
 // @success 200 {array} models.MapVariable
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByPageID(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) GetMapVariablesByPageID(c echo.Context) error {
 	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByPageID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, variables)
+	variables, err := mvc.Service.GetMapVariablesByPageID(mvc.Ctx, id)
+	if err != nil {
+		return ErrorMapVariableNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", MapVariables: variables})
 }
 
 // GetMapVariablesByParagraphID обрабатывает запросы на получение переменных карты по идентификатору параграфа.
@@ -174,14 +182,18 @@ func (mvc *Controller) GetMapVariablesByPageID(c echo.Context, ctx context.Conte
 // @param id path string true "ID параграфа"
 // @success 200 {array} models.MapVariable
 // @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByParagraphID(c echo.Context, ctx context.Context) error {
+func (mvc *Controller) GetMapVariablesByParagraphID(c echo.Context) error {
 	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByParagraphID(ctx, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+	if id == "" {
+		return ErrorValidationFailed
 	}
 
-	return c.JSON(http.StatusOK, variables)
+	variables, err := mvc.Service.GetMapVariablesByParagraphID(mvc.Ctx, id)
+	if err != nil {
+		return ErrorMapVariableNotFound
+	}
+
+	return c.JSON(http.StatusOK, responseListModel{Status: "ok", MapVariables: variables})
 }
 
 // CreateMapVariable обрабатывает создание новой переменной карты.
@@ -194,104 +206,16 @@ func (mvc *Controller) GetMapVariablesByParagraphID(c echo.Context, ctx context.
 // @param variable body models.MapVariable true "MapVariable object"
 // @success 201 {object} models.MapVariable
 // @failure 400 {object} config.HTTPError
-func (mvc *Controller) CreateMapVariable(c echo.Context, ctx context.Context) error {
-	var variable models.MapVariable
-	if err := c.Bind(&variable); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+func (mvc *Controller) CreateMapVariable(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
 	}
 
-	createdVariable, err := mvc.service.CreateMapVariable(ctx, &variable)
+	createdVariable, err := mvc.Service.CreateMapVariable(mvc.Ctx, request.MapVariables)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, config.ErrorForbidden)
+		return ErrorMapVariableNotCreated
 	}
 
-	return c.JSON(http.StatusCreated, createdVariable)
-}
-
-// GetMapVariablesByMapLinkAndBookID обрабатывает запросы на получение переменных карты по идентификатору карты
-// и идентификатору книги.
-// @router /bookevents/maplink/{link}/book/{id} [get]
-// @summary Получить переменные карты по идентификатору карты и идентификатору книги
-// @description Извлекает переменные карты по идентификатору карты и идентификатору книги
-// @tags Переменные карты
-// @produce application/json
-// @param link path string true "ID карты"
-// @param id path string true "ID книги"
-// @success 200 {array} models.MapVariable
-// @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByMapLinkAndBookID(c echo.Context, ctx context.Context) error {
-	link := c.Param("link")
-	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByMapLinkAndBookID(ctx, link, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
-	}
-
-	return c.JSON(http.StatusOK, variables)
-}
-
-// GetMapVariablesByMapLinkAndChapterID обрабатывает запросы на получение переменных карты по идентификатору карты
-// и идентификатору главы.
-// @router /bookevents/maplink/{link}/chapter/{id} [get]
-// @summary Получить переменные карты по идентификатору карты и идентификатору главы
-// @description Извлекает переменные карты по идентификатору карты и идентификатору главы
-// @tags Переменные карты
-// @produce application/json
-// @param link path string true "ID карты"
-// @param id path string true "ID главы"
-// @success 200 {array} models.MapVariable
-// @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByMapLinkAndChapterID(c echo.Context, ctx context.Context) error {
-	link := c.Param("link")
-	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByMapLinkAndChapterID(ctx, link, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
-	}
-
-	return c.JSON(http.StatusOK, variables)
-}
-
-// GetMapVariablesByMapLinkAndPageID обрабатывает запросы на получение переменных карты по идентификатору карты
-// и идентификатору страницы.
-// @router /bookevents/maplink/{link}/page/{id} [get]
-// @summary Получить переменные карты по идентификатору карты и идентификатору страницы
-// @description Извлекает переменные карты по идентификатору карты и идентификатору страницы
-// @tags Переменные карты
-// @produce application/json
-// @param link path string true "ID карты"
-// @param id path string true "ID страницы"
-// @success 200 {array} models.MapVariable
-// @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByMapLinkAndPageID(c echo.Context, ctx context.Context) error {
-	link := c.Param("link")
-	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByMapLinkAndPageID(ctx, link, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
-	}
-
-	return c.JSON(http.StatusOK, variables)
-}
-
-// GetMapVariablesByMapLinkAndParagraphID обрабатывает запросы на получение переменных карты по идентификатору карты
-// и идентификатору параграфа.
-// @router /bookevents/maplink/{link}/paragraph/{id} [get]
-// @summary Получить переменные карты по идентификатору карты и идентификатору параграфа
-// @description Извлекает переменные карты по идентификатору карты и идентификатору параграфа
-// @tags Переменные карты
-// @produce application/json
-// @param link path string true "ID карты"
-// @param id path string true "ID параграфа"
-// @success 200 {array} models.MapVariable
-// @failure 404 {object} config.HTTPError
-func (mvc *Controller) GetMapVariablesByMapLinkAndParagraphID(c echo.Context, ctx context.Context) error {
-	link := c.Param("link")
-	id := c.Param("id")
-	variables, err := mvc.service.GetMapVariablesByMapLinkAndParagraphID(ctx, link, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
-	}
-
-	return c.JSON(http.StatusOK, variables)
+	return c.JSON(http.StatusCreated, responseSingleModel{Status: "created", MapVariable: createdVariable})
 }
