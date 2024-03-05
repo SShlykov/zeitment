@@ -2,18 +2,18 @@ package app
 
 import (
 	"context"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/circuitbreaker"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/httpmiddlewares"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/book"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/bookevents"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/chapter"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/health"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/mapvariables"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/page"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/paragraph"
+	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/swagger"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/circuitbreaker"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/book"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/bookevents"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/chapter"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/health"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/mapvariables"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/page"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/paragraph"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/controllers/swagger"
-	"github.com/SShlykov/zeitment/bookback/internal/servers/http/httpmiddlewares"
-	"github.com/SShlykov/zeitment/bookback/pkg/db"
+	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log/slog"
@@ -22,8 +22,8 @@ import (
 )
 
 func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 		httpServer := &http.Server{
 			ReadHeaderTimeout: app.config.Timeout,
@@ -69,7 +69,7 @@ func (app *App) initEndpoint(_ context.Context) error {
 }
 
 func (app *App) initRouter(_ context.Context) error {
-	controllers := []func(e *echo.Echo, database db.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context){
+	controllers := []func(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context){
 		health.SetHealthController,
 		book.SetBookController,
 		chapter.SetChapterController,

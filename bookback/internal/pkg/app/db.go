@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/SShlykov/zeitment/bookback/internal/config"
-	"github.com/SShlykov/zeitment/bookback/pkg/db/pg"
+	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"time"
 )
 
@@ -13,7 +13,7 @@ func (app *App) initDB(ctx context.Context) error {
 	if err != nil {
 		return errors.New("failed to init pg config: " + err.Error())
 	}
-	db, err := pg.NewClient(ctx, pgConf.DSN())
+	db, err := postgres.NewClient(ctx, app.logger, pgConf.DSN())
 	if err != nil {
 		return errors.New("failed to init pg client: " + err.Error())
 	}
@@ -27,11 +27,11 @@ func (app *App) initDB(ctx context.Context) error {
 			if err != nil {
 				broken++
 				if broken > pgConf.MaxPingAttempts() {
-					app.logger.Error("db is down")
+					app.logger.Error("postgres is down")
 					app.closeCtx()
 					break
 				}
-				app.logger.Error("failed to ping db")
+				app.logger.Error("failed to ping postgres")
 			} else {
 				broken = 0
 			}

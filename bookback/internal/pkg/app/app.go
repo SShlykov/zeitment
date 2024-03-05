@@ -4,7 +4,7 @@ import (
 	"context"
 	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
-	"github.com/SShlykov/zeitment/bookback/pkg/db"
+	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
 	"log/slog"
 	"os"
@@ -16,7 +16,7 @@ type App struct {
 	configPath string
 	logger     *slog.Logger
 	config     *cfg.Config
-	db         db.Client
+	db         postgres.Client
 	Echo       *echo.Echo
 	metrics    metrics.Metrics
 
