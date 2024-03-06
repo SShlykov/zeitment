@@ -1,7 +1,6 @@
 package pgrepo
 
 import (
-	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 )
@@ -14,12 +13,11 @@ type paragraphRepo struct {
 	repository[entity.Paragraph]
 }
 
-func NewParagraphRepository(db postgres.Client, ctx context.Context) ParagraphRepo {
+func NewParagraphRepository(db postgres.Client) ParagraphRepo {
 	return &paragraphRepo{
 		repository: repository[entity.Paragraph]{
 			Name:   "ParagraphRepository",
 			entity: entity.Paragraph{},
-			ctx:    ctx,
 			db:     db,
 		},
 	}

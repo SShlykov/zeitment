@@ -9,7 +9,7 @@ type Repository interface {
 	Create(ctx context.Context, page *entity.Page) (string, error)
 	FindByID(ctx context.Context, id string) (*entity.Page, error)
 	Update(ctx context.Context, id string, page *entity.Page) (*entity.Page, error)
-	Delete(ctx context.Context, id string) (*entity.Page, error)
-	List(ctx context.Context) ([]entity.Page, error)
-	GetPagesByChapterID(ctx context.Context, chapterID string) ([]entity.Page, error)
+	HardDelete(ctx context.Context, id string) error
+	List(ctx context.Context, limit uint64, offset uint64) ([]*entity.Page, error)
+	FindByKV(ctx context.Context, key string, value any) ([]*entity.Page, error)
 }

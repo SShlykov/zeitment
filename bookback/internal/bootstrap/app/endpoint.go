@@ -2,20 +2,20 @@ package app
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/circuitbreaker"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/httpmiddlewares"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/book"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/bookevents"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/chapter"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/health"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/mapvariables"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/page"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/paragraph"
-	"github.com/SShlykov/zeitment/bookback/internal/controller/http/v1/swagger"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/book"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/bookevents"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/chapter"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/health"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/mapvariables"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/page"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/paragraph"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/swagger"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
+	"github.com/SShlykov/zeitment/bookback/pkg/circuitbreaker"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomv "github.com/labstack/echo/v4/middleware"
 	"log/slog"
 	"net/http"
 	"sync"
@@ -53,13 +53,13 @@ func (app *App) initEndpoint(_ context.Context) error {
 	)
 
 	middlewares := []echo.MiddlewareFunc{
-		httpmiddlewares.LoggerConfiguration(app.logger),
-		middleware.Recover(),
-		httpmiddlewares.CreateCircuitBreakerMiddleware(cb),
+		middleware.LoggerConfiguration(app.logger),
+		echomv.Recover(),
+		middleware.CreateCircuitBreakerMiddleware(cb),
 	}
 
 	if app.config.CorsEnabled {
-		middlewares = append(middlewares, httpmiddlewares.CORS())
+		middlewares = append(middlewares, middleware.CORS())
 	}
 
 	e.Use(middlewares...)

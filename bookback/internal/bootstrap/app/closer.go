@@ -8,10 +8,11 @@ import (
 
 func (app *App) closer(ctx context.Context) error {
 	<-ctx.Done()
-	ctx, cancel := context.WithTimeout(context.Background(), app.config.ShutdownTimeout)
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), app.config.ShutdownTimeout)
 	app.logger.Log(context.Background(), slog.LevelInfo, "Shutting down controller")
 	defer cancel()
-	if err := app.Echo.Shutdown(ctx); err != nil {
+	if err := app.Echo.Shutdown(shutdownCtx); err != nil {
 		return errors.New("failed to shutdown controller: " + err.Error())
 	}
 

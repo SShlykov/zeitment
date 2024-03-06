@@ -1,7 +1,6 @@
 package pgrepo
 
 import (
-	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 )
@@ -14,12 +13,11 @@ type mapVariablesRepo struct {
 	repository[entity.MapVariable]
 }
 
-func NewMapVariablesRepository(db postgres.Client, ctx context.Context) MapVariablesRepo {
+func NewMapVariablesRepository(db postgres.Client) MapVariablesRepo {
 	return &mapVariablesRepo{
 		repository: repository[entity.MapVariable]{
 			Name:   "MapVariablesRepository",
 			entity: entity.MapVariable{},
-			ctx:    ctx,
 			db:     db,
 		},
 	}

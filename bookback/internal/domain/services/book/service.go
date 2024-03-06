@@ -3,15 +3,17 @@ package book
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
+	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
 )
 
 // Service описывает сервис для работы с книгами.
 type Service interface {
-	CreateBook(ctx context.Context, book *entity.Book) (*entity.Book, error)
-	GetBookByID(ctx context.Context, id string) (*entity.Book, error)
-	UpdateBook(ctx context.Context, id string, book *entity.Book) (*entity.Book, error)
-	DeleteBook(ctx context.Context, id string) (*entity.Book, error)
-	ListBooks(ctx context.Context) ([]entity.Book, error)
+	CreateBook(ctx context.Context, request models.CreateBookRequest) (*models.Book, error)
+	GetBookByID(ctx context.Context, id string) (*models.Book, error)
+	UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error)
+	DeleteBook(ctx context.Context, id string) (*models.Book, error)
+	ListBooks(ctx context.Context, limit uint64, offset uint64) ([]*models.Book, error)
 }
 
 type service struct {
@@ -23,7 +25,9 @@ func NewService(repo Repo) Service {
 	return &service{repo}
 }
 
-func (s *service) CreateBook(ctx context.Context, book *entity.Book) (*entity.Book, error) {
+func (s *service) CreateBook(ctx context.Context, request models.CreateBookRequest) (*models.Book, error) {
+	book := converter.BookModelToEntity(request.Book)
+
 	if book.Variables == nil {
 		book.Variables = []string{}
 	}
@@ -33,31 +37,51 @@ func (s *service) CreateBook(ctx context.Context, book *entity.Book) (*entity.Bo
 	}
 
 	var newBook *entity.Book
-	newBook, err = s.GetBookByID(ctx, id)
+	newBook, err = s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return newBook, err
+	return converter.BookEntityToModel(newBook), err
 }
 
-func (s *service) GetBookByID(ctx context.Context, id string) (*entity.Book, error) {
-	return s.repo.FindByID(ctx, id)
+func (s *service) GetBookByID(ctx context.Context, id string) (*models.Book, error) {
+	book, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return converter.BookEntityToModel(book), nil
 }
 
-func (s *service) UpdateBook(ctx context.Context, id string, book *entity.Book) (*entity.Book, error) {
-	return s.repo.Update(ctx, id, book)
+func (s *service) UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error) {
+	book, err := s.repo.Update(ctx, id, converter.BookModelToEntity(request.Book))
+	if err != nil {
+		return nil, err
+	}
+
+	return converter.BookEntityToModel(book), nil
 }
 
-func (s *service) DeleteBook(ctx context.Context, id string) (*entity.Book, error) {
-	return s.repo.Delete(ctx, id)
+func (s *service) DeleteBook(ctx context.Context, id string) (*models.Book, error) {
+	book, err := s.GetBookByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repo.HardDelete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return book, err
 }
 
-func (s *service) ListBooks(ctx context.Context) ([]entity.Book, error) {
-	return s.repo.List(ctx)
-}
+func (s *service) ListBooks(ctx context.Context, limit uint64, offset uint64) ([]*models.Book, error) {
+	books, err := s.repo.List(ctx, limit, offset)
+	if err != nil {
+		return nil, err
+	}
 
-func (s *service) isBookExisted(ctx context.Context, id string) bool {
-	_, err := s.GetBookByID(ctx, id)
-	return err == nil
+	return converter.BooksEntityToModel(books), nil
 }

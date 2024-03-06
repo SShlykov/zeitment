@@ -2,7 +2,7 @@ package mapvariables
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/adapters/db/postgres/mapvarrepo"
+	"errors"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 )
 
@@ -11,17 +11,18 @@ type Service interface {
 	GetMapVariableByID(ctx context.Context, id string) (*entity.MapVariable, error)
 	UpdateMapVariable(ctx context.Context, id string, variable *entity.MapVariable) (*entity.MapVariable, error)
 	DeleteMapVariable(ctx context.Context, id string) (*entity.MapVariable, error)
-	GetMapVariablesByBookID(ctx context.Context, mapID string) ([]entity.MapVariable, error)
-	GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]entity.MapVariable, error)
-	GetMapVariablesByPageID(ctx context.Context, pageID string) ([]entity.MapVariable, error)
-	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]entity.MapVariable, error)
+
+	GetMapVariablesByBookID(ctx context.Context, mapID string) ([]*entity.MapVariable, error)
+	GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]*entity.MapVariable, error)
+	GetMapVariablesByPageID(ctx context.Context, pageID string) ([]*entity.MapVariable, error)
+	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]*entity.MapVariable, error)
 }
 
 type service struct {
-	repo mapvarrepo.Repository
+	repo Repository
 }
 
-func NewService(repo mapvarrepo.Repository) Service {
+func NewService(repo Repository) Service {
 	return &service{repo}
 }
 
@@ -44,21 +45,31 @@ func (s *service) UpdateMapVariable(ctx context.Context, id string, variable *en
 }
 
 func (s *service) DeleteMapVariable(ctx context.Context, id string) (*entity.MapVariable, error) {
-	return s.repo.Delete(ctx, id)
+	mapVariable, err := s.GetMapVariableByID(ctx, id)
+	if err != nil {
+		return nil, errors.Join(errors.New("MapVariable not found"), err)
+	}
+
+	err = s.repo.HardDelete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapVariable, err
 }
 
-func (s *service) GetMapVariablesByBookID(ctx context.Context, mapID string) ([]entity.MapVariable, error) {
-	return s.repo.GetByBookID(ctx, mapID)
+func (s *service) GetMapVariablesByBookID(ctx context.Context, mapID string) ([]*entity.MapVariable, error) {
+	return s.repo.FindByKV(ctx, "map_id", mapID)
 }
 
-func (s *service) GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]entity.MapVariable, error) {
-	return s.repo.GetByChapterID(ctx, chapterID)
+func (s *service) GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]*entity.MapVariable, error) {
+	return s.repo.FindByKV(ctx, "chapter_id", chapterID)
 }
 
-func (s *service) GetMapVariablesByPageID(ctx context.Context, pageID string) ([]entity.MapVariable, error) {
-	return s.repo.GetByPageID(ctx, pageID)
+func (s *service) GetMapVariablesByPageID(ctx context.Context, pageID string) ([]*entity.MapVariable, error) {
+	return s.repo.FindByKV(ctx, "page_id", pageID)
 }
 
-func (s *service) GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]entity.MapVariable, error) {
-	return s.repo.GetByParagraphID(ctx, paragraphID)
+func (s *service) GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]*entity.MapVariable, error) {
+	return s.repo.FindByKV(ctx, "paragraph_id", paragraphID)
 }

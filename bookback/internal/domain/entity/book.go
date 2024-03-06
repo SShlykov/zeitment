@@ -10,7 +10,7 @@ type Book struct {
 	ID          string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedAt   sql.NullTime // Обратите внимание на правильное использование типа NullTime
+	DeletedAt   sql.NullTime
 	Owner       string
 	Title       string
 	Author      string

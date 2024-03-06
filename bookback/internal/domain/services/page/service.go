@@ -2,6 +2,7 @@ package page
 
 import (
 	"context"
+	"errors"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 )
 
@@ -10,9 +11,9 @@ type Service interface {
 	GetPageByID(ctx context.Context, id string) (*entity.Page, error)
 	UpdatePage(ctx context.Context, id string, page *entity.Page) (*entity.Page, error)
 	DeletePage(ctx context.Context, id string) (*entity.Page, error)
-	ListPages(ctx context.Context) ([]entity.Page, error)
+	ListPages(ctx context.Context, limit uint64, offset uint64) ([]*entity.Page, error)
 
-	GetPagesByChapterID(ctx context.Context, chapterID string) ([]entity.Page, error)
+	GetPagesByChapterID(ctx context.Context, chapterID string) ([]*entity.Page, error)
 }
 
 type service struct {
@@ -42,13 +43,21 @@ func (s *service) UpdatePage(ctx context.Context, id string, page *entity.Page) 
 }
 
 func (s *service) DeletePage(ctx context.Context, id string) (*entity.Page, error) {
-	return s.repo.Delete(ctx, id)
+	page, err := s.GetPageByID(ctx, id)
+	if err != nil {
+		return nil, errors.Join(errors.New("page not found"), err)
+	}
+	err = s.repo.HardDelete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return page, err
 }
 
-func (s *service) ListPages(ctx context.Context) ([]entity.Page, error) {
-	return s.repo.List(ctx)
+func (s *service) ListPages(ctx context.Context, limit uint64, offset uint64) ([]*entity.Page, error) {
+	return s.repo.List(ctx, limit, offset)
 }
 
-func (s *service) GetPagesByChapterID(ctx context.Context, chapterID string) ([]entity.Page, error) {
-	return s.repo.GetPagesByChapterID(ctx, chapterID)
+func (s *service) GetPagesByChapterID(ctx context.Context, chapterID string) ([]*entity.Page, error) {
+	return s.repo.FindByKV(ctx, "chapter_id", chapterID)
 }

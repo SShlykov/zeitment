@@ -6,12 +6,10 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, event *entity.BookEvent) (string, error)
+	Create(ctx context.Context, chapter *entity.BookEvent) (string, error)
 	FindByID(ctx context.Context, id string) (*entity.BookEvent, error)
-	Update(ctx context.Context, id string, event *entity.BookEvent) (*entity.BookEvent, error)
-	Delete(ctx context.Context, id string) (*entity.BookEvent, error)
-	GetByBookID(ctx context.Context, bookID string) ([]entity.BookEvent, error)
-	GetByChapterID(ctx context.Context, chapterID string) ([]entity.BookEvent, error)
-	GetByPageID(ctx context.Context, pageID string) ([]entity.BookEvent, error)
-	GetByParagraphID(ctx context.Context, paragraphID string) ([]entity.BookEvent, error)
+	Update(ctx context.Context, id string, chapter *entity.BookEvent) (*entity.BookEvent, error)
+	HardDelete(ctx context.Context, id string) error
+	List(ctx context.Context, limit uint64, offset uint64) ([]*entity.BookEvent, error)
+	FindByKV(ctx context.Context, key string, value any) ([]*entity.BookEvent, error)
 }

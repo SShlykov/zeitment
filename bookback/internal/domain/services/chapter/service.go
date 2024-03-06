@@ -2,6 +2,7 @@ package chapter
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 )
@@ -11,9 +12,9 @@ type Service interface {
 	GetChapterByID(ctx context.Context, id string) (*entity.Chapter, error)
 	UpdateChapter(ctx context.Context, id string, chapter *entity.Chapter) (*entity.Chapter, error)
 	DeleteChapter(ctx context.Context, id string) (*entity.Chapter, error)
-	ListChapters(ctx context.Context) ([]entity.Chapter, error)
+	ListChapters(ctx context.Context, limit uint64, offset uint64) ([]*entity.Chapter, error)
 
-	GetChapterByBookID(ctx context.Context, bookID string) ([]entity.Chapter, error)
+	GetChapterByBookID(ctx context.Context, bookID string) ([]*entity.Chapter, error)
 }
 
 type service struct {
@@ -48,13 +49,21 @@ func (ch *service) UpdateChapter(ctx context.Context, id string, chapter *entity
 }
 
 func (ch *service) DeleteChapter(ctx context.Context, id string) (*entity.Chapter, error) {
-	return ch.chapterRepo.Delete(ctx, id)
+	chapter, err := ch.GetChapterByID(ctx, id)
+	if err != nil {
+		return nil, errors.Join(errors.New("chapter not found"), err)
+	}
+	err = ch.chapterRepo.HardDelete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return chapter, err
 }
 
-func (ch *service) ListChapters(ctx context.Context) ([]entity.Chapter, error) {
-	return ch.chapterRepo.List(ctx)
+func (ch *service) ListChapters(ctx context.Context, limit uint64, offset uint64) ([]*entity.Chapter, error) {
+	return ch.chapterRepo.List(ctx, limit, offset)
 }
 
-func (ch *service) GetChapterByBookID(ctx context.Context, bookID string) ([]entity.Chapter, error) {
-	return ch.chapterRepo.GetChapterByBookID(ctx, bookID)
+func (ch *service) GetChapterByBookID(ctx context.Context, bookID string) ([]*entity.Chapter, error) {
+	return ch.chapterRepo.FindByKV(ctx, "book_id", bookID)
 }

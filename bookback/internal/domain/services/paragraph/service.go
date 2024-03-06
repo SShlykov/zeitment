@@ -10,9 +10,9 @@ type Service interface {
 	GetParagraphByID(ctx context.Context, id string) (*entity.Paragraph, error)
 	UpdateParagraph(ctx context.Context, id string, paragraph *entity.Paragraph) (*entity.Paragraph, error)
 	DeleteParagraph(ctx context.Context, id string) (*entity.Paragraph, error)
-	ListParagraphs(ctx context.Context) ([]entity.Paragraph, error)
+	ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*entity.Paragraph, error)
 
-	GetParagraphsByPageID(ctx context.Context, pageID string) ([]entity.Paragraph, error)
+	GetParagraphsByPageID(ctx context.Context, pageID string) ([]*entity.Paragraph, error)
 }
 
 type service struct {
@@ -42,13 +42,21 @@ func (s *service) UpdateParagraph(ctx context.Context, id string, paragraph *ent
 }
 
 func (s *service) DeleteParagraph(ctx context.Context, id string) (*entity.Paragraph, error) {
-	return s.repo.Delete(ctx, id)
+	paragraph, err := s.GetParagraphByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	err = s.repo.HardDelete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return paragraph, err
 }
 
-func (s *service) ListParagraphs(ctx context.Context) ([]entity.Paragraph, error) {
-	return s.repo.List(ctx)
+func (s *service) ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*entity.Paragraph, error) {
+	return s.repo.List(ctx, limit, offset)
 }
 
-func (s *service) GetParagraphsByPageID(ctx context.Context, pageID string) ([]entity.Paragraph, error) {
-	return s.repo.GetParagraphsByPageID(ctx, pageID)
+func (s *service) GetParagraphsByPageID(ctx context.Context, pageID string) ([]*entity.Paragraph, error) {
+	return s.repo.FindByKV(ctx, "page_id", pageID)
 }
