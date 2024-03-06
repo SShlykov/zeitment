@@ -2,8 +2,6 @@ package page
 
 import (
 	"context"
-	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	service "github.com/SShlykov/zeitment/bookback/internal/domain/services/page"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -108,9 +106,6 @@ func (p *Controller) UpdatePage(c echo.Context) error {
 
 	updatedPage, err := p.Service.UpdatePage(p.Ctx, id, request.Page)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorPageNotFound
-		}
 		return ErrorUnknown
 	}
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Page: updatedPage})

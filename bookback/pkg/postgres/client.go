@@ -21,11 +21,11 @@ type pgClient struct {
 	connTimeout  time.Duration
 
 	db      DB
-	Builder squirrel.StatementBuilderType
+	builder squirrel.StatementBuilderType
 }
 
 func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, error) {
-	client := &pgClient{}
+	client := &pgClient{builder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)}
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -54,6 +54,11 @@ func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, er
 func (c *pgClient) DB() DB {
 	return c.db
 }
+
+func (c *pgClient) Builder() squirrel.StatementBuilderType {
+	return c.builder
+}
+
 func (c *pgClient) Close() error {
 	if c.db != nil {
 		c.db.Close()

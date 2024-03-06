@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -10,6 +11,7 @@ type Handler func(ctx context.Context) error
 
 type Client interface {
 	DB() DB
+	Builder() squirrel.StatementBuilderType
 	Close() error
 }
 

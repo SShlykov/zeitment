@@ -24,7 +24,7 @@ func (bc *Controller) RegisterRoutes(e *echo.Echo) {
 	group := e.Group(PathPrefix)
 	group.Use(httpmiddlewares.MetricsLogger(bc.Metrics))
 
-	group.GET("", bc.ListBooks)
+	group.POST("", bc.ListBooks)
 	group.POST("", bc.CreateBook)
 	group.GET("/:id", bc.GetBookByID)
 	group.PUT("/:id", bc.UpdateBook)

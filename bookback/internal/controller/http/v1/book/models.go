@@ -5,6 +5,8 @@ import (
 )
 
 type Options struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
 }
 
 type requestModel struct {

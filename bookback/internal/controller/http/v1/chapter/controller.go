@@ -2,9 +2,6 @@ package chapter
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/services/chapter"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -104,15 +101,11 @@ func (ch *Controller) UpdateChapter(c echo.Context) error {
 
 	var request requestModel
 	if err := c.Bind(&request); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, config.ErrorBadInput)
+		return echo.NewHTTPError(http.StatusBadRequest, ErrorValidationFailed)
 	}
 
 	updatedChapter, err := ch.Service.UpdateChapter(ch.Ctx, id, request.Chapter)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorChapterNotFound
-		}
-		fmt.Println(err)
 		return ErrorUnknown
 	}
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Chapter: updatedChapter})
@@ -135,7 +128,7 @@ func (ch *Controller) DeleteChapter(c echo.Context) error {
 
 	chapt, err := ch.Service.DeleteChapter(ch.Ctx, id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotAcceptable, config.ErrorNotDeleted)
+		return echo.NewHTTPError(http.StatusNotAcceptable, ErrorDeleteChapter)
 	}
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", Chapter: chapt})
 }

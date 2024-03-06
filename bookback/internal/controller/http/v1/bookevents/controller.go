@@ -2,8 +2,6 @@ package bookevents
 
 import (
 	"context"
-	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	service "github.com/SShlykov/zeitment/bookback/internal/domain/services/bookevents"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -70,9 +68,6 @@ func (bec *Controller) UpdateBookEvent(c echo.Context) error {
 
 	updatedEvent, err := bec.Service.UpdateBookEvent(bec.Ctx, id, request.BookEvents)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorBookEventNotFound
-		}
 		return ErrorUnknown
 	}
 

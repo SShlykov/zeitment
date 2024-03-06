@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
+	"github.com/SShlykov/zeitment/bookback/pkg/config"
 )
 
 func (app *App) initConfig(_ context.Context) error {

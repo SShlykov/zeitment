@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	cfg "github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
+	cfg "github.com/SShlykov/zeitment/bookback/pkg/config"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
 	"log/slog"

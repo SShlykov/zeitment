@@ -2,8 +2,6 @@ package book
 
 import (
 	"context"
-	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	service "github.com/SShlykov/zeitment/bookback/internal/domain/services/book"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -25,7 +23,7 @@ func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Log
 }
 
 // ListBooks обрабатывает запросы на получение списка книг.
-// @router /books [get]
+// @router /books [post]
 // @summary Получить список книг
 // @description Извлекает список всех книг
 // @tags Книги
@@ -33,6 +31,11 @@ func NewController(srv service.Service, metric metrics.Metrics, logger *slog.Log
 // @success 200 {array} entity.Book
 // @failure 500 {object} string
 func (bc *Controller) ListBooks(c echo.Context) error {
+	var request requestModel
+	if err := c.Bind(&request); err != nil {
+		return ErrorValidationFailed
+	}
+
 	books, err := bc.Service.ListBooks(bc.Ctx)
 	if err != nil {
 		return ErrorUnknown
@@ -115,9 +118,6 @@ func (bc *Controller) UpdateBook(c echo.Context) error {
 
 	updatedBook, err := bc.Service.UpdateBook(bc.Ctx, id, request.Book)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorBookNotFound
-		}
 		return ErrorUnknown
 	}
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Book: updatedBook})

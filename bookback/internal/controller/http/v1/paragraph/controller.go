@@ -2,8 +2,6 @@ package paragraph
 
 import (
 	"context"
-	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	service "github.com/SShlykov/zeitment/bookback/internal/domain/services/paragraph"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -109,9 +107,6 @@ func (p *Controller) UpdateParagraph(c echo.Context) error {
 
 	updatedParagraph, err := p.Service.UpdateParagraph(p.Ctx, id, request.Paragraph)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorParagraphNotFound
-		}
 		return ErrorUnknown
 	}
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "updated", Paragraph: updatedParagraph})

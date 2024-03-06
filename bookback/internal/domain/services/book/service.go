@@ -2,7 +2,6 @@ package book
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 )
 
@@ -25,12 +24,15 @@ func NewService(repo Repo) Service {
 }
 
 func (s *service) CreateBook(ctx context.Context, book *entity.Book) (*entity.Book, error) {
-	var newBook *entity.Book
+	if book.Variables == nil {
+		book.Variables = []string{}
+	}
 	id, err := s.repo.Create(ctx, book)
 	if err != nil {
 		return nil, err
 	}
 
+	var newBook *entity.Book
 	newBook, err = s.GetBookByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -44,16 +46,10 @@ func (s *service) GetBookByID(ctx context.Context, id string) (*entity.Book, err
 }
 
 func (s *service) UpdateBook(ctx context.Context, id string, book *entity.Book) (*entity.Book, error) {
-	if !s.isBookExisted(ctx, id) {
-		return nil, config.ErrorNotFound
-	}
 	return s.repo.Update(ctx, id, book)
 }
 
 func (s *service) DeleteBook(ctx context.Context, id string) (*entity.Book, error) {
-	if !s.isBookExisted(ctx, id) {
-		return nil, config.ErrorNotFound
-	}
 	return s.repo.Delete(ctx, id)
 }
 

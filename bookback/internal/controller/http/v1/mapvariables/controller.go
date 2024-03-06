@@ -2,9 +2,7 @@ package mapvariables
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/SShlykov/zeitment/bookback/internal/config"
 	service "github.com/SShlykov/zeitment/bookback/internal/domain/services/mapvariables"
 	"github.com/SShlykov/zeitment/bookback/internal/metrics"
 	"github.com/labstack/echo/v4"
@@ -73,9 +71,6 @@ func (mvc *Controller) UpdateMapVariable(c echo.Context) error {
 
 	updatedVariable, err := mvc.Service.UpdateMapVariable(mvc.Ctx, id, request.MapVariables)
 	if err != nil {
-		if errors.Is(err, config.ErrorNotFound) {
-			return ErrorMapVariableNotFound
-		}
 		return ErrorUnknown
 	}
 
@@ -98,7 +93,7 @@ func (mvc *Controller) DeleteMapVariable(c echo.Context) error {
 
 	mapVariable, err := mvc.Service.DeleteMapVariable(mvc.Ctx, id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, config.ErrorNotFound)
+		return echo.NewHTTPError(http.StatusNotFound, ErrorDeleteMapVariable)
 	}
 
 	return c.JSON(http.StatusOK, responseSingleModel{Status: "deleted", MapVariable: mapVariable})
