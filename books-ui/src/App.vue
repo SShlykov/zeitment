@@ -21,7 +21,7 @@ export default {
     }
   },
   mounted() {
-    const url = import.meta.env.VITE_API_ADDR
+    // const url = import.meta.env.VITE_API_ADDR
     this.fetchBooks()
     this.initScreenSizeRecalc()
   },
