@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/metrics/localmetrics"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
 )
 
 func (app *App) initMetrics(_ context.Context) error {

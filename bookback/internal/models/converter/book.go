@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/SShlykov/zeitment/bookback/internal/models/types"
 	"time"
 )
 
@@ -38,15 +39,15 @@ func BookEntityToModel(book *entity.Book) *models.Book {
 		ID:          book.ID,
 		CreatedAt:   book.CreatedAt,
 		UpdatedAt:   book.UpdatedAt,
-		DeletedAt:   models.Null[time.Time]{Valid: book.DeletedAt.Valid, Value: book.DeletedAt.Time},
+		DeletedAt:   types.Null[time.Time]{Valid: book.DeletedAt.Valid, Value: book.DeletedAt.Time},
 		Owner:       book.Owner,
 		Title:       book.Title,
 		Author:      book.Author,
 		Description: book.Description,
 		IsPublic:    book.IsPublic,
-		Publication: models.Null[time.Time]{Valid: book.Publication.Valid, Value: book.Publication.Time},
-		ImageLink:   models.Null[string]{Valid: book.ImageLink.Valid, Value: book.ImageLink.String},
-		MapLink:     models.Null[string]{Valid: book.MapLink.Valid, Value: book.MapLink.String},
+		Publication: types.Null[time.Time]{Valid: book.Publication.Valid, Value: book.Publication.Time},
+		ImageLink:   types.Null[string]{Valid: book.ImageLink.Valid, Value: book.ImageLink.String},
+		MapLink:     types.Null[string]{Valid: book.MapLink.Valid, Value: book.MapLink.String},
 		Variables:   book.Variables,
 	}
 }

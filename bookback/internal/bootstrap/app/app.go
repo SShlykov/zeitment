@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/metrics"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	cfg "github.com/SShlykov/zeitment/bookback/pkg/config"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"

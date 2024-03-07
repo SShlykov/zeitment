@@ -1,0 +1,116 @@
+package controllers
+
+import (
+	"context"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/errors"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	"github.com/SShlykov/zeitment/bookback/internal/models"
+	"github.com/labstack/echo/v4"
+	"log/slog"
+	"net/http"
+)
+
+type paragraphService interface {
+	CreateParagraph(ctx context.Context, paragraph models.CreateParagraphRequest) (*models.Paragraph, error)
+	GetParagraphByID(ctx context.Context, id string) (*models.Paragraph, error)
+	UpdateParagraph(ctx context.Context, id string, paragraph models.UpdateParagraphRequest) (*models.Paragraph, error)
+	DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error)
+	ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*models.Paragraph, error)
+	GetParagraphsByPageID(ctx context.Context, pageID string) ([]*models.Paragraph, error)
+}
+
+type ParagraphController struct {
+	Service paragraphService
+	Metrics metrics.Metrics
+	Logger  *slog.Logger
+	Ctx     context.Context
+}
+
+// NewParagraphController создает новый экземпляр ParagraphController.
+func NewParagraphController(srv paragraphService, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *ParagraphController {
+	return &ParagraphController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
+}
+
+func (p *ParagraphController) ListParagraphs(c echo.Context) error {
+	var request models.RequestParagraph
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraphs, err := p.Service.ListParagraphs(p.Ctx, request.Options.Limit, request.Options.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[[]*models.Paragraph]{Data: paragraphs, Status: "ok"})
+}
+
+func (p *ParagraphController) CreateParagraph(c echo.Context) error {
+	var request models.CreateParagraphRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraph, err := p.Service.CreateParagraph(p.Ctx, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ParagraphNotCreated)
+	}
+	return c.JSON(http.StatusCreated, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "created"})
+}
+
+func (p *ParagraphController) GetParagraphByID(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraph, err := p.Service.GetParagraphByID(p.Ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ParagraphNotFound)
+	}
+
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "ok"})
+}
+
+func (p *ParagraphController) UpdateParagraph(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	var request models.UpdateParagraphRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraph, err := p.Service.UpdateParagraph(p.Ctx, id, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "ok"})
+}
+
+func (p *ParagraphController) DeleteParagraph(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraph, err := p.Service.DeleteParagraph(p.Ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ParagraphNotDeleted)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "deleted"})
+}
+
+func (p *ParagraphController) GetParagraphsByPageID(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraphs, err := p.Service.GetParagraphsByPageID(p.Ctx, id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[[]*models.Paragraph]{Data: paragraphs, Status: "deleted"})
+}
