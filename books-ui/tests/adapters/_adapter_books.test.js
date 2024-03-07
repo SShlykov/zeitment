@@ -1,7 +1,8 @@
 import {test, describe, vi, expect} from 'vitest'
 import axios from 'axios'
-import BooksApi, {adapterToApiFromParams} from "@apiServices/BooksApi.js"
+import BooksApi from "@adapters/AdapterOfBooks.js"
 import {reverseObject} from '@helpers/objectUtils'
+import {appBook, apiBook, apiBookResponse, apiBooksResponse} from '@mocks/BooksApiMock.js
 
 vi.mock('axios')
 
@@ -62,21 +63,17 @@ describe("test BooksApi class with mocks data and adapterConfig", () => {
   const BooksService = new BooksApi(bookConfig)
 
   test("get books list", async () => {
-    const booksMock = [
-      bookMock
-    ]
-
-    axios.get.mockResolvedValue({data: booksMock})
+    axios.get.mockResolvedValue({data: apiBooksResponse})
 
     const booksData = await BooksService.getBooks()
-    expect(booksData).toEqual([expectedBook])
+    expect(booksData).toEqual([appBook])
   })
 
   test("create book (save book)", async () => {
-    axios.post.mockResolvedValue({data: bookMock})
+    axios.post.mockResolvedValue({data: apiBookResponse})
 
     const booksData = await BooksService.createBook(expectedBook)
-    expect(booksData).toEqual(expectedBook)
+    expect(booksData).toEqual(appBook)
   })
 
   test("update book", async () => {

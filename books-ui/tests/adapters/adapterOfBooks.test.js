@@ -1,5 +1,5 @@
 import {expect, test, describe} from 'vitest'
-import AdapterOfBooks from '@/adapters/adapterOfBooks.js'
+import AdapterOfBooks from '@/adapters/AdapterOfBooks.js'
 
 describe('adapterOfBooks', () => {
   const uri = 'https://www.googleapis.com/books/v1/volumes?q=javascript';

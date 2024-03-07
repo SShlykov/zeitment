@@ -21,6 +21,7 @@ export default defineConfig({
       '@adapters':    fileURLToPath(new URL('./src/adapters', import.meta.url)),
       '@services':    fileURLToPath(new URL('./src/services', import.meta.url)),
       '@useCases':    fileURLToPath(new URL('./src/useCases', import.meta.url)),
+      '@mocks':       fileURLToPath(new URL('./tests/mocks', import.meta.url)),
     }
   },
   test: {

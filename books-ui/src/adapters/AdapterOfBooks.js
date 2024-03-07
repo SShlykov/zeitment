@@ -3,7 +3,6 @@ import {convertList, convertObject} from '@helpers/adapter/adapter.js'
 import {reverseObject} from '@helpers/objectUtils'
 import {path} from 'ramda'
 
-
 const adapterConfig = {
   "id": "id",
   "created_at": "createdAt",
