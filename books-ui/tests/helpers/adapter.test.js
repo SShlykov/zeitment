@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { convertObject, convertList } from '@helpers/adapter/adapter.js'
+import {apiBook, appBook} from "@mocks/books.js"
 
 test('parse object from api', () => {
   const targetObject = {
@@ -39,6 +40,33 @@ test('parse object from api', () => {
   }
 
   expect(convertObject(targetObject, {config})).toEqual(expectedObject)
+})
+
+test('parse book object', () => {
+  const targetObject = {...apiBook}
+
+  const expectedObject = {...appBook}
+
+  const config = {
+    id: 'id',
+    created_at: 'createdAt',
+    updated_at: 'updatedAt',
+    deleted_at: 'deletedAt',
+    owner: 'owner',
+    title: 'title',
+    author: 'author',
+    description: 'description',
+    is_public: 'isPublic',
+    publication: 'publication',
+    image_link: 'imageLink',
+    map_link: 'mapLink',
+    map_params_id: 'mapParamsId',
+    variables: 'variables'
+  }
+
+  const newObject = convertObject(targetObject, {config})
+
+  expect(newObject).toEqual(expectedObject)
 })
 
 test('adapt list objects without callback', () => {

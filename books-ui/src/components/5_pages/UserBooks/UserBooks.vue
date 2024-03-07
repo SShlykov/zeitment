@@ -1,12 +1,27 @@
 <script>
 import BooksViewer from '@organisms/BooksViewer/BooksViewer.vue';
+import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import ServiceOfBooks from "@services/ServiceOfBooks.js";
+import {useStore} from "@store";
 
 export default {
   name: 'UserBooks',
   components: {BooksViewer},
   data() {},
+  setup() {
+    const url = import.meta.env.VITE_API_ADDR
+    const adapterOfBooks = new AdapterOfBooks(url)
+    const store = useStore()
+
+    const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
+    return {
+      serviceOfBooks
+    }
+  },
   computed: {},
-  mounted() {},
+  mounted() {
+
+  },
   methods: {}
 }
 
@@ -14,6 +29,6 @@ export default {
 
 <template>
   <div class="p-6">
-    <BooksViewer />
+    <BooksViewer :serviceOfBooks="serviceOfBooks" />
   </div>
 </template>

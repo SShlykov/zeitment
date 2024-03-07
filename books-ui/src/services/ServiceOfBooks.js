@@ -4,9 +4,9 @@ class ServiceOfBooks {
     this.store = store;
   }
 
-  async fetchBooksList() {
+  async fetchUserBooks() {
     const booksList = await this.adapterOfBooks.getBooks();
-    this.store.dispatch('books/saveBooks', booksList);
+    this.store.dispatch('books/saveUserBooks', booksList);
   }
 }
 

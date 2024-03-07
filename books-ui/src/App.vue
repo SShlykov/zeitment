@@ -1,7 +1,9 @@
 <script>
 import Head from '@frames/Head.vue';
 import SideMenu from '@frames/SideMenu/SideMenu.vue';
-import {mapActions, mapGetters} from "vuex";
+import {mapGetters} from "vuex";
+import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import ServiceOfBooks from "@services/ServiceOfBooks.js";
 
 
 export default {
@@ -14,21 +16,21 @@ export default {
     return {}
   },
   computed: {
-    ...mapGetters('userBooks', ['booksList']),
+    ...mapGetters('books', ['userBooks']),
     pageName() {
       if (!this.$route) return "pending"
       return this.$route.name
     }
   },
   mounted() {
-    // const url = import.meta.env.VITE_API_ADDR
-    this.fetchBooks()
-    this.initScreenSizeRecalc()
+    const url = import.meta.env.VITE_API_ADDR
+    const adapterOfBooks = new AdapterOfBooks(url)
+    const store = this.$store
+
+    const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
+    serviceOfBooks.fetchUserBooks()
+
   },
-  methods: {
-    ...mapActions('layout', ['initScreenSizeRecalc']),
-    ...mapActions('userBooks', ['fetchBooks']),
-  }
 }
 </script>
 
