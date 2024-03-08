@@ -8,11 +8,8 @@ import {adapterConfig} from "@store/modules/books/StaticData.js";
 import {apiBook, apiBooksResponse, appBook} from "@mocks/books.js";
 
 vi.mock('axios')
-const BooksService = new BooksApi(adapterConfig)
 
 describe("tests of App", async () => {
-
-
   const store = createStore({
     modules: {
       layout: {
@@ -36,15 +33,12 @@ describe("tests of App", async () => {
         },
         actions: {
           async saveUserBooks({commit}, userBooks) {
-            console.log(userBooks)
             commit('setUserBooks', userBooks)
           }
         }
       }
     }
   })
-
-
   axios.get.mockResolvedValue({data: apiBooksResponse})
 
   test('mount test of App', async () => {

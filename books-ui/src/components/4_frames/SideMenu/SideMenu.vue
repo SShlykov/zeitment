@@ -16,6 +16,8 @@ import {mapGetters, mapMutations} from "vuex";
 import MenuHead from './SideMenuHead.vue'
 import MenuList from './SideMenuList.vue'
 import {booksListToMenuList} from '@helpers/menuFuncs'
+import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import ServiceOfBooks from "@services/ServiceOfBooks.js";
 
 export default {
   name: 'SideMenu',
@@ -24,16 +26,25 @@ export default {
   },
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
-    ...mapGetters('userBooks', ['booksList']),
+    ...mapGetters('books', ['userBooks']),
     flattenMenuList() {
       const newBook = {
         "title": "Создать книгу",
         "icon": "file-add-line",
-        "link": "/new_book",
-        "type": "link",
+        "itemFunction": async () => {
+          const url = import.meta.env.VITE_API_ADDR
+          const adapterOfBooks = new AdapterOfBooks(url)
+          const store = this.$store
+
+          const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
+          const book = await serviceOfBooks.createBook()
+
+          this.$router.push(`/book/${book.id}`)
+        },
+        "type": "button",
         "name": "new_book"
       }
-      const booksMenu = booksListToMenuList(this.booksList)
+      const booksMenu = booksListToMenuList(this.userBooks)
       return [newBook, ...booksMenu, ...this.menuList]
     },
     pageName() {

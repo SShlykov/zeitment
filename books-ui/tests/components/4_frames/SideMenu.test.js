@@ -1,45 +1,54 @@
-import {expect, describe, test} from 'vitest'
+import {expect, describe, test, vi} from 'vitest'
 import {mount} from "@vue/test-utils";
 import SideMenu from "@frames/SideMenu/SideMenu.vue";
 import SideMenuList from "@frames/SideMenu/SideMenuList.vue";
 import SideMenuHead from "@frames/SideMenu/SideMenuHead.vue";
+import MenuItems from "@frames/SideMenu/MenuItems/MenuItems.vue";
+import ItemLink from "@frames/SideMenu/MenuItems/ItemLink.vue";
+import ItemLine from "@frames/SideMenu/MenuItems/ItemLine.vue";
+import ItemButton from "@frames/SideMenu/MenuItems/ItemButton.vue";
 import {createStore} from "vuex";
 import {bookMock} from '@helpers/staticData.js'
 import menuList from "@store/modules/layout/menuList.js";
+import Router from "@router"
 
-describe("tests of SideMenu", () => {
-
-  const store = createStore({
-    plugins: [],
-    modules: {
-      userBooks: {
-        state: {
-          booksList: []
-        },
-        mutations: {
-          setBooksList() { },
-          resetStore() { }
-        },
-        actions: {
-          async fetchBooks() { }
-        },
-        getters: {
-          booksList: () => [bookMock]
-        },
-        namespaced: true,
+const store = createStore({
+  plugins: [],
+  modules: {
+    books: {
+      state: {
+        userBooks: []
       },
-      layout: {
-        namespaced: true,
-        getters: {
-          isSideMenuOpen: () => true,
-          menuList: () => menuList,
+      mutations: {
+        setBooksList() {
         },
-        actions: {
-          toggleMenu() { }
+        resetStore() {
+        }
+      },
+      actions: {
+        async fetchBooks() {
+        }
+      },
+      getters: {
+        userBooks: () => [bookMock]
+      },
+      namespaced: true,
+    },
+    layout: {
+      namespaced: true,
+      getters: {
+        isSideMenuOpen: () => true,
+        menuList: () => menuList,
+      },
+      actions: {
+        toggleMenu() {
         }
       }
     }
-  })
+  }
+})
+
+describe("tests of SideMenu", () => {
 
   test('mount test of SideMenu', async () => {
     const wrapper = mount(SideMenu, {
@@ -69,7 +78,31 @@ describe("tests of SideMenu", () => {
       }
     })
 
-    expect(wrapper.exists()).toBe(true)
+    const flattenMenuList = wrapper.vm.flattenMenuList
+
+    flattenMenuList.forEach((item) => {
+      expect(item.title).not.toBe(null)
+    })
+
+    expect(flattenMenuList.length).toBeGreaterThan(0)
+  })
+
+  test('create book from menu', async () => {
+    await Router.push('/')
+    await Router.isReady()
+
+    const wrapper = mount(SideMenu, {
+      plugins: [Router],
+      shallow: true,
+      global: {
+        mocks: {
+          $store: store
+        },
+      }
+    })
+
+    console.log(wrapper.html())
+    expect(wrapper.vm.flattenMenuList[0].title).toBe("Создать книгу")
   })
 })
 
@@ -93,3 +126,58 @@ describe("tests of SideMenuHead", () => {
     expect(wrapper.exists()).toBe(true)
   })
 })
+
+describe("tests of MenuItems", () => {
+  test('mount test of MenuItems', async () => {
+    const wrapper = mount(MenuItems, {
+      shallow: true,
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  test('mount test of ItemLink', async () => {
+    await Router.push('/')
+    await Router.isReady()
+
+    const wrapper = mount(ItemLink, {
+      shallow: true,
+      plugins: [Router],
+      global: {
+        mocks: {
+          $store: store
+        }
+      }
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  test('mount test of ItemLine', async () => {
+    const wrapper = mount(ItemLine, {
+      shallow: true,
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  test('mount test of ItemButton', async () => {
+    const wrapper = mount(ItemButton, {
+      shallow: true,
+      props: {
+        itemFunction: () => {
+          return "22"
+        }
+      },
+      global: {
+        mocks: {
+          $store: store
+        }
+      }
+    })
+
+    expect(wrapper.vm.itemFunction()).toBe("22")
+    expect(wrapper.exists()).toBe(true)
+  })
+})
+

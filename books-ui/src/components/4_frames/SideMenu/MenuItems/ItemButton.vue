@@ -1,22 +1,22 @@
 <template>
-  <router-link
+  <div
     class="flex p-2 rounded-md hover:bg-gray-200 flex items-center"
     :class="{'bg-gray-200': pageName === name}"
-    :to="link"
+    @click="itemFunction"
   >
     <i :class="`ri-${icon} text-slate-600 mr-2 `" />
     <span
       v-if="isOpenMenu"
       class="text-slate-700 truncate"
     >{{ title }}</span>
-  </router-link>
+  </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
 
 export default {
-  name: 'MenuLink',
+  name: 'ItemButton',
   components: {},
   props: {
     icon: {
@@ -27,9 +27,9 @@ export default {
       default: "",
       type: String
     },
-    link: {
-      default: "",
-      type: String
+    itemFunction: {
+      default: () => null,
+      type: Function
     },
     name: {
       default: "",
@@ -39,6 +39,7 @@ export default {
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
     pageName() {
+      if (!this.$route) return ""
       return this.$route.name
     }
   },

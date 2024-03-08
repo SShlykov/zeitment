@@ -8,13 +8,13 @@ export default {
   components: {BooksViewerCard, BooksViewerContainer},
   data() {},
   computed: {
-    ...mapGetters('userBooks', ['booksList'])
+    ...mapGetters('books', ['userBooks'])
   },
   mounted() {
     this.fetchUserBooks()
   },
   methods: {
-    ...mapActions('userBooks', ['fetchUserBooks'])
+    ...mapActions('books', ['fetchUserBooks'])
   }
 }
 
@@ -24,7 +24,7 @@ export default {
   <div class="">
     <BooksViewerContainer>
       <BooksViewerCard 
-        v-for="item in booksList"
+        v-for="item in userBooks"
         :id="item.id"
         :key="item.id"
         :owner="item.owner"

@@ -1,4 +1,4 @@
-import {expect, test, describe} from 'vitest'
+import {expect, test, describe, beforeEach} from 'vitest'
 import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {createStore} from "vuex";
 import {AdapterOfBooks, appBook} from "@mocks/books.js"
@@ -15,6 +15,9 @@ describe('serviceOfBooks', () => {
         mutations: {
           setUserBooks(state, userBooks) {
             state.userBooks = userBooks
+          },
+          resetStore(state) {
+            state.userBooks = []
           }
         },
         getters: {
@@ -23,10 +26,17 @@ describe('serviceOfBooks', () => {
         actions: {
           async saveUserBooks({commit}, userBooks) {
             commit('setUserBooks', userBooks)
+          },
+          resetStore({commit}) {
+            commit('resetStore')
           }
         }
       }
     }
+  })
+
+  beforeEach(async () => {
+    await store.dispatch('books/resetStore')
   })
 
   const adapterOfBooks = new AdapterOfBooks('');
@@ -41,4 +51,15 @@ describe('serviceOfBooks', () => {
     const booksList = store.getters['books/userBooks']
     expect(booksList).toEqual([appBook])
   })
+
+  test("create book", async () => {
+    let books = store.getters['books/userBooks']
+    expect(books).toEqual([])
+
+    await serviceOfBooks.createBook(appBook)
+
+    books = store.getters['books/userBooks']
+    expect(books).toEqual([appBook])
+  })
+
 })

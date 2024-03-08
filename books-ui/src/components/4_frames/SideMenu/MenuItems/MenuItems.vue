@@ -1,27 +1,37 @@
 <template>
   <div class="flex flex-col justify-between">
     <div
-      v-for="{title, icon, link, type, name} in menuList"
+      v-for="{title, icon, link, type, name, itemFunction} in menuList"
       :key="`${title}${name}`"
     >
-      <Link
+      <ItemLink
+        v-if="type === 'link'"
         :icon="icon"
         :title="title"
         :link="link"
         :name="name"
       />
-      <Line v-if="type === 'line'" />
+      <ItemLine v-if="type === 'line'" />
+      <ItemButton
+        v-if="type === 'button'"
+        :icon="icon"
+        :title="title"
+        :link="link"
+        :name="name"
+        :itemFunction="itemFunction"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Link from './Link.vue'
-import Line from './Line.vue'
+import ItemLink from './ItemLink.vue'
+import ItemLine from './ItemLine.vue'
+import ItemButton from './ItemButton.vue'
 
 export default {
   name: 'MenuItems',
-  components: {Link, Line},
+  components: {ItemLink, ItemLine, ItemButton},
   props: {
     menuList: {
       type: Array,
