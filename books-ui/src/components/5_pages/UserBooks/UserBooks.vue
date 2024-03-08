@@ -7,7 +7,6 @@ import {useStore} from "@store";
 export default {
   name: 'UserBooks',
   components: {BooksViewer},
-  data() {},
   setup() {
     const url = import.meta.env.VITE_API_ADDR
     const adapterOfBooks = new AdapterOfBooks(url)
@@ -18,6 +17,7 @@ export default {
       serviceOfBooks
     }
   },
+  data() {},
   computed: {},
   mounted() {
 
