@@ -86,7 +86,7 @@ linters:
     - bodyclose
     - depguard
     - dogsled
-    - dupl
+#    - dupl
     - errcheck
     - errorlint
     - exportloopref

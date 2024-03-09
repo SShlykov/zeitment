@@ -1,0 +1,20 @@
+package endpoint
+
+import (
+	"log/slog"
+	"net/http"
+)
+
+func RunServer(handler *Handler, logger *slog.Logger) error {
+	httpServer := &http.Server{
+		ReadHeaderTimeout: handler.Timeout,
+		ReadTimeout:       handler.Timeout,
+		WriteTimeout:      handler.Timeout,
+		IdleTimeout:       handler.IddleTimeout,
+		Addr:              handler.Address,
+		Handler:           handler.e,
+	}
+
+	logger.Info("HTTP server started")
+	return httpServer.ListenAndServe()
+}
