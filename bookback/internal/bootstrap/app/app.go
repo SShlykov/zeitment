@@ -6,6 +6,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+
 	"log/slog"
 	"os"
 	"os/signal"

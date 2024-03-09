@@ -63,7 +63,7 @@ func setMiddlewares(e *echo.Echo, logger *slog.Logger, config *HTTPServerConfig)
 
 	middlewares := []echo.MiddlewareFunc{
 		middleware.LoggerConfiguration(logger),
-		middleware.Recover(),
+		//middleware.Recover(),
 		middleware.CreateCircuitBreakerMiddleware(cb),
 	}
 

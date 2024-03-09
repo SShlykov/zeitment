@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"github.com/SShlykov/zeitment/bookback/internal/models/types"
 	"time"
 )
@@ -17,7 +16,7 @@ type MapVariable struct {
 	MapLink     string             `json:"map_link"`
 	Lat         float64            `json:"lat"`
 	Lng         float64            `json:"lng"`
-	Zoom        sql.NullInt64      `json:"zoom"`
+	Zoom        types.Null[int64]  `json:"zoom"`
 	Date        types.Null[string] `json:"date"`
 	Description types.Null[string] `json:"description"`
 	Link        types.Null[string] `json:"link"`
