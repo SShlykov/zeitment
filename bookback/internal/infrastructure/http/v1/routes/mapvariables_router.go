@@ -12,7 +12,7 @@ import (
 	"log/slog"
 )
 
-func SetMapVariablesRoutes(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func MapVariables(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	repo := pgrepo.NewMapVariablesRepository(database)
 	service := services.NewMapVariablesService(repo)
 	cnt := controllers.NewMapVariablesController(service, metrics, logger, ctx)
@@ -24,8 +24,8 @@ func SetMapVariablesRoutes(e *echo.Echo, database postgres.Client, metrics metri
 	group.PUT("/:id", cnt.UpdateMapVariable)
 	group.DELETE("/:id", cnt.DeleteMapVariable)
 	group.POST("", cnt.CreateMapVariable)
-	group.GET("/book/:id", cnt.GetMapVariablesByBookID)
-	group.GET("/chapter/:id", cnt.GetMapVariablesByChapterID)
-	group.GET("/page/:id", cnt.GetMapVariablesByPageID)
-	group.GET("/paragraph/:id", cnt.GetMapVariablesByParagraphID)
+	group.POST("/book/:id", cnt.GetMapVariablesByBookID)
+	group.POST("/chapter/:id", cnt.GetMapVariablesByChapterID)
+	group.POST("/page/:id", cnt.GetMapVariablesByPageID)
+	group.POST("/paragraph/:id", cnt.GetMapVariablesByParagraphID)
 }

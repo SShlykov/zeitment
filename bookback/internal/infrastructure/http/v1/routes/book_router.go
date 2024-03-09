@@ -12,8 +12,8 @@ import (
 	"log/slog"
 )
 
-// SetBookRoutes регистрирует контроллер книг в маршрутизаторе.
-func SetBookRoutes(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+// Book регистрирует контроллер книг в маршрутизаторе.
+func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	repo := pgrepo.NewBookRepository(database)
 	service := services.NewBookService(repo)
 	cntr := controllers.NewBookController(service, metrics, logger, ctx)
@@ -21,7 +21,7 @@ func SetBookRoutes(e *echo.Echo, database postgres.Client, metrics metrics.Metri
 	group := e.Group(BooksPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.POST("", cntr.ListBooks)
+	group.POST("/list", cntr.ListBooks)
 	group.POST("", cntr.CreateBook)
 	group.GET("/:id", cntr.GetBookByID)
 	group.PUT("/:id", cntr.UpdateBook)

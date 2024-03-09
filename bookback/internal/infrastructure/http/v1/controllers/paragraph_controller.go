@@ -15,8 +15,8 @@ type paragraphService interface {
 	GetParagraphByID(ctx context.Context, id string) (*models.Paragraph, error)
 	UpdateParagraph(ctx context.Context, id string, paragraph models.UpdateParagraphRequest) (*models.Paragraph, error)
 	DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error)
-	ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*models.Paragraph, error)
-	GetParagraphsByPageID(ctx context.Context, pageID string) ([]*models.Paragraph, error)
+	ListParagraphs(ctx context.Context, request models.RequestParagraph) ([]*models.Paragraph, error)
+	GetParagraphsByPageID(ctx context.Context, pageID string, request models.RequestParagraph) ([]*models.Paragraph, error)
 }
 
 type ParagraphController struct {
@@ -37,7 +37,7 @@ func (p *ParagraphController) ListParagraphs(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	paragraphs, err := p.Service.ListParagraphs(p.Ctx, request.Options.Limit, request.Options.Offset)
+	paragraphs, err := p.Service.ListParagraphs(p.Ctx, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -108,7 +108,12 @@ func (p *ParagraphController) GetParagraphsByPageID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	paragraphs, err := p.Service.GetParagraphsByPageID(p.Ctx, id)
+	var request models.RequestParagraph
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraphs, err := p.Service.GetParagraphsByPageID(p.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}

@@ -6,15 +6,15 @@ import (
 )
 
 type Paragraph struct {
-	ID        string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt types.Null[time.Time]
-	Title     string
-	Text      string
-	Type      string
-	IsPublic  bool
-	PageID    string
+	ID        string                `json:"id"`
+	CreatedAt time.Time             `json:"created_at"`
+	UpdatedAt time.Time             `json:"updated_at"`
+	DeletedAt types.Null[time.Time] `json:"deleted_at"`
+	Title     string                `json:"title"`
+	Text      string                `json:"text"`
+	Type      string                `json:"type"`
+	IsPublic  bool                  `json:"is_public"`
+	PageID    string                `json:"page_id"`
 }
 
 type CreateParagraphRequest struct {

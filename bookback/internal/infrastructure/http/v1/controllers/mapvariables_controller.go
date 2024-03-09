@@ -16,10 +16,10 @@ type mapVariablesService interface {
 	GetMapVariableByID(ctx context.Context, id string) (*models.MapVariable, error)
 	UpdateMapVariable(ctx context.Context, id string, request models.UpdateMapVariableRequest) (*models.MapVariable, error)
 	DeleteMapVariable(ctx context.Context, id string) (*models.MapVariable, error)
-	GetMapVariablesByBookID(ctx context.Context, mapID string) ([]*models.MapVariable, error)
-	GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]*models.MapVariable, error)
-	GetMapVariablesByPageID(ctx context.Context, pageID string) ([]*models.MapVariable, error)
-	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]*models.MapVariable, error)
+	GetMapVariablesByBookID(ctx context.Context, mapID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByChapterID(ctx context.Context, chapterID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByPageID(ctx context.Context, pageID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
 }
 
 // MapVariablesController структура для HTTP-контроллера книг.
@@ -31,7 +31,8 @@ type MapVariablesController struct {
 }
 
 // NewMapVariablesController создает новый экземпляр MapVariablesController.
-func NewMapVariablesController(srv mapVariablesService, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *MapVariablesController {
+func NewMapVariablesController(srv mapVariablesService, metric metrics.Metrics, logger *slog.Logger,
+	ctx context.Context) *MapVariablesController {
 	return &MapVariablesController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
@@ -89,7 +90,12 @@ func (mvc *MapVariablesController) GetMapVariablesByBookID(c echo.Context) error
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	variables, err := mvc.Service.GetMapVariablesByBookID(mvc.Ctx, id)
+	var request models.RequestMapVariable
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	variables, err := mvc.Service.GetMapVariablesByBookID(mvc.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -103,7 +109,12 @@ func (mvc *MapVariablesController) GetMapVariablesByChapterID(c echo.Context) er
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	variables, err := mvc.Service.GetMapVariablesByChapterID(mvc.Ctx, id)
+	var request models.RequestMapVariable
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	variables, err := mvc.Service.GetMapVariablesByChapterID(mvc.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -117,7 +128,12 @@ func (mvc *MapVariablesController) GetMapVariablesByPageID(c echo.Context) error
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	variables, err := mvc.Service.GetMapVariablesByPageID(mvc.Ctx, id)
+	var request models.RequestMapVariable
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	variables, err := mvc.Service.GetMapVariablesByPageID(mvc.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -131,7 +147,12 @@ func (mvc *MapVariablesController) GetMapVariablesByParagraphID(c echo.Context) 
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	variables, err := mvc.Service.GetMapVariablesByParagraphID(mvc.Ctx, id)
+	var request models.RequestMapVariable
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	variables, err := mvc.Service.GetMapVariablesByParagraphID(mvc.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}

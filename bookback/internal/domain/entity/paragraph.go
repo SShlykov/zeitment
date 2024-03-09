@@ -35,29 +35,24 @@ func (p Paragraph) InsertFields() []string {
 }
 
 // EntityToInsertValues преобразует сущность Paragraph в список значений для вставки
-func (p Paragraph) EntityToInsertValues(entity any) []interface{} {
-	if e, ok := entity.(Paragraph); ok {
-		return []interface{}{
-			e.Title, e.Text, e.Type, e.IsPublic, e.PageID,
-		}
-	}
-	return nil
+func (p Paragraph) EntityToInsertValues(entity *Paragraph) []interface{} {
+	return []interface{}{entity.Title, entity.Text, entity.Type, entity.IsPublic, entity.PageID}
 }
 
 // ReadItem читает одну запись из строки запроса
-func (p Paragraph) ReadItem(row pgx.Row) (any, error) {
+func (p Paragraph) ReadItem(row pgx.Row) (Paragraph, error) {
 	var paragraph Paragraph
 	err := row.Scan(&paragraph.ID, &paragraph.CreatedAt, &paragraph.UpdatedAt, &paragraph.DeletedAt, &paragraph.Title,
 		&paragraph.Text, &paragraph.Type, &paragraph.IsPublic, &paragraph.PageID)
 	if err != nil {
-		return nil, err
+		return Paragraph{}, err
 	}
 	return paragraph, nil
 }
 
 // ReadList читает список записей из результатов запроса
-func (p Paragraph) ReadList(rows pgx.Rows) ([]any, error) {
-	var paragraphs []any
+func (p Paragraph) ReadList(rows pgx.Rows) ([]Paragraph, error) {
+	var paragraphs []Paragraph
 	for rows.Next() {
 		paragraph, err := p.ReadItem(rows)
 		if err != nil {

@@ -3,25 +3,28 @@ package pgrepo
 import (
 	"context"
 	"fmt"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/jackc/pgx/v5"
 	"strings"
 )
 
-type Simulated interface {
+const Equals = " = ?"
+
+type Simulated[T any] interface {
 	TableName() string
 	AllFields() []string
 	InsertFields() []string
-	EntityToInsertValues(entity any) []interface{}
-	ReadItem(row pgx.Row) (any, error)
-	ReadList(rows pgx.Rows) ([]any, error)
+	EntityToInsertValues(impl *T) []interface{}
+	ReadItem(row pgx.Row) (T, error)
+	ReadList(rows pgx.Rows) ([]T, error)
 }
 
 // Repository определяет обобщенный интерфейс для операций CRUD над сущностями типа T.
 // T представляет тип сущности, который должен быть структурой.
 type Repository[T any] interface {
 	// List извлекает срез сущностей на основе лимита и смещения для пагинации.
-	List(ctx context.Context, limit uint64, offset uint64) ([]*T, error)
+	List(ctx context.Context, options dbutils.Pagination) ([]*T, error)
 
 	// Create вставляет новую сущность в репозиторий и возвращает её ID или ошибку.
 	Create(ctx context.Context, item *T) (string, error)
@@ -37,22 +40,22 @@ type Repository[T any] interface {
 	FindByID(ctx context.Context, id string) (*T, error)
 
 	// FindByKV ищет сущности, соответствующие определенной паре ключ-значение.
-	FindByKV(ctx context.Context, key string, value any) ([]*T, error)
+	FindByKV(ctx context.Context, options dbutils.QueryOptions) ([]*T, error)
 }
 
-type repository[T Simulated] struct {
+type repository[T Simulated[T]] struct {
 	Name   string
 	entity T
 	db     postgres.Client
 }
 
-func (r *repository[T]) List(ctx context.Context, limit uint64, offset uint64) ([]*T, error) {
+func (r *repository[T]) List(ctx context.Context, options dbutils.Pagination) ([]*T, error) {
+	limit, offset := options.GetPagination()
 	query, args, err := r.db.Builder().
 		Select(r.entity.AllFields()...).
 		From(r.entity.TableName()).
-		Offset(offset).
 		Limit(limit).
-		Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
+		Offset(offset).
 		ToSql()
 
 	if err != nil {
@@ -71,17 +74,20 @@ func (r *repository[T]) List(ctx context.Context, limit uint64, offset uint64) (
 }
 
 func (r *repository[T]) Create(ctx context.Context, item *T) (string, error) {
+	fields := r.entity.InsertFields()
+	insertValues := r.entity.EntityToInsertValues(item)
+
 	query, args, err := r.db.Builder().
 		Insert(r.entity.TableName()).
-		Columns(r.entity.InsertFields()...).
-		Values(r.entity.EntityToInsertValues(&item)...).
-		Prefix("RETURNING id").
+		Columns(fields...).
+		Values(insertValues...).
+		Suffix("RETURNING id").
 		ToSql()
 
 	if err != nil {
 		return "", err
 	}
-
+	fmt.Println("query", query)
 	q := postgres.Query{Name: r.Name + ".Insert", Raw: query}
 
 	var id string
@@ -100,7 +106,7 @@ func (r *repository[T]) Update(ctx context.Context, id string, item *T) (*T, err
 	}
 
 	query, args, err := updateQuery.
-		Where("? = ?", r.entity.TableName()+`.id`, id).
+		Where(r.entity.TableName()+Equals, id).
 		Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
 		ToSql()
 
@@ -118,7 +124,7 @@ func (r *repository[T]) Update(ctx context.Context, id string, item *T) (*T, err
 func (r *repository[T]) HardDelete(ctx context.Context, id string) error {
 	query, args, err := r.db.Builder().
 		Delete(r.entity.TableName()).
-		Where("? = ?", r.entity.TableName()+`.id`, id).
+		Where(r.tableKey("id")+Equals, id).
 		Suffix("RETURNING id").
 		ToSql()
 
@@ -135,12 +141,16 @@ func (r *repository[T]) HardDelete(ctx context.Context, id string) error {
 
 // FindByKV ONLY FOR QUERY COMPOSITION; KEY WILL NOT BE ESCAPED/CHECKED SO IT'S UNSAFE
 // e.g. you need a function FindByTitle(title string) ([]Book, error) -> FindByKV("title", title)
-func (r *repository[T]) FindByKV(ctx context.Context, key string, value interface{}) ([]*T, error) {
+func (r *repository[T]) FindByKV(ctx context.Context, options dbutils.QueryOptions) ([]*T, error) {
+	key, value := options.GetFilter()
+	limit, offset := options.GetPagination()
+
 	query, args, err := r.db.Builder().
 		Select(r.entity.AllFields()...).
 		From(r.entity.TableName()).
-		Where("? = ?", key, value).
-		Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
+		Where(r.tableKey(key)+Equals, value).
+		Limit(limit).
+		Offset(offset).
 		ToSql()
 
 	if err != nil {
@@ -162,8 +172,7 @@ func (r *repository[T]) FindByID(ctx context.Context, id string) (*T, error) {
 	query, args, err := r.db.Builder().
 		Select(r.entity.AllFields()...).
 		From(r.entity.TableName()).
-		Where(r.entity.TableName()+".id = ?", id).
-		Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
+		Where(r.tableKey("id")+Equals, id).
 		ToSql()
 
 	if err != nil {
@@ -181,12 +190,7 @@ func (r *repository[T]) readItem(row pgx.Row) (*T, error) {
 		return nil, err
 	}
 
-	result, ok := res.(*T)
-	if !ok {
-		return nil, fmt.Errorf("ошибка приведения типа в %s.Update", r.Name)
-	}
-
-	return result, nil
+	return &res, nil
 }
 
 func (r *repository[T]) readList(rows pgx.Rows) ([]*T, error) {
@@ -199,12 +203,7 @@ func (r *repository[T]) readList(rows pgx.Rows) ([]*T, error) {
 			return nil, err
 		}
 
-		typedItem, ok := item.(*T)
-		if !ok {
-			return nil, fmt.Errorf("не удалось привести тип элемента в readList")
-		}
-
-		result = append(result, typedItem)
+		result = append(result, &item)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -212,4 +211,8 @@ func (r *repository[T]) readList(rows pgx.Rows) ([]*T, error) {
 	}
 
 	return result, nil
+}
+
+func (r *repository[T]) tableKey(key string) string {
+	return r.entity.TableName() + "." + key
 }

@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
 type ChapterService interface {
@@ -14,9 +15,9 @@ type ChapterService interface {
 	GetChapterByID(ctx context.Context, id string) (*models.Chapter, error)
 	UpdateChapter(ctx context.Context, id string, request models.UpdateChapterRequest) (*models.Chapter, error)
 	DeleteChapter(ctx context.Context, id string) (*models.Chapter, error)
-	ListChapters(ctx context.Context, limit uint64, offset uint64) ([]*models.Chapter, error)
+	ListChapters(ctx context.Context, request models.RequestChapter) ([]*models.Chapter, error)
 
-	GetChapterByBookID(ctx context.Context, bookID string) ([]*models.Chapter, error)
+	GetChapterByBookID(ctx context.Context, bookID string, request models.RequestChapter) ([]*models.Chapter, error)
 }
 
 type chapterService struct {
@@ -28,7 +29,7 @@ func NewChapterService(chapterRepo SimpleRepo[*entity.Chapter]) ChapterService {
 }
 
 func (ch *chapterService) CreateChapter(ctx context.Context, request models.CreateChapterRequest) (*models.Chapter, error) {
-	chapter := converter.ChapterModelToEntity(request.Chapter)
+	chapter := adapters.ChapterModelToEntity(request.Chapter)
 
 	id, err := ch.chapterRepo.Create(ctx, chapter)
 	if err != nil {
@@ -51,18 +52,18 @@ func (ch *chapterService) GetChapterByID(ctx context.Context, id string) (*model
 		return nil, err
 	}
 
-	return converter.ChapterEntityToModel(chapter), nil
+	return adapters.ChapterEntityToModel(chapter), nil
 }
 
 func (ch *chapterService) UpdateChapter(ctx context.Context, id string, request models.UpdateChapterRequest) (*models.Chapter, error) {
-	chapter := converter.ChapterModelToEntity(request.Chapter)
+	chapter := adapters.ChapterModelToEntity(request.Chapter)
 
 	updatedChapter, err := ch.chapterRepo.Update(ctx, id, chapter)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ChapterEntityToModel(updatedChapter), err
+	return adapters.ChapterEntityToModel(updatedChapter), err
 }
 
 func (ch *chapterService) DeleteChapter(ctx context.Context, id string) (*models.Chapter, error) {
@@ -77,19 +78,26 @@ func (ch *chapterService) DeleteChapter(ctx context.Context, id string) (*models
 	return chapter, err
 }
 
-func (ch *chapterService) ListChapters(ctx context.Context, limit uint64, offset uint64) ([]*models.Chapter, error) {
-	chapters, err := ch.chapterRepo.List(ctx, limit, offset)
+func (ch *chapterService) ListChapters(ctx context.Context, request models.RequestChapter) ([]*models.Chapter, error) {
+	options := dbutils.NewPagination(&request.Options)
+
+	chapters, err := ch.chapterRepo.List(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ChaptersEntityToModel(chapters), nil
+	return adapters.ChaptersEntityToModel(chapters), nil
 }
 
-func (ch *chapterService) GetChapterByBookID(ctx context.Context, bookID string) ([]*models.Chapter, error) {
-	chapters, err := ch.chapterRepo.FindByKV(ctx, "book_id", bookID)
+func (ch *chapterService) GetChapterByBookID(ctx context.Context, bookID string, request models.RequestChapter) ([]*models.Chapter, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("book_id", bookID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	chapters, err := ch.chapterRepo.FindByKV(ctx, options)
 	if err != nil {
 		return nil, err
 	}
-	return converter.ChaptersEntityToModel(chapters), nil
+	return adapters.ChaptersEntityToModel(chapters), nil
 }

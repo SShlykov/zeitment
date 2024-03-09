@@ -12,7 +12,7 @@ import (
 	"log/slog"
 )
 
-func SetChapterController(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Chapter(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	chapterRepo := pgrepo.NewChapterRepository(database)
 	service := services.NewChapterService(chapterRepo)
 	cnt := controllers.NewChapterController(service, metrics, logger, ctx)
@@ -20,10 +20,10 @@ func SetChapterController(e *echo.Echo, database postgres.Client, metrics metric
 	group := e.Group(ChaptersPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.GET("", cnt.ListChapters)
+	group.POST("/list", cnt.ListChapters)
 	group.POST("", cnt.CreateChapter)
 	group.GET("/:id", cnt.GetChapterByID)
 	group.PUT("/:id", cnt.UpdateChapter)
 	group.DELETE("/:id", cnt.DeleteChapter)
-	group.GET("/book/:id", cnt.GetChapterByBookID)
+	group.POST("/book/:id", cnt.GetChapterByBookID)
 }

@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
+	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
 type ParagraphService interface {
@@ -12,9 +13,9 @@ type ParagraphService interface {
 	GetParagraphByID(ctx context.Context, id string) (*models.Paragraph, error)
 	UpdateParagraph(ctx context.Context, id string, request models.UpdateParagraphRequest) (*models.Paragraph, error)
 	DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error)
-	ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*models.Paragraph, error)
+	ListParagraphs(ctx context.Context, request models.RequestParagraph) ([]*models.Paragraph, error)
 
-	GetParagraphsByPageID(ctx context.Context, pageID string) ([]*models.Paragraph, error)
+	GetParagraphsByPageID(ctx context.Context, pageID string, request models.RequestParagraph) ([]*models.Paragraph, error)
 }
 
 type paragraphService struct {
@@ -26,7 +27,7 @@ func NewParagraphService(repo SimpleRepo[*entity.Paragraph]) ParagraphService {
 }
 
 func (s *paragraphService) CreateParagraph(ctx context.Context, request models.CreateParagraphRequest) (*models.Paragraph, error) {
-	paragraph := converter.ParagraphModelToEntity(request.Paragraph)
+	paragraph := adapters.ParagraphModelToEntity(request.Paragraph)
 
 	id, err := s.repo.Create(ctx, paragraph)
 	if err != nil {
@@ -42,18 +43,19 @@ func (s *paragraphService) GetParagraphByID(ctx context.Context, id string) (*mo
 		return nil, err
 	}
 
-	return converter.ParagraphEntityToModel(paragraph), nil
+	return adapters.ParagraphEntityToModel(paragraph), nil
 }
 
-func (s *paragraphService) UpdateParagraph(ctx context.Context, id string, request models.UpdateParagraphRequest) (*models.Paragraph, error) {
-	paragraph := converter.ParagraphModelToEntity(request.Paragraph)
+func (s *paragraphService) UpdateParagraph(ctx context.Context, id string,
+	request models.UpdateParagraphRequest) (*models.Paragraph, error) {
+	paragraph := adapters.ParagraphModelToEntity(request.Paragraph)
 
 	updatedParagraph, err := s.repo.Update(ctx, id, paragraph)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ParagraphEntityToModel(updatedParagraph), nil
+	return adapters.ParagraphEntityToModel(updatedParagraph), nil
 }
 
 func (s *paragraphService) DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error) {
@@ -68,20 +70,28 @@ func (s *paragraphService) DeleteParagraph(ctx context.Context, id string) (*mod
 	return paragraph, err
 }
 
-func (s *paragraphService) ListParagraphs(ctx context.Context, limit uint64, offset uint64) ([]*models.Paragraph, error) {
-	paragraph, err := s.repo.List(ctx, limit, offset)
+func (s *paragraphService) ListParagraphs(ctx context.Context, request models.RequestParagraph) ([]*models.Paragraph, error) {
+	options := dbutils.NewPagination(&request.Options)
+
+	paragraph, err := s.repo.List(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ParagraphsEntityToModel(paragraph), nil
+	return adapters.ParagraphsEntityToModel(paragraph), nil
 }
 
-func (s *paragraphService) GetParagraphsByPageID(ctx context.Context, pageID string) ([]*models.Paragraph, error) {
-	paragraphs, err := s.repo.FindByKV(ctx, "page_id", pageID)
+func (s *paragraphService) GetParagraphsByPageID(ctx context.Context, pageID string,
+	request models.RequestParagraph) ([]*models.Paragraph, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("page_id", pageID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	paragraphs, err := s.repo.FindByKV(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ParagraphsEntityToModel(paragraphs), nil
+	return adapters.ParagraphsEntityToModel(paragraphs), nil
 }

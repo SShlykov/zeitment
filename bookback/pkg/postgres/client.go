@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"github.com/Masterminds/squirrel"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres/pg"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
 	"time"
@@ -25,7 +25,12 @@ type pgClient struct {
 }
 
 func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, error) {
-	client := &pgClient{builder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)}
+	client := &pgClient{
+		builder:      squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
+		maxPoolSize:  _defaultMaxPoolSize,
+		connAttempts: _defaultConnAttempts,
+		connTimeout:  _defaultConnTimeout,
+	}
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -35,20 +40,30 @@ func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, er
 
 	poolConfig.MaxConns = int32(_defaultMaxPoolSize)
 
-	for client.connAttempts > 0 {
+	return client.Connect(ctx, logger, poolConfig)
+}
+
+func (c *pgClient) Connect(ctx context.Context, logger *slog.Logger, poolConfig *pgxpool.Config) (Client, error) {
+	logger.Debug(
+		"connecting to db",
+		slog.Int("attempts", c.connAttempts),
+		slog.String("dsn", poolConfig.ConnString()),
+		slog.Int("maxPoolSize", _defaultMaxPoolSize),
+	)
+	for c.connAttempts > 0 {
 		var pool *pgxpool.Pool
-		pool, err = pgxpool.NewWithConfig(ctx, poolConfig)
+		pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
 		if err == nil {
-			client.db = pg.NewDB(pool, logger)
-			return client, nil
+			c.db = NewDB(pool, logger)
+			return c, nil
 		}
 
-		time.Sleep(client.connTimeout)
+		time.Sleep(c.connTimeout)
 
-		client.connAttempts--
+		c.connAttempts--
 	}
 
-	return nil, err
+	return nil, errors.New("failed to connect to db")
 }
 
 func (c *pgClient) DB() DB {

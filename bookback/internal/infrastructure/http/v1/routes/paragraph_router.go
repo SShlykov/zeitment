@@ -12,7 +12,7 @@ import (
 	"log/slog"
 )
 
-func SetParagraphController(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	repo := pgrepo.NewParagraphRepository(database)
 	service := services.NewParagraphService(repo)
 	cnt := controllers.NewParagraphController(service, metrics, logger, ctx)
@@ -20,10 +20,10 @@ func SetParagraphController(e *echo.Echo, database postgres.Client, metrics metr
 	group := e.Group(ParagraphsPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.GET("", cnt.ListParagraphs)
+	group.POST("/list", cnt.ListParagraphs)
 	group.POST("", cnt.CreateParagraph)
 	group.GET("/:id", cnt.GetParagraphByID)
 	group.PUT("/:id", cnt.UpdateParagraph)
 	group.DELETE("/:id", cnt.DeleteParagraph)
-	group.GET("/pages/:id", cnt.GetParagraphsByPageID)
+	group.POST("/pages/:id", cnt.GetParagraphsByPageID)
 }

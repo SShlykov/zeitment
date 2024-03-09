@@ -1,11 +1,10 @@
 package app
 
 import (
-	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
 )
 
-func (app *App) initMetrics(_ context.Context) error {
+func (app *App) initMetrics() error {
 	logger := app.logger
 	logger.Info("initializing metrics as local metrics")
 

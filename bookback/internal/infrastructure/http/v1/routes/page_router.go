@@ -12,7 +12,7 @@ import (
 	"log/slog"
 )
 
-func SetPageController(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Page(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	repo := pgrepo.NewPageRepository(database)
 	service := services.NewPageService(repo)
 	cnt := controllers.NewPageController(service, metrics, logger, ctx)
@@ -20,10 +20,10 @@ func SetPageController(e *echo.Echo, database postgres.Client, metrics metrics.M
 	group := e.Group(PagesPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.GET("", cnt.ListPages)
+	group.POST("/list", cnt.ListPages)
 	group.POST("", cnt.CreatePage)
 	group.GET("/:id", cnt.GetPageByID)
 	group.PUT("/:id", cnt.UpdatePage)
 	group.DELETE("/:id", cnt.DeletePage)
-	group.GET("/chapters/:id", cnt.GetPagesByChapterID)
+	group.POST("/chapters/:id", cnt.GetPagesByChapterID)
 }

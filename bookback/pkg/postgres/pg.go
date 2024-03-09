@@ -1,8 +1,7 @@
-package pg
+package postgres
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -21,11 +20,11 @@ type Postgres struct {
 	logger *slog.Logger
 }
 
-func NewDB(dbc *pgxpool.Pool, logger *slog.Logger) postgres.DB {
+func NewDB(dbc *pgxpool.Pool, logger *slog.Logger) DB {
 	return &Postgres{Pool: dbc, logger: logger}
 }
 
-func (p *Postgres) ScanSingleContext(ctx context.Context, q postgres.Query, dest interface{}, args ...interface{}) error { //nolint:gofmt
+func (p *Postgres) ScanSingleContext(ctx context.Context, q Query, dest interface{}, args ...interface{}) error { //nolint:gofmt
 	logQuery(ctx, p.logger, q, args...)
 
 	row, err := p.QueryContext(ctx, q, args...)
@@ -36,7 +35,7 @@ func (p *Postgres) ScanSingleContext(ctx context.Context, q postgres.Query, dest
 	return pgxscan.ScanOne(dest, row)
 }
 
-func (p *Postgres) ScanAllContext(ctx context.Context, q postgres.Query, dest interface{}, args ...interface{}) error { //nolint:gofmt
+func (p *Postgres) ScanAllContext(ctx context.Context, q Query, dest interface{}, args ...interface{}) error { //nolint:gofmt
 	logQuery(ctx, p.logger, q, args...)
 
 	rows, err := p.QueryContext(ctx, q, args...)
@@ -47,7 +46,7 @@ func (p *Postgres) ScanAllContext(ctx context.Context, q postgres.Query, dest in
 	return pgxscan.ScanAll(dest, rows)
 }
 
-func (p *Postgres) ExecContext(ctx context.Context, q postgres.Query, args ...interface{}) (pgconn.CommandTag, error) { //nolint:gofmt
+func (p *Postgres) ExecContext(ctx context.Context, q Query, args ...interface{}) (pgconn.CommandTag, error) { //nolint:gofmt
 	logQuery(ctx, p.logger, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
@@ -58,7 +57,7 @@ func (p *Postgres) ExecContext(ctx context.Context, q postgres.Query, args ...in
 	return p.Pool.Exec(ctx, q.Raw, args...)
 }
 
-func (p *Postgres) QueryContext(ctx context.Context, q postgres.Query, args ...interface{}) (pgx.Rows, error) {
+func (p *Postgres) QueryContext(ctx context.Context, q Query, args ...interface{}) (pgx.Rows, error) {
 	logQuery(ctx, p.logger, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
@@ -69,7 +68,7 @@ func (p *Postgres) QueryContext(ctx context.Context, q postgres.Query, args ...i
 	return p.Pool.Query(ctx, q.Raw, args...)
 }
 
-func (p *Postgres) QueryRowContext(ctx context.Context, q postgres.Query, args ...interface{}) pgx.Row {
+func (p *Postgres) QueryRowContext(ctx context.Context, q Query, args ...interface{}) pgx.Row {
 	logQuery(ctx, p.logger, q, args...)
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
@@ -81,7 +80,7 @@ func (p *Postgres) QueryRowContext(ctx context.Context, q postgres.Query, args .
 	return res
 }
 
-func (p *Postgres) QueryRawContextMulti(ctx context.Context, q postgres.Query, args ...interface{}) (pgx.Rows, error) {
+func (p *Postgres) QueryRawContextMulti(ctx context.Context, q Query, args ...interface{}) (pgx.Rows, error) {
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
 		return tx.Query(ctx, q.Raw, args...)
@@ -108,11 +107,11 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
 
-func logQuery(_ context.Context, logger *slog.Logger, q postgres.Query, args ...interface{}) {
+func logQuery(_ context.Context, logger *slog.Logger, q Query, args ...interface{}) {
 	logger.Debug(
 		"executing query",
 		slog.String("sql", q.Name),
 		slog.String("query", q.Raw),
-		slog.Group("args", args),
+		slog.Any("args", args),
 	)
 }

@@ -3,9 +3,10 @@ package services
 import (
 	"context"
 	"errors"
+	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
 type MapVariablesService interface {
@@ -14,10 +15,10 @@ type MapVariablesService interface {
 	UpdateMapVariable(ctx context.Context, id string, variable models.UpdateMapVariableRequest) (*models.MapVariable, error)
 	DeleteMapVariable(ctx context.Context, id string) (*models.MapVariable, error)
 
-	GetMapVariablesByBookID(ctx context.Context, mapID string) ([]*models.MapVariable, error)
-	GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]*models.MapVariable, error)
-	GetMapVariablesByPageID(ctx context.Context, pageID string) ([]*models.MapVariable, error)
-	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]*models.MapVariable, error)
+	GetMapVariablesByBookID(ctx context.Context, mapID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByChapterID(ctx context.Context, chapterID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByPageID(ctx context.Context, pageID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
+	GetMapVariablesByParagraphID(ctx context.Context, paragraphID string, request models.RequestMapVariable) ([]*models.MapVariable, error)
 }
 
 type mapVariablesService struct {
@@ -29,7 +30,7 @@ func NewMapVariablesService(repo SimpleRepo[*entity.MapVariable]) MapVariablesSe
 }
 
 func (s *mapVariablesService) CreateMapVariable(ctx context.Context, request models.CreateMapVariableRequest) (*models.MapVariable, error) {
-	variable := converter.MapVariableModelToEntity(request.MapVariable)
+	variable := adapters.MapVariableModelToEntity(request.MapVariable)
 
 	id, err := s.repo.Create(ctx, variable)
 	if err != nil {
@@ -45,18 +46,19 @@ func (s *mapVariablesService) GetMapVariableByID(ctx context.Context, id string)
 		return nil, err
 	}
 
-	return converter.MapVariableEntityToModel(variable), nil
+	return adapters.MapVariableEntityToModel(variable), nil
 }
 
-func (s *mapVariablesService) UpdateMapVariable(ctx context.Context, id string, request models.UpdateMapVariableRequest) (*models.MapVariable, error) {
-	mapVariable := converter.MapVariableModelToEntity(request.MapVariable)
+func (s *mapVariablesService) UpdateMapVariable(ctx context.Context, id string,
+	request models.UpdateMapVariableRequest) (*models.MapVariable, error) {
+	mapVariable := adapters.MapVariableModelToEntity(request.MapVariable)
 
 	updatedVariable, err := s.repo.Update(ctx, id, mapVariable)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.MapVariableEntityToModel(updatedVariable), nil
+	return adapters.MapVariableEntityToModel(updatedVariable), nil
 }
 
 func (s *mapVariablesService) DeleteMapVariable(ctx context.Context, id string) (*models.MapVariable, error) {
@@ -73,42 +75,65 @@ func (s *mapVariablesService) DeleteMapVariable(ctx context.Context, id string) 
 	return mapVariable, err
 }
 
-func (s *mapVariablesService) GetMapVariablesByBookID(ctx context.Context, mapID string) ([]*models.MapVariable, error) {
-	variable, err := s.repo.FindByKV(ctx, "map_id", mapID)
+func (s *mapVariablesService) GetMapVariablesByBookID(ctx context.Context, mapID string,
+	request models.RequestMapVariable) ([]*models.MapVariable, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("book_id", mapID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	variable, err := s.repo.FindByKV(ctx, options)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.MapVariablesEntityToModel(variable), nil
+	return adapters.MapVariablesEntityToModel(variable), nil
 }
 
-func (s *mapVariablesService) GetMapVariablesByChapterID(ctx context.Context, chapterID string) ([]*models.MapVariable, error) {
-	variable, err := s.repo.FindByKV(ctx, "chapter_id", chapterID)
+func (s *mapVariablesService) GetMapVariablesByChapterID(ctx context.Context, chapterID string,
+	request models.RequestMapVariable) ([]*models.MapVariable, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("chapter_id", chapterID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	variable, err := s.repo.FindByKV(ctx, options)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.MapVariablesEntityToModel(variable), nil
+	return adapters.MapVariablesEntityToModel(variable), nil
 }
 
-func (s *mapVariablesService) GetMapVariablesByPageID(ctx context.Context, pageID string) ([]*models.MapVariable, error) {
-	variable, err := s.repo.FindByKV(ctx, "page_id", pageID)
+func (s *mapVariablesService) GetMapVariablesByPageID(ctx context.Context, pageID string,
+	request models.RequestMapVariable) ([]*models.MapVariable, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("page_id", pageID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	variable, err := s.repo.FindByKV(ctx, options)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.MapVariablesEntityToModel(variable), nil
+	return adapters.MapVariablesEntityToModel(variable), nil
 }
 
-func (s *mapVariablesService) GetMapVariablesByParagraphID(ctx context.Context, paragraphID string) ([]*models.MapVariable, error) {
-	variable, err := s.repo.FindByKV(ctx, "paragraph_id", paragraphID)
+func (s *mapVariablesService) GetMapVariablesByParagraphID(ctx context.Context, paragraphID string,
+	request models.RequestMapVariable) ([]*models.MapVariable, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("paragraph_id", paragraphID),
+		dbutils.NewPagination(&request.Options),
+	)
+	variable, err := s.repo.FindByKV(ctx, options)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.MapVariablesEntityToModel(variable), nil
+	return adapters.MapVariablesEntityToModel(variable), nil
 }

@@ -18,7 +18,7 @@ var configPath string
 // @produces application/json
 // @consumes application/json
 func main() {
-	flag.StringVar(&configPath, "config", "./config/default.yml", "path to the configuration file")
+	flag.StringVar(&configPath, "config", "./config", "path to the configuration files")
 	app, err := pkg.NewApp(configPath)
 	if err != nil {
 		fmt.Printf("failed to create app: %+v\n", err)

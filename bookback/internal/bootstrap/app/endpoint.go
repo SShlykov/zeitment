@@ -1,89 +1,59 @@
 package app
 
 import (
-	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers/book"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers/bookevents"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers/chapter"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/health"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/mapvariables"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/page"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/paragraph"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/swagger"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
-	"github.com/SShlykov/zeitment/bookback/pkg/circuitbreaker"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
-	"github.com/labstack/echo/v4"
-	echomv "github.com/labstack/echo/v4/middleware"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/endpoint"
+	"github.com/SShlykov/zeitment/bookback/pkg/config"
 	"log/slog"
-	"net/http"
 	"sync"
 )
 
-func (app *App) runWebServer(wg *sync.WaitGroup, _ context.Context) {
+func (app *App) initWebServer() error {
+	cfg, err := getConfig(app.configPath)
+	if err != nil {
+		return err
+	}
+	app.web, err = endpoint.NewHandler(app.db, app.metrics, app.logger, app.ctx, cfg)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (app *App) RunWebServer(wg *sync.WaitGroup) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		httpServer := &http.Server{
-			ReadHeaderTimeout: app.config.Timeout,
-			ReadTimeout:       app.config.Timeout,
-			WriteTimeout:      app.config.Timeout,
-			IdleTimeout:       app.config.IddleTimeout,
-			Addr:              app.config.Address,
-			Handler:           app.Echo,
-		}
 
-		app.logger.Info("HTTP server started")
-		err := httpServer.ListenAndServe()
+		err := endpoint.RunServer(app.web, app.logger)
 		if err != nil {
 			app.logger.Error("HTTP server stopped", slog.Group("err", err))
 		}
 	}()
 }
 
-func (app *App) initEndpoint(_ context.Context) error {
-	e := echo.New()
-	cb := circuitbreaker.NewCircuitBreaker(
-		app.config.RequestLimit,
-		app.config.MinRequests,
-		app.config.ErrorThresholdPercentage,
-		app.config.IntervalDuration,
-		app.config.OpenStateTimeout,
-	)
+func getConfig(configPath string) (*endpoint.HTTPServerConfig, error) {
+	cfg, err := config.LoadServerConfig(configPath)
 
-	middlewares := []echo.MiddlewareFunc{
-		middleware.LoggerConfiguration(app.logger),
-		echomv.Recover(),
-		middleware.CreateCircuitBreakerMiddleware(cb),
+	if err != nil {
+		return nil, err
 	}
 
-	if app.config.CorsEnabled {
-		middlewares = append(middlewares, middleware.CORS())
-	}
-
-	e.Use(middlewares...)
-
-	app.Echo = e
-	return nil
+	return FileConfigToServerConfig(cfg), nil
 }
 
-func (app *App) initRouter(_ context.Context) error {
-	controllers := []func(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context){
-		health.SetHealthController,
-		book.SetBookController,
-		chapter.SetChapterController,
-		page.SetPageController,
-		paragraph.SetParagraphController,
-		bookevents.SetBookEventController,
-		mapvariables.SetMapVariablesController,
+func FileConfigToServerConfig(cfg *config.HTTPServer) *endpoint.HTTPServerConfig {
+	return &endpoint.HTTPServerConfig{
+		RequestLimit:             cfg.RequestLimit,
+		MinRequests:              cfg.MinRequests,
+		ErrorThresholdPercentage: cfg.ErrorThresholdPercentage,
+		IntervalDuration:         cfg.IntervalDuration,
+		OpenStateTimeout:         cfg.OpenStateTimeout,
+		CorsEnabled:              cfg.CorsEnabled,
+		SwaggerEnabled:           cfg.SwaggerEnabled,
+		Timeout:                  cfg.Timeout,
+		IddleTimeout:             cfg.IddleTimeout,
+		Address:                  cfg.Address,
 	}
-
-	for _, controller := range controllers {
-		controller(app.Echo, app.db, app.metrics, app.logger, app.ctx)
-	}
-
-	swagger.SetSwagger(app.Echo, app.config.SwaggerEnabled)
-
-	return nil
 }

@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
+	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
 // BookService описывает сервис для работы с книгами.
@@ -13,7 +14,7 @@ type BookService interface {
 	GetBookByID(ctx context.Context, id string) (*models.Book, error)
 	UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error)
 	DeleteBook(ctx context.Context, id string) (*models.Book, error)
-	ListBooks(ctx context.Context, limit uint64, offset uint64) ([]*models.Book, error)
+	ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error)
 }
 
 type bookService struct {
@@ -26,7 +27,7 @@ func NewBookService(repo SimpleRepo[*entity.Book]) BookService {
 }
 
 func (s *bookService) CreateBook(ctx context.Context, request models.CreateBookRequest) (*models.Book, error) {
-	book := converter.BookModelToEntity(request.Book)
+	book := adapters.BookModelToEntity(request.Book)
 
 	if book.Variables == nil {
 		book.Variables = []string{}
@@ -45,16 +46,16 @@ func (s *bookService) GetBookByID(ctx context.Context, id string) (*models.Book,
 		return nil, err
 	}
 
-	return converter.BookEntityToModel(book), nil
+	return adapters.BookEntityToModel(book), nil
 }
 
 func (s *bookService) UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error) {
-	book, err := s.repo.Update(ctx, id, converter.BookModelToEntity(request.Book))
+	book, err := s.repo.Update(ctx, id, adapters.BookModelToEntity(request.Book))
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.BookEntityToModel(book), nil
+	return adapters.BookEntityToModel(book), nil
 }
 
 func (s *bookService) DeleteBook(ctx context.Context, id string) (*models.Book, error) {
@@ -71,11 +72,13 @@ func (s *bookService) DeleteBook(ctx context.Context, id string) (*models.Book, 
 	return book, err
 }
 
-func (s *bookService) ListBooks(ctx context.Context, limit uint64, offset uint64) ([]*models.Book, error) {
-	books, err := s.repo.List(ctx, limit, offset)
+func (s *bookService) ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error) {
+	options := dbutils.NewPagination(&request.Options)
+
+	books, err := s.repo.List(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.BooksEntityToModel(books), nil
+	return adapters.BooksEntityToModel(books), nil
 }

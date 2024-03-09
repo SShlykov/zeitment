@@ -33,8 +33,6 @@ type Query struct {
 
 type Transactor interface {
 	BeginTx(ctx context.Context, options pgx.TxOptions) (pgx.Tx, error)
-	Commit(ctx context.Context) error
-	Rollback(ctx context.Context) error
 }
 
 type SQLScanner interface {

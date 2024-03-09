@@ -20,6 +20,10 @@ type PageMetadata struct {
 }
 
 type PageOptions struct {
-	Limit  uint64 `json:"limit,omitempty"`
-	Offset uint64 `json:"offset,omitempty"`
+	PageSize uint64 `json:"page_size,omitempty"`
+	Page     uint64 `json:"page,omitempty"`
+}
+
+func (po *PageOptions) GetPageAndPageSize() (uint64, uint64) {
+	return po.Page, po.PageSize
 }

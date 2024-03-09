@@ -46,32 +46,30 @@ func (mv MapVariable) InsertFields() []string {
 }
 
 // EntityToInsertValues преобразует сущность в список значений для вставки
-func (mv MapVariable) EntityToInsertValues(entity any) []interface{} {
-	if e, ok := entity.(MapVariable); ok {
-		return []interface{}{
-			e.BookID, e.ChapterID, e.PageID, e.ParagraphID, e.MapLink, e.Lat, e.Lng, e.Zoom, e.Date,
-			e.Description, e.Link, e.LinkText, e.LinkType, e.LinkImage, e.Image,
-		}
+func (mv MapVariable) EntityToInsertValues(entity *MapVariable) []interface{} {
+	return []interface{}{
+		entity.BookID, entity.ChapterID, entity.PageID, entity.ParagraphID, entity.MapLink, entity.Lat, entity.Lng,
+		entity.Zoom, entity.Date, entity.Description, entity.Link, entity.LinkText, entity.LinkType,
+		entity.LinkImage, entity.Image,
 	}
-	return nil
 }
 
 // ReadItem читает одну запись из строки запроса
-func (mv MapVariable) ReadItem(row pgx.Row) (any, error) {
+func (mv MapVariable) ReadItem(row pgx.Row) (MapVariable, error) {
 	var mapVariable MapVariable
 	err := row.Scan(&mapVariable.ID, &mapVariable.CreatedAt, &mapVariable.UpdatedAt, &mapVariable.BookID, &mapVariable.ChapterID,
 		&mapVariable.PageID, &mapVariable.ParagraphID, &mapVariable.MapLink, &mapVariable.Lat, &mapVariable.Lng, &mapVariable.Zoom,
 		&mapVariable.Date, &mapVariable.Description, &mapVariable.Link, &mapVariable.LinkText, &mapVariable.LinkType,
 		&mapVariable.LinkImage, &mapVariable.Image)
 	if err != nil {
-		return nil, err
+		return MapVariable{}, err
 	}
 	return mapVariable, nil
 }
 
 // ReadList читает список записей из результатов запроса
-func (mv MapVariable) ReadList(rows pgx.Rows) ([]any, error) {
-	var mapVariables []any
+func (mv MapVariable) ReadList(rows pgx.Rows) ([]MapVariable, error) {
+	var mapVariables []MapVariable
 	for rows.Next() {
 		mapVariable, err := mv.ReadItem(rows)
 		if err != nil {

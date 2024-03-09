@@ -33,25 +33,23 @@ func (c Chapter) InsertFields() []string {
 	return []string{"title", "number", "text", "book_id", "is_public", "map_link", "map_params_id"}
 }
 
-func (c Chapter) EntityToInsertValues(entity any) []interface{} {
-	if e, ok := entity.(Chapter); ok {
-		return []interface{}{e.Title, e.Number, e.Text, e.BookID, e.IsPublic, e.MapLink, e.MapParamsID}
-	}
-	return nil
+func (c Chapter) EntityToInsertValues(entity *Chapter) []interface{} {
+	return []interface{}{entity.Title, entity.Number, entity.Text, entity.BookID, entity.IsPublic,
+		entity.MapLink, entity.MapParamsID}
 }
 
-func (c Chapter) ReadItem(row pgx.Row) (any, error) {
+func (c Chapter) ReadItem(row pgx.Row) (Chapter, error) {
 	var e Chapter
-	err := row.Scan(&e.ID, &e.CreatedAt, &e.UpdatedAt, &e.Title, &e.Number, &e.Text, &e.BookID, &e.IsPublic,
-		&e.MapLink, &e.MapParamsID)
+	err := row.Scan(&e.ID, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt, &e.Title, &e.Number, &e.Text, &e.BookID,
+		&e.IsPublic, &e.MapLink, &e.MapParamsID)
 	if err != nil {
-		return nil, err
+		return Chapter{}, err
 	}
 	return e, nil
 }
 
-func (c Chapter) ReadList(rows pgx.Rows) ([]any, error) {
-	var entities []any
+func (c Chapter) ReadList(rows pgx.Rows) ([]Chapter, error) {
+	var entities []Chapter
 	for rows.Next() {
 		chapter, err := c.ReadItem(rows)
 		if err != nil {

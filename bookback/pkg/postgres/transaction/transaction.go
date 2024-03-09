@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres/pg"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -19,7 +18,7 @@ func NewTransactionManager(db postgres.Transactor) postgres.TxManager {
 
 // Transaction основная функция, которая выполняет указанный пользователем обработчик в транзакции
 func (m *manager) Transaction(ctx context.Context, opts pgx.TxOptions, fn postgres.Handler) (err error) {
-	tx, ok := ctx.Value(pg.TxKey).(pgx.Tx)
+	tx, ok := ctx.Value(postgres.TxKey).(pgx.Tx)
 	if ok {
 		return fn(ctx)
 	}
@@ -29,7 +28,7 @@ func (m *manager) Transaction(ctx context.Context, opts pgx.TxOptions, fn postgr
 		return errors.Join(err, errors.New("can't begin transaction"))
 	}
 
-	ctx = pg.MakeContextTx(ctx, tx)
+	ctx = postgres.MakeContextTx(ctx, tx)
 
 	defer func() {
 		if r := recover(); r != nil {

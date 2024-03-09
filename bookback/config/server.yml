@@ -1,0 +1,12 @@
+address: "0.0.0.0:7077"
+timeout: 4s
+iddle_timeout: 60s
+
+request_limit: 100
+min_requests: 10
+error_threshold_percentage: 0.6
+interval_duration: 10s
+open_state_timeout: 10s
+
+cors_enabled: true
+swagger_enabled: true

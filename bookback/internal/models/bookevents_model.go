@@ -6,22 +6,22 @@ import (
 )
 
 type BookEvent struct {
-	ID          string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	BookID      string
-	ChapterID   types.Null[string]
-	PageID      types.Null[string]
-	ParagraphID types.Null[string]
-	EventType   types.Null[string] // Тип события (начало главы, начало страницы, начало параграфа...)
-	IsPublic    bool
-	Key         string
-	Value       string
-	Link        types.Null[string]
-	LinkText    types.Null[string]
-	LinkType    types.Null[string]
-	LinkImage   types.Null[string]
-	Description types.Null[string]
+	ID          string             `json:"id"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	BookID      string             `json:"book_id"`
+	ChapterID   types.Null[string] `json:"chapter_id"`
+	PageID      types.Null[string] `json:"page_id"`
+	ParagraphID types.Null[string] `json:"paragraph_id"`
+	EventType   types.Null[string] `json:"event_type"` // Тип события (начало главы, начало страницы, начало параграфа...)
+	IsPublic    bool               `json:"is_public"`
+	Key         string             `json:"key"`
+	Value       string             `json:"value"`
+	Link        types.Null[string] `json:"link"`
+	LinkText    types.Null[string] `json:"link_text"`
+	LinkType    types.Null[string] `json:"link_type"`
+	LinkImage   types.Null[string] `json:"link_image"`
+	Description types.Null[string] `json:"description"`
 }
 
 type CreateBookEventRequest struct {

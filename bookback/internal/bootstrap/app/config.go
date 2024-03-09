@@ -1,12 +1,11 @@
 package app
 
 import (
-	"context"
 	"errors"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
 )
 
-func (app *App) initConfig(_ context.Context) error {
+func (app *App) initConfig() error {
 	cfg, err := config.LoadConfig(app.configPath)
 	if err != nil {
 		return errors.New("failed to load config: " + err.Error())

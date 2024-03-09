@@ -3,19 +3,20 @@ package services
 import (
 	"context"
 	"errors"
+	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/converter"
+	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
 type PageService interface {
 	CreatePage(ctx context.Context, request models.CreatePageRequest) (*models.Page, error)
 	GetPageByID(ctx context.Context, id string) (*models.Page, error)
-	UpdatePage(ctx context.Context, id string, prequest models.UpdatePageRequest) (*models.Page, error)
+	UpdatePage(ctx context.Context, id string, request models.UpdatePageRequest) (*models.Page, error)
 	DeletePage(ctx context.Context, id string) (*models.Page, error)
-	ListPages(ctx context.Context, limit uint64, offset uint64) ([]*models.Page, error)
+	ListPages(ctx context.Context, request models.RequestPage) ([]*models.Page, error)
 
-	GetPagesByChapterID(ctx context.Context, chapterID string) ([]*models.Page, error)
+	GetPagesByChapterID(ctx context.Context, chapterID string, request models.RequestPage) ([]*models.Page, error)
 }
 
 type pageService struct {
@@ -27,7 +28,7 @@ func NewPageService(repo SimpleRepo[*entity.Page]) PageService {
 }
 
 func (s *pageService) CreatePage(ctx context.Context, request models.CreatePageRequest) (*models.Page, error) {
-	page := converter.PageModelToEntity(request.Page)
+	page := adapters.PageModelToEntity(request.Page)
 
 	id, err := s.repo.Create(ctx, page)
 	if err != nil {
@@ -43,18 +44,18 @@ func (s *pageService) GetPageByID(ctx context.Context, id string) (*models.Page,
 		return nil, err
 	}
 
-	return converter.PageEntityToModel(page), nil
+	return adapters.PageEntityToModel(page), nil
 }
 
 func (s *pageService) UpdatePage(ctx context.Context, id string, request models.UpdatePageRequest) (*models.Page, error) {
-	page := converter.PageModelToEntity(request.Page)
+	page := adapters.PageModelToEntity(request.Page)
 
 	updatedPage, err := s.repo.Update(ctx, id, page)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.PageEntityToModel(updatedPage), nil
+	return adapters.PageEntityToModel(updatedPage), nil
 }
 
 func (s *pageService) DeletePage(ctx context.Context, id string) (*models.Page, error) {
@@ -69,20 +70,27 @@ func (s *pageService) DeletePage(ctx context.Context, id string) (*models.Page, 
 	return page, err
 }
 
-func (s *pageService) ListPages(ctx context.Context, limit uint64, offset uint64) ([]*models.Page, error) {
-	pages, err := s.repo.List(ctx, limit, offset)
+func (s *pageService) ListPages(ctx context.Context, request models.RequestPage) ([]*models.Page, error) {
+	options := dbutils.NewPagination(&request.Options)
+
+	pages, err := s.repo.List(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.PagesEntityToModel(pages), nil
+	return adapters.PagesEntityToModel(pages), nil
 }
 
-func (s *pageService) GetPagesByChapterID(ctx context.Context, chapterID string) ([]*models.Page, error) {
-	pages, err := s.repo.FindByKV(ctx, "chapter_id", chapterID)
+func (s *pageService) GetPagesByChapterID(ctx context.Context, chapterID string, request models.RequestPage) ([]*models.Page, error) {
+	options := dbutils.NewQueryOptions(
+		dbutils.NewFilter("chapter_id", chapterID),
+		dbutils.NewPagination(&request.Options),
+	)
+
+	pages, err := s.repo.FindByKV(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.PagesEntityToModel(pages), nil
+	return adapters.PagesEntityToModel(pages), nil
 }

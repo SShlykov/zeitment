@@ -12,7 +12,7 @@ import (
 	"log/slog"
 )
 
-func SetBookEventController(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func BookEvent(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
 	repo := pgrepo.NewBookEventsRepository(database)
 	service := services.NewBookEventsService(repo)
 	cntr := controllers.NewBookEventController(service, metrics, logger, ctx)
@@ -24,8 +24,8 @@ func SetBookEventController(e *echo.Echo, database postgres.Client, metrics metr
 	group.GET("/:id", cntr.GetBookEventByID)
 	group.PUT("/:id", cntr.UpdateBookEvent)
 	group.DELETE("/:id", cntr.DeleteBookEvent)
-	group.GET("/book/:id", cntr.GetBookEventsByBookID)
-	group.GET("/chapter/:id", cntr.GetBookEventsByChapterID)
-	group.GET("/page/:id", cntr.GetBookEventsByPageID)
-	group.GET("/paragraph/:id", cntr.GetBookEventsByParagraphID)
+	group.POST("/book/:id", cntr.GetBookEventsByBookID)
+	group.POST("/chapter/:id", cntr.GetBookEventsByChapterID)
+	group.POST("/page/:id", cntr.GetBookEventsByPageID)
+	group.POST("/paragraph/:id", cntr.GetBookEventsByParagraphID)
 }

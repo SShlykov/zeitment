@@ -15,8 +15,8 @@ type pageService interface {
 	GetPageByID(ctx context.Context, id string) (*models.Page, error)
 	UpdatePage(ctx context.Context, id string, request models.UpdatePageRequest) (*models.Page, error)
 	DeletePage(ctx context.Context, id string) (*models.Page, error)
-	ListPages(ctx context.Context, limit uint64, offset uint64) ([]*models.Page, error)
-	GetPagesByChapterID(ctx context.Context, chapterID string) ([]*models.Page, error)
+	ListPages(ctx context.Context, page models.RequestPage) ([]*models.Page, error)
+	GetPagesByChapterID(ctx context.Context, chapterID string, page models.RequestPage) ([]*models.Page, error)
 }
 
 type PageController struct {
@@ -31,12 +31,12 @@ func NewPageController(srv pageService, metric metrics.Metrics, logger *slog.Log
 }
 
 func (p *PageController) ListPages(c echo.Context) error {
-	var request models.RequestBook
+	var request models.RequestPage
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	pages, err := p.Service.ListPages(p.Ctx, request.Options.Limit, request.Options.Offset)
+	pages, err := p.Service.ListPages(p.Ctx, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -107,7 +107,12 @@ func (p *PageController) GetPagesByChapterID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
 	}
 
-	pages, err := p.Service.GetPagesByChapterID(p.Ctx, id)
+	var request models.RequestPage
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	pages, err := p.Service.GetPagesByChapterID(p.Ctx, id, request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, errors.BookNotFound)
 	}
