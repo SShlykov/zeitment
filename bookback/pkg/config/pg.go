@@ -2,12 +2,9 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
-)
-
-const (
-	dsnEnvVar = "DSN"
 )
 
 var ErrDSNNotSet = errors.New("DSN not set")
@@ -25,7 +22,16 @@ type pgConfig struct {
 }
 
 func NewPGConfig() (PGConfig, error) {
-	dsn := os.Getenv(dsnEnvVar)
+	host := os.Getenv("PG_HOST")
+	port := os.Getenv("PG_PORT")
+	user := os.Getenv("PG_USER")
+	password := os.Getenv("PG_PASSWORD")
+	dbName := os.Getenv("PG_DB_NAME")
+	sslMode := os.Getenv("PG_SSL_MODE")
+
+	// Формирование DSN
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbName, sslMode)
 	if dsn == "" {
 		return nil, ErrDSNNotSet
 	}
