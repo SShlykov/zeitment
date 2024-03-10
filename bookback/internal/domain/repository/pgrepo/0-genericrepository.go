@@ -2,7 +2,6 @@ package pgrepo
 
 import (
 	"context"
-	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/jackc/pgx/v5"
@@ -87,7 +86,6 @@ func (r *repository[T]) Create(ctx context.Context, item *T) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("query", query)
 	q := postgres.Query{Name: r.Name + ".Insert", Raw: query}
 
 	var id string
@@ -99,16 +97,20 @@ func (r *repository[T]) Create(ctx context.Context, item *T) (string, error) {
 }
 
 func (r *repository[T]) Update(ctx context.Context, id string, item *T) (*T, error) {
-	updateQuery := r.db.Builder().Update(r.entity.TableName())
 	insertList := r.entity.EntityToInsertValues(item)
-	for i, f := range r.entity.InsertFields() {
-		updateQuery = updateQuery.Set(f, insertList[i])
+
+	updateQuery := r.db.Builder().
+		Update(r.entity.TableName())
+
+	for i, field := range r.entity.InsertFields() {
+		updateQuery = updateQuery.Set(field, insertList[i])
 	}
 
-	query, args, err := updateQuery.
-		Where(r.entity.TableName()+Equals, id).
-		Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
-		ToSql()
+	query, args, err :=
+		updateQuery.
+			Where(r.tableKey("id")+Equals, id).
+			Suffix("RETURNING " + strings.Join(r.entity.AllFields(), ", ")).
+			ToSql()
 
 	if err != nil {
 		return nil, err

@@ -14,14 +14,14 @@ type PageResponse[T any] struct {
 
 type PageMetadata struct {
 	Page      int   `json:"page"`
-	Size      int   `json:"size"`
+	PageSize  int   `json:"page_size"`
 	TotalItem int64 `json:"total_item"`
 	TotalPage int64 `json:"total_page"`
 }
 
 type PageOptions struct {
-	PageSize uint64 `json:"page_size,omitempty"`
 	Page     uint64 `json:"page,omitempty"`
+	PageSize uint64 `json:"page_size,omitempty"`
 }
 
 func (po *PageOptions) GetPageAndPageSize() (uint64, uint64) {

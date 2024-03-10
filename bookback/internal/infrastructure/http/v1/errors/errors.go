@@ -21,4 +21,6 @@ const (
 	ParagraphNotFound      = "Параграф не найден"
 	ParagraphNotCreated    = "Ошибка создания параграфа. Параграф с такими параметрами уже существует."
 	ParagraphNotDeleted    = "Ошибка удаления параграфа"
+	MinioObjectNotCreated  = "Ошибка создания объекта Minio"
+	MinioObjectNotFound    = "Объект Minio не найден"
 )

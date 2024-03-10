@@ -6,6 +6,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	"github.com/minio/minio-go/v7"
 
 	"log/slog"
 	"os"
@@ -20,6 +21,7 @@ type App struct {
 	db         postgres.Client
 	web        *endpoint.Handler
 	metrics    metrics.Metrics
+	minio      *minio.Client
 
 	ctx      context.Context
 	closeCtx func()
@@ -34,6 +36,7 @@ func NewApp(configPath string) (*App, error) {
 		app.initLogger,
 		app.initMetrics,
 		app.initDB,
+		app.initMinio,
 		app.initWebServer,
 	}
 
