@@ -1,16 +1,30 @@
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import AdapterOfBooks from '@/adapters/AdapterOfBooks'
 
 export default {
   name: 'TestsPage',
   components: {},
-  data() {},
+  data() {
+    return {
+      testData: [],
+      url: import.meta.env.VITE_API_ADDR
+    }
+  },
   computed: {
-    ...mapGetters('test', ['integrationTestLog'])
   },
   mounted() {},
   methods: {
-    ...mapActions('test', ['startIntegrationTest'])
+    startIntegrationTest() {
+      const adapterOfBooks = new AdapterOfBooks(this.url)
+      adapterOfBooks.integrationTests(
+        (data) => {
+          this.testData = [
+            ...this.testData,
+            data
+          ]
+        }
+      )
+    }
   }
 }
 
@@ -28,7 +42,7 @@ export default {
       </button>
     </div>
     <pre>
-<code>{{ integrationTestLog }}
+<code>{{ testData }}
       </code>
     </pre>
   </div>

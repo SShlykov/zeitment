@@ -1,17 +1,18 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
 
 export default {
   name: 'MenuHead',
   components: {},
-  data() {
+  props: {
+    isOpenMenu: {
+      default: false,
+      type: Boolean
+    },
+    toggleMenu: {
+      default: () => {},
+      type: Function
+    }
   },
-  computed: {
-    ...mapGetters('layout', ['isOpenMenu']),
-  },
-  methods: {
-    ...mapMutations('layout', ['toggleMenu']),
-  }
 }
 
 </script>

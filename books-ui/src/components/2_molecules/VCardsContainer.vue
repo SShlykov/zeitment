@@ -1,9 +1,7 @@
 <script>
-import BookEditor from "@organisms/BookEditor/BookEditor.vue";
-
 export default {
-  name: 'BookPage',
-  components: {BookEditor},
+  name: 'VCardsContainer',
+  components: {},
   data() {},
   computed: {},
   mounted() {},
@@ -14,6 +12,6 @@ export default {
 
 <template>
   <div class="">
-    <BookEditor />
+    template
   </div>
 </template>

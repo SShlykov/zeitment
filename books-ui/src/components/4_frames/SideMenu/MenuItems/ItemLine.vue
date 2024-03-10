@@ -5,8 +5,7 @@
 <script>
 
 export default {
-  
-  name: 'MenuLine'
+  name: 'ItemLine'
 }
 
 </script>

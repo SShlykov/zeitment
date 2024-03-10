@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 import Auth from "@pages/Auth/index.vue"
 import UserBooks from "@pages/UserBooks/UserBooks.vue"
 import NewBook from "@pages/NewBook/NewBook.vue"
+import Book from "@pages/Book/Book.vue"
 import UserSettings from "@pages/UserSettings/UserSettings.vue"
 import TestsPage from "@pages/Tests/TestsPage.vue"
 
@@ -16,7 +17,13 @@ const prod_routes = [
     path: "/settings",
     name: "setting",
     component: UserSettings,
-  },  {
+  },
+  {
+    path: "/book/:id",
+    name: "book",
+    component: Book,
+  },
+  {
     path: "/new_book",
     name: "new_book",
     component: NewBook,
