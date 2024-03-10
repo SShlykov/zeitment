@@ -32,6 +32,7 @@ func (b Book) AllFields() []string {
 		"description", "is_public", "publication", "image_link", "map_link", "map_params_id", "variables"}
 }
 
+// TODO: Insert or update field
 func (b Book) InsertFields() []string {
 	return []string{"owner", "title", "author", "description", "is_public", "publication", "image_link", "map_link",
 		"map_params_id", "variables"}

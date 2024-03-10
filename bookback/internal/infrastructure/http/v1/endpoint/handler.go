@@ -8,6 +8,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/pkg/circuitbreaker"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
+	"github.com/minio/minio-go/v7"
 	"log/slog"
 	"time"
 )
@@ -37,19 +38,24 @@ func (h *Handler) Shutdown(ctx context.Context) error {
 	return h.e.Shutdown(ctx)
 }
 
-func NewHandler(database postgres.Client, metric metrics.Metrics,
+func NewHandler(database postgres.Client, minioClient *minio.Client, metric metrics.Metrics,
 	logger *slog.Logger, ctx context.Context, cfg *HTTPServerConfig) (*Handler, error) {
 	e := echo.New()
 
 	setMiddlewares(e, logger, cfg)
 
 	setRouter(e, database, metric, logger, ctx)
+	setMinioRouter(e, minioClient, metric, logger, ctx)
 
 	if cfg.SwaggerEnabled {
 		routes.SetSwagger(e)
 	}
 
 	return &Handler{e: e, Timeout: cfg.Timeout, IddleTimeout: cfg.IddleTimeout, Address: cfg.Address}, nil
+}
+
+func setMinioRouter(e *echo.Echo, client *minio.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+	routes.Minio(e, client, metrics, logger, ctx)
 }
 
 func setMiddlewares(e *echo.Echo, logger *slog.Logger, config *HTTPServerConfig) {
@@ -63,7 +69,7 @@ func setMiddlewares(e *echo.Echo, logger *slog.Logger, config *HTTPServerConfig)
 
 	middlewares := []echo.MiddlewareFunc{
 		middleware.LoggerConfiguration(logger),
-		//middleware.Recover(),
+		middleware.Recover(),
 		middleware.CreateCircuitBreakerMiddleware(cb),
 	}
 
@@ -91,6 +97,4 @@ func setRouter(e *echo.Echo, database postgres.Client, metric metrics.Metrics,
 	for _, controller := range controllers {
 		controller(e, database, metric, logger, ctx)
 	}
-
-	return
 }

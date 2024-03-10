@@ -12,7 +12,7 @@ func (app *App) initWebServer() error {
 	if err != nil {
 		return err
 	}
-	app.web, err = endpoint.NewHandler(app.db, app.metrics, app.logger, app.ctx, cfg)
+	app.web, err = endpoint.NewHandler(app.db, app.minio, app.metrics, app.logger, app.ctx, cfg)
 
 	if err != nil {
 		return err

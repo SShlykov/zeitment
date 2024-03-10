@@ -5,6 +5,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/services"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
+	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
@@ -17,7 +18,7 @@ func Page(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logge
 	service := services.NewPageService(repo)
 	cnt := controllers.NewPageController(service, metrics, logger, ctx)
 
-	group := e.Group(PagesPath)
+	group := e.Group(v1.PagesPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
 	group.POST("/list", cnt.ListPages)

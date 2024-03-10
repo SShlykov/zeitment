@@ -5,6 +5,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/services"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
+	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
@@ -17,7 +18,7 @@ func BookEvent(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, 
 	service := services.NewBookEventsService(repo)
 	cntr := controllers.NewBookEventController(service, metrics, logger, ctx)
 
-	group := e.Group(BookEventsPath)
+	group := e.Group(v1.BookEventsPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
 	group.POST("", cntr.CreateBookEvent)
