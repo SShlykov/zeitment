@@ -5,6 +5,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
+// SimpleRepo описывает базовый интерфейс для DI репозиториев.
 type SimpleRepo[T any] interface {
 	Create(ctx context.Context, ent T) (string, error)
 	FindByID(ctx context.Context, id string) (T, error)

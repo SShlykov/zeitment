@@ -10,6 +10,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
+//go:generate mockgen -destination=../../tests/mocks/domain/services/chapter_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services ChapterService
 type ChapterService interface {
 	CreateChapter(ctx context.Context, request models.CreateChapterRequest) (*models.Chapter, error)
 	GetChapterByID(ctx context.Context, id string) (*models.Chapter, error)

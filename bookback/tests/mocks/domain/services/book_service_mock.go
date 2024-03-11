@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/SShlykov/zeitment/bookback/internal/models"
-	gomock "go.uber.org/mock/gomock"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockBookService is a mock of BookService interface.

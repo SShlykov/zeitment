@@ -5,6 +5,9 @@ import (
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 )
 
+// MapVariablesRepo описывает репозиторий для работы с переменными карты.
+//
+//go:generate mockgen -destination=../../tests/mocks/domain/repository/pgrepo/map_variables_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo MapVariablesRepo
 type MapVariablesRepo interface {
 	Repository[entity.MapVariable]
 }

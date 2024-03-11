@@ -9,6 +9,8 @@ import (
 )
 
 // BookService описывает сервис для работы с книгами.
+//
+//go:generate mockgen -destination=../../tests/mocks/domain/services/book_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services BookService
 type BookService interface {
 	CreateBook(ctx context.Context, request models.CreateBookRequest) (*models.Book, error)
 	GetBookByID(ctx context.Context, id string) (*models.Book, error)

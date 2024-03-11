@@ -8,6 +8,11 @@ import { store } from '@store'
 import VueTippy from 'vue-tippy'
 import Router from "@router"
 
+import moment from "moment/dist/moment"
+import ru from "moment/dist/locale/ru"
+
+moment.locale('ru', ru)
+
 createApp(App)
   .use(Router)
   .use(ramdaVue)

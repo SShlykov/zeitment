@@ -1,7 +1,9 @@
 <script>
+import BookEditor from "@organisms/BookEditor/BookEditor.vue";
+
 export default {
-  name: 'UserSettings',
-  components: {},
+  name: 'BookPage',
+  components: {BookEditor},
   data() {},
   computed: {},
   mounted() {},
@@ -12,6 +14,6 @@ export default {
 
 <template>
   <div class="">
-    template
+    <BookEditor />
   </div>
 </template>
