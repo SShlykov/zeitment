@@ -22,9 +22,9 @@ func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logge
 	group := e.Group(v1.BooksPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.POST("/list", cntr.ListBooks)
+	group.POST(v1.ListSubPath, cntr.ListBooks)
 	group.POST("", cntr.CreateBook)
-	group.GET("/:id", cntr.GetBookByID)
-	group.PUT("/:id", cntr.UpdateBook)
-	group.DELETE("/:id", cntr.DeleteBook)
+	group.GET(v1.IDVar, cntr.GetBookByID)
+	group.PUT(v1.IDVar, cntr.UpdateBook)
+	group.DELETE(v1.IDVar, cntr.DeleteBook)
 }

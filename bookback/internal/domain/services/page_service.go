@@ -9,7 +9,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
-//go:generate mockgen -destination=../../tests/mocks/domain/services/mapvariables_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services MapVariablesService
+//go:generate mockgen -destination=../../../tests/mocks/domain/services/page_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services PageService
 type PageService interface {
 	CreatePage(ctx context.Context, request models.CreatePageRequest) (*models.Page, error)
 	GetPageByID(ctx context.Context, id string) (*models.Page, error)

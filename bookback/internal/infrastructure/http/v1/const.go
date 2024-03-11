@@ -10,4 +10,9 @@ const (
 	PagesPath        = BasePath + "/pages"
 	ParagraphsPath   = BasePath + "/paragraphs"
 	MinioPath        = BasePath + "/storage"
+
+	IDVar          = "/:id"
+	BookSubPath    = "/book"
+	ChapterSubPath = "/chapter"
+	ListSubPath    = "/list"
 )

@@ -7,7 +7,7 @@ import (
 
 // PageRepo описывает репозиторий для работы с страницами.
 //
-//go:generate mockgen -destination=../../tests/mocks/domain/repository/pgrepo/page_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo PageRepo
+//go:generate mockgen -destination=../../../../tests/mocks/domain/repository/pgrepo/page_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo PageRepo
 type PageRepo interface {
 	Repository[entity.Page]
 }

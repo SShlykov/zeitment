@@ -9,7 +9,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
-//go:generate mockgen -destination=../../tests/mocks/domain/services/mapvariables_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services MapVariablesService
+//go:generate mockgen -destination=../../../tests/mocks/domain/services/mapvariables_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services MapVariablesService
 type MapVariablesService interface {
 	CreateMapVariable(ctx context.Context, request models.CreateMapVariableRequest) (*models.MapVariable, error)
 	GetMapVariableByID(ctx context.Context, id string) (*models.MapVariable, error)

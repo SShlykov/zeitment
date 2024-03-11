@@ -19,14 +19,6 @@ func NewHealthController(metric metrics.Metrics, logger *slog.Logger, ctx contex
 	return &HealthController{Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
-// GetHealthCheck возвращает статус приложения.
-// @router /health [get]
-// @summary Получить статус приложения
-// @description Возвращает статус приложения
-// @tags Статус приложения
-// @produce  application/json
-// @success 200 {string} string "healthy"
-// @failure 500 {object} config.HTTPError
 func (hc *HealthController) GetHealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, "healthy")
+	return c.JSON(http.StatusOK, map[string]string{"message": "healthy", "status": "ok"})
 }

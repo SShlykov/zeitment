@@ -9,7 +9,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
-//go:generate mockgen -destination=../../tests/mocks/domain/services/bookevents_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services BookEventsService
+//go:generate mockgen -destination=../../../tests/mocks/domain/services/bookevents_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services BookEventsService
 type BookEventsService interface {
 	CreateBookEvent(ctx context.Context, request models.CreateBookEventRequest) (*models.BookEvent, error)
 	GetBookEventByID(ctx context.Context, id string) (*models.BookEvent, error)

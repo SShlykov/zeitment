@@ -17,5 +17,5 @@ func Health(e *echo.Echo, _ postgres.Client, metrics metrics.Metrics, logger *sl
 	group := e.Group(v1.HealthPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.GET("/", cntr.GetHealthCheck)
+	group.GET("", cntr.GetHealthCheck)
 }

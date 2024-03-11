@@ -86,7 +86,7 @@ func (p *ParagraphController) UpdateParagraph(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
-	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "ok"})
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "updated"})
 }
 
 func (p *ParagraphController) DeleteParagraph(c echo.Context) error {
@@ -117,5 +117,5 @@ func (p *ParagraphController) GetParagraphsByPageID(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
-	return c.JSON(http.StatusOK, models.WebResponse[[]*models.Paragraph]{Data: paragraphs, Status: "deleted"})
+	return c.JSON(http.StatusOK, models.WebResponse[[]*models.Paragraph]{Data: paragraphs, Status: "ok"})
 }

@@ -7,7 +7,7 @@ import (
 
 // BookEventsRepo описывает репозиторий для работы с событиями книг.
 //
-//go:generate mockgen -destination=../../tests/mocks/domain/repository/pgrepo/book_events_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo BookEventsRepo
+//go:generate mockgen -destination=../../../../tests/mocks/domain/repository/pgrepo/book_events_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo BookEventsRepo
 type BookEventsRepo interface {
 	Repository[entity.BookEvent]
 }

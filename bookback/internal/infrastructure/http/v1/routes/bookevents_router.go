@@ -22,11 +22,11 @@ func BookEvent(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, 
 	group.Use(middleware.MetricsLogger(metrics))
 
 	group.POST("", cntr.CreateBookEvent)
-	group.GET("/:id", cntr.GetBookEventByID)
-	group.PUT("/:id", cntr.UpdateBookEvent)
-	group.DELETE("/:id", cntr.DeleteBookEvent)
-	group.POST("/book/:id", cntr.GetBookEventsByBookID)
-	group.POST("/chapter/:id", cntr.GetBookEventsByChapterID)
-	group.POST("/page/:id", cntr.GetBookEventsByPageID)
-	group.POST("/paragraph/:id", cntr.GetBookEventsByParagraphID)
+	group.GET(v1.IDVar, cntr.GetBookEventByID)
+	group.PUT(v1.IDVar, cntr.UpdateBookEvent)
+	group.DELETE(v1.IDVar, cntr.DeleteBookEvent)
+	group.POST(v1.BookSubPath+v1.IDVar, cntr.GetBookEventsByBookID)
+	group.POST(v1.ChapterSubPath+v1.IDVar, cntr.GetBookEventsByChapterID)
+	group.POST("/page"+v1.IDVar, cntr.GetBookEventsByPageID)
+	group.POST("/paragraph"+v1.IDVar, cntr.GetBookEventsByParagraphID)
 }

@@ -8,16 +8,21 @@ import (
 	"io"
 )
 
+//go:generate mockgen -source=minio_usecase.go -destination=../../../tests/mocks/usecase/minio_usecase_mock.go
 type MinioUseCase interface {
 	CreateMinioObject(ctx context.Context, request models.RequestMinioObject) (string, error)
 	GetMinioObject(ctx context.Context, request models.RequestMinioObject) (*models.MinioResp, error)
 }
 
-type minioUseCase struct {
-	minioClient *minio.Client
+type MinioClient interface {
+	GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*minio.Object, error)
 }
 
-func NewMinioUseCase(minioClient *minio.Client) MinioUseCase {
+type minioUseCase struct {
+	minioClient MinioClient
+}
+
+func NewMinioUseCase(minioClient MinioClient) MinioUseCase {
 	return &minioUseCase{minioClient: minioClient}
 }
 

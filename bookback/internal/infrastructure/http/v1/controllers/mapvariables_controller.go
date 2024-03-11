@@ -69,7 +69,7 @@ func (mvc *MapVariablesController) UpdateMapVariable(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
 
-	return c.JSON(http.StatusOK, models.WebResponse[*models.MapVariable]{Data: variable, Status: "ok"})
+	return c.JSON(http.StatusOK, models.WebResponse[*models.MapVariable]{Data: variable, Status: "updated"})
 }
 
 func (mvc *MapVariablesController) DeleteMapVariable(c echo.Context) error {
@@ -85,7 +85,7 @@ func (mvc *MapVariablesController) DeleteMapVariable(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotDeleted)
 	}
 
-	return c.JSON(http.StatusOK, models.WebResponse[*models.MapVariable]{Data: variable, Status: "ok"})
+	return c.JSON(http.StatusOK, models.WebResponse[*models.MapVariable]{Data: variable, Status: "deleted"})
 }
 
 func (mvc *MapVariablesController) GetMapVariablesByBookID(c echo.Context) error {
@@ -185,5 +185,5 @@ func (mvc *MapVariablesController) CreateMapVariable(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.MapVariablesNotCreated)
 	}
 
-	return c.JSON(http.StatusCreated, models.WebResponse[*models.MapVariable]{Data: variable, Status: "ok"})
+	return c.JSON(http.StatusCreated, models.WebResponse[*models.MapVariable]{Data: variable, Status: "created"})
 }

@@ -2,16 +2,29 @@ package controllers
 
 import (
 	ctx "context"
-	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	localMetrics "github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
+	loggerPkg "github.com/SShlykov/zeitment/bookback/pkg/logger"
 	"log/slog"
 )
 
-var (
-	logger             *slog.Logger
-	metrics            localMetrics.Metrics
-	context            ctx.Context
-	requestPageOptions string
-	id                 = "12b9b045-0845-462c-b372-0fca3180a6af"
-	idPath             = v1.BooksPath + "/id"
-)
+type TestFixture struct {
+	Logger             *slog.Logger
+	Metrics            localMetrics.Metrics
+	Context            ctx.Context
+	RequestPageOptions string
+	ID                 string
+	IDPath             string
+}
+
+func NewTestFixture(basePath string) *TestFixture {
+	fixture := &TestFixture{}
+	fixture.Logger = loggerPkg.SetupLogger("debug")
+	fixture.Metrics = localmetrics.NewLocalMetrics(fixture.Logger)
+	fixture.Context = ctx.Background()
+	fixture.RequestPageOptions = `{"options": {"page": 1, "page_size": 10}}`
+	fixture.ID = "12b9b045-0845-462c-b372-0fca3180a6af"
+	fixture.IDPath = basePath + "/id"
+
+	return fixture
+}

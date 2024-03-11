@@ -21,10 +21,10 @@ func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, 
 	group := e.Group(v1.ParagraphsPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
-	group.POST("/list", cnt.ListParagraphs)
+	group.POST(v1.ListSubPath, cnt.ListParagraphs)
 	group.POST("", cnt.CreateParagraph)
-	group.GET("/:id", cnt.GetParagraphByID)
-	group.PUT("/:id", cnt.UpdateParagraph)
-	group.DELETE("/:id", cnt.DeleteParagraph)
-	group.POST("/pages/:id", cnt.GetParagraphsByPageID)
+	group.GET(v1.IDVar, cnt.GetParagraphByID)
+	group.PUT(v1.IDVar, cnt.UpdateParagraph)
+	group.DELETE(v1.IDVar, cnt.DeleteParagraph)
+	group.POST("/pages"+v1.IDVar, cnt.GetParagraphsByPageID)
 }
