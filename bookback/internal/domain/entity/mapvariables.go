@@ -40,7 +40,7 @@ func (mv MapVariable) AllFields() []string {
 }
 
 // InsertFields возвращает список полей, используемых при вставке новой записи
-func (mv MapVariable) InsertFields() []string {
+func (mv MapVariable) InsertOrUpdateFields() []string {
 	return []string{"book_id", "chapter_id", "page_id", "paragraph_id", "map_link", "lat", "lng", "zoom", "date",
 		"description", "link", "link_text", "link_type", "link_image", "image"}
 }

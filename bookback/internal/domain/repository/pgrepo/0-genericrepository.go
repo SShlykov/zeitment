@@ -13,7 +13,7 @@ const Equals = " = ?"
 type Simulated[T any] interface {
 	TableName() string
 	AllFields() []string
-	InsertFields() []string
+	InsertOrUpdateFields() []string
 	EntityToInsertValues(impl *T) []interface{}
 	ReadItem(row pgx.Row) (T, error)
 	ReadList(rows pgx.Rows) ([]T, error)
@@ -73,7 +73,7 @@ func (r *repository[T]) List(ctx context.Context, options dbutils.Pagination) ([
 }
 
 func (r *repository[T]) Create(ctx context.Context, item *T) (string, error) {
-	fields := r.entity.InsertFields()
+	fields := r.entity.InsertOrUpdateFields()
 	insertValues := r.entity.EntityToInsertValues(item)
 
 	query, args, err := r.db.Builder().
@@ -102,7 +102,7 @@ func (r *repository[T]) Update(ctx context.Context, id string, item *T) (*T, err
 	updateQuery := r.db.Builder().
 		Update(r.entity.TableName())
 
-	for i, field := range r.entity.InsertFields() {
+	for i, field := range r.entity.InsertOrUpdateFields() {
 		updateQuery = updateQuery.Set(field, insertList[i])
 	}
 

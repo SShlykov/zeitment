@@ -84,7 +84,7 @@ func (bec *BookEventController) UpdateBookEvent(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
 
-	return c.JSON(http.StatusOK, models.WebResponse[*models.BookEvent]{Data: event, Status: "ok"})
+	return c.JSON(http.StatusOK, models.WebResponse[*models.BookEvent]{Data: event, Status: "updated"})
 }
 
 func (bec *BookEventController) DeleteBookEvent(c echo.Context) error {

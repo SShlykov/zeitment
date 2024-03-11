@@ -8,6 +8,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 )
 
+//go:generate mockgen -destination=../../tests/mocks/domain/services/paragraph_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services ParagraphService
 type ParagraphService interface {
 	CreateParagraph(ctx context.Context, request models.CreateParagraphRequest) (*models.Paragraph, error)
 	GetParagraphByID(ctx context.Context, id string) (*models.Paragraph, error)

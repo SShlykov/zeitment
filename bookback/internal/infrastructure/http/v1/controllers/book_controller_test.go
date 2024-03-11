@@ -1,37 +1,26 @@
 package controllers
 
 import (
-	"context"
+	contextPkg "context"
 	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/pkg/logger"
+	loggerPkg "github.com/SShlykov/zeitment/bookback/pkg/logger"
 	mocks "github.com/SShlykov/zeitment/bookback/tests/mocks/domain/services"
+	gomock "github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
 
-var (
-	lggr        *slog.Logger
-	mtrcs       metrics.Metrics
-	ctx         context.Context
-	RequestBook string
-	id          = "12b9b045-0845-462c-b372-0fca3180a6af"
-	idPath      = v1.BooksPath + "/id"
-)
-
 func init() {
-	lggr = logger.SetupLogger("debug")
-	mtrcs = localmetrics.NewLocalMetrics(lggr)
-	ctx = context.Background()
-	RequestBook = `{"options": {"page": 1, "page_size": 10}}`
+	logger = loggerPkg.SetupLogger("debug")
+	metrics = localmetrics.NewLocalMetrics(logger)
+	context = contextPkg.Background()
+	requestPageOptions = `{"options": {"page": 1, "page_size": 10}}`
 	return
 }
 
@@ -44,12 +33,12 @@ func TestBookController_ListBooks(t *testing.T) {
 	service.EXPECT().ListBooks(gomock.Any(), gomock.Any()).Return(listBooks, nil)
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, v1.BooksPath+"/list", strings.NewReader(RequestBook))
+	req := httptest.NewRequest(http.MethodPost, v1.BooksPath+"/list", strings.NewReader(requestPageOptions))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	bc := NewBookController(service, mtrcs, lggr, ctx)
+	bc := NewBookController(service, metrics, logger, context)
 	err := bc.ListBooks(c)
 	if err != nil {
 		return
@@ -76,7 +65,7 @@ func TestBookController_GetBookByID(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues(id)
 
-	bc := NewBookController(service, mtrcs, lggr, ctx)
+	bc := NewBookController(service, metrics, logger, context)
 	err := bc.GetBookByID(c)
 	if err != nil {
 		return
@@ -98,12 +87,12 @@ func TestBookController_CreateBook(t *testing.T) {
 	service.EXPECT().CreateBook(gomock.Any(), gomock.Any()).Return(book, nil)
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, v1.BooksPath, strings.NewReader(RequestBook))
+	req := httptest.NewRequest(http.MethodPost, v1.BooksPath, strings.NewReader(requestPageOptions))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	bc := NewBookController(service, mtrcs, lggr, ctx)
+	bc := NewBookController(service, metrics, logger, context)
 	err := bc.CreateBook(c)
 	if err != nil {
 		return
@@ -125,14 +114,14 @@ func TestBookController_UpdateBook(t *testing.T) {
 	service.EXPECT().UpdateBook(gomock.Any(), gomock.Any(), gomock.Any()).Return(book, nil)
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPut, idPath, strings.NewReader(RequestBook))
+	req := httptest.NewRequest(http.MethodPut, idPath, strings.NewReader(requestPageOptions))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
 	c.SetParamValues(id)
 
-	bc := NewBookController(service, mtrcs, lggr, ctx)
+	bc := NewBookController(service, metrics, logger, context)
 	err := bc.UpdateBook(c)
 	if err != nil {
 		return
@@ -160,7 +149,7 @@ func TestBookController_DeleteBook(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues(id)
 
-	bc := NewBookController(service, mtrcs, lggr, ctx)
+	bc := NewBookController(service, metrics, logger, context)
 	err := bc.DeleteBook(c)
 	if err != nil {
 		return

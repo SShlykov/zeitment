@@ -30,7 +30,7 @@ func (p Paragraph) AllFields() []string {
 }
 
 // InsertFields возвращает список полей, используемых при вставке новой записи
-func (p Paragraph) InsertFields() []string {
+func (p Paragraph) InsertOrUpdateFields() []string {
 	return []string{"title", "text", "type", "is_public", "page_id"}
 }
 

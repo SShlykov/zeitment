@@ -34,7 +34,7 @@ func (be BookEvent) AllFields() []string {
 		"is_public", "key", "value", "link", "link_text", "link_type", "link_image", "description"}
 }
 
-func (be BookEvent) InsertFields() []string {
+func (be BookEvent) InsertOrUpdateFields() []string {
 	return []string{"book_id", "chapter_id", "page_id", "paragraph_id", "event_type",
 		"is_public", "key", "value", "link", "link_text", "link_type", "link_image", "description"}
 }

@@ -29,7 +29,7 @@ func (c Chapter) AllFields() []string {
 		"is_public", "map_link", "map_params_id"}
 }
 
-func (c Chapter) InsertFields() []string {
+func (c Chapter) InsertOrUpdateFields() []string {
 	return []string{"title", "number", "text", "book_id", "is_public", "map_link", "map_params_id"}
 }
 

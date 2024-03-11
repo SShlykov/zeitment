@@ -30,6 +30,6 @@ migrate:
 
 gen_mock:
 	mockgen \
- 	-source=internal/domain/services/book_service.go \
- 	-destination=tests/mocks/domain/services/book_service_mock.go \
+ 	-source=internal/domain/services/chapter_service.go \
+ 	-destination=tests/mocks/domain/services/chapter_service_mock.go \
  	-package=mocks
