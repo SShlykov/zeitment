@@ -1,3 +1,27 @@
+<script>
+import ItemLink from './ItemLink.vue'
+import ItemLine from './ItemLine.vue'
+import ItemButton from './ItemButton.vue'
+import ItemBook from './ItemBook.vue'
+
+export default {
+  name: 'MenuItems',
+  components: {ItemLink, ItemLine, ItemButton, ItemBook},
+  props: {
+    menuList: {
+      type: Array,
+      required: true
+    },
+    isOpenMenu: {
+      type: Boolean,
+      default: false
+    }
+  }
+}
+
+</script>
+
+
 <template>
   <div class="flex flex-col justify-between">
     <div
@@ -10,6 +34,15 @@
         :title="title"
         :link="link"
         :name="name"
+        :isOpenMenu="isOpenMenu"
+      />
+      <ItemBook
+        v-if="type === 'book'"
+        :icon="icon"
+        :title="title"
+        :link="link"
+        :name="name"
+        :isOpenMenu="isOpenMenu"
       />
       <ItemLine v-if="type === 'line'" />
       <ItemButton
@@ -24,20 +57,3 @@
   </div>
 </template>
 
-<script>
-import ItemLink from './ItemLink.vue'
-import ItemLine from './ItemLine.vue'
-import ItemButton from './ItemButton.vue'
-
-export default {
-  name: 'MenuItems',
-  components: {ItemLink, ItemLine, ItemButton},
-  props: {
-    menuList: {
-      type: Array,
-      required: true
-    }
-  }
-}
-
-</script>

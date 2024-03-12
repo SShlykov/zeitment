@@ -15,7 +15,7 @@
 <script>
 
 export default {
-  name: 'ItemLink',
+  name: 'ItemBook',
   components: {},
   props: {
     icon: {

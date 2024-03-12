@@ -7,7 +7,10 @@
       :isOpenMenu="isOpenMenu"
       :toggleMenu="toggleMenu"
     />
-    <MenuList :menuList="flattenMenuList" />
+    <MenuList
+      :menuList="flattenMenuList"
+      :isOpenMenu="isOpenMenu"
+    />
   </div>
 </template>
 
