@@ -27,8 +27,6 @@ import {useStore} from "@store";
 export default {
   name: 'SideMenu',
   components: {MenuHead, MenuList},
-  data() {
-  },
   setup() {
     const url = import.meta.env.VITE_API_ADDR
     const adapterOfBooks = new AdapterOfBooks(url)
@@ -38,6 +36,8 @@ export default {
     return {
       serviceOfBooks
     }
+  },
+  data() {
   },
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
