@@ -11,11 +11,9 @@ export default {
   },
   computed: {},
   mounted() {
-    // Listen for clicks outside the dropdown
     document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
-    // Remove click outside listener when component is unmounted
     document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
