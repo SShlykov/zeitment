@@ -1,7 +1,3 @@
-import BooksApi from "@apiServices/BooksApi.js"
-
-const BooksService = new BooksApi()
-
 const initialState = {
   integrationTestLog: [],
 }
@@ -23,9 +19,6 @@ const mutations = {
 
 const actions = {
   async startIntegrationTest({ commit, state }) {
-    commit('setIntegrationTestLog', [])
-    const logTest = (result) => commit('setIntegrationTestLog', [...state.integrationTestLog, result])
-    await BooksService.integrationTests(logTest)
   },
 };
 

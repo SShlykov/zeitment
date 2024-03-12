@@ -28,7 +28,12 @@ class ServiceOfBooks {
 
   }
 
-
+  async removeBook(id) {
+    const book = await this.adapterOfBooks.deleteBookById(id);
+    const books = await this.adapterOfBooks.getBooks();
+    this.store.dispatch('books/saveUserBooks', books);
+    return book;
+  }
 }
 
 export default ServiceOfBooks;

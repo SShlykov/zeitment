@@ -3,9 +3,7 @@ import {mount} from "@vue/test-utils";
 import App from "@/App.vue";
 import {createStore} from "vuex";
 import axios  from "axios";
-import BooksApi from "@apiServices/BooksApi.js";
-import {adapterConfig} from "@store/modules/books/StaticData.js";
-import {apiBook, apiBooksResponse, appBook} from "@mocks/books.js";
+import {apiBooksResponse, appBook} from "@mocks/books.js";
 
 vi.mock('axios')
 
