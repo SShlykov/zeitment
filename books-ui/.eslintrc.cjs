@@ -5,6 +5,7 @@ module.exports = {
   ],
   rules: {
     "no-multiple-empty-lines": ["error", {max: 2, "maxBOF": 0}],
+    "vue/order-in-components": "error",
     "indent": ["error", 2],
     "no-mixed-spaces-and-tabs": "error",
     "vue/attribute-hyphenation": "off",

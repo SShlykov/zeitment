@@ -1,7 +1,15 @@
 <template>
   <div class="h-full flex flex-col justify-between pb-4">
-    <MenuItems :menuList="topMenuList" />
-    <MenuItems :menuList="bottomMenuList" />
+    <MenuItems
+      :isOpenMenu="isOpenMenu"
+      :menuList="topMenuList"
+      :serviceOfBooks="serviceOfBooks"
+    />
+    <MenuItems
+      :isOpenMenu="isOpenMenu"
+      :menuList="bottomMenuList"
+      :serviceOfBooks="serviceOfBooks"
+    />
   </div>
 </template>
 
@@ -15,6 +23,14 @@ export default {
     menuList: {
       default: () => [],
       type: Array
+    },
+    isOpenMenu: {
+      default: false,
+      type: Boolean
+    },
+    serviceOfBooks: {
+      default: () => {},
+      type: Object
     }
   },
   computed: {

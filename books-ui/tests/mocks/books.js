@@ -33,12 +33,12 @@ const apiBook = {
 }
 
 const apiBooksResponse = {
-  books: [apiBook],
+  data: [apiBook],
   status: "ok"
 }
 
 const apiBookResponse = {
-  book: apiBook,
+  data: apiBook,
   status: "ok"
 }
 
@@ -56,6 +56,10 @@ class AdapterOfBooks {
   }
 
   async createBook() {
+    return appBook
+  }
+
+  async deleteBookById() {
     return appBook
   }
 }

@@ -1,13 +1,13 @@
 /**
- * @typedef {'link' | 'line'}     Link
+ * @typedef {'link' | 'line' | 'book'}     Type
  */
 
 /**
  * @typedef {Object}              MenuItem
  * @param   {String}              title
  * @param   {String}              icon
- * @param   {Link}                link
- * @param   {String}              type
+ * @param   {String}              link
+ * @param   {Type}                type
  * @param   {String}              name
  * @param   {'top' | 'bottom'}    position
  */

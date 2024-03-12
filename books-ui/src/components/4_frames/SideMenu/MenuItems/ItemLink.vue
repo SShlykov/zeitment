@@ -1,6 +1,6 @@
 <template>
   <router-link
-    class="flex p-2 rounded-md hover:bg-gray-200 flex items-center"
+    class="flex p-2 rounded-md hover:bg-gray-200 items-center"
     :class="{'bg-gray-200': pageName === name}"
     :to="link"
   >
@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
 
 export default {
   name: 'ItemLink',
@@ -35,9 +34,12 @@ export default {
       default: "",
       type: String
     },
+    isOpenMenu: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
-    ...mapGetters('layout', ['isOpenMenu', 'menuList']),
     pageName() {
       if (!this.$route) return ""
       return this.$route.name

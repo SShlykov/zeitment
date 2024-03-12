@@ -62,4 +62,8 @@ describe('serviceOfBooks', () => {
     expect(books).toEqual([appBook])
   })
 
+  test("remove book", async () => {
+    const book = await serviceOfBooks.removeBook(appBook.id)
+    expect(book).toEqual(appBook)
+  })
 })

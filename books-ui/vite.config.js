@@ -12,6 +12,7 @@ export default defineConfig({
       '@router':      fileURLToPath(new URL('./src/router/index.js', import.meta.url)),
       '@apiServices': fileURLToPath(new URL('./src/services/apiServices', import.meta.url)),
       '@helpers':     fileURLToPath(new URL('./src/helpers', import.meta.url)),
+      '@directives':  fileURLToPath(new URL('./src/directives', import.meta.url)),
       '@cmp':         fileURLToPath(new URL('/src/components', import.meta.url)),
       '@atoms':       fileURLToPath(new URL('./src/components/1_atoms', import.meta.url)),
       '@molecules':   fileURLToPath(new URL('./src/components/2_molecules', import.meta.url)),

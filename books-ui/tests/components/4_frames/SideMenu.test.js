@@ -7,10 +7,12 @@ import MenuItems from "@frames/SideMenu/MenuItems/MenuItems.vue";
 import ItemLink from "@frames/SideMenu/MenuItems/ItemLink.vue";
 import ItemLine from "@frames/SideMenu/MenuItems/ItemLine.vue";
 import ItemButton from "@frames/SideMenu/MenuItems/ItemButton.vue";
+import ItemBook from "@frames/SideMenu/MenuItems/ItemBook.vue";
 import {createStore} from "vuex";
 import {bookMock} from '@helpers/staticData.js'
 import menuList from "@store/modules/layout/menuList.js";
 import Router from "@router"
+import {appBook} from "@mocks/books.js";
 
 const store = createStore({
   plugins: [],
@@ -143,11 +145,6 @@ describe("tests of MenuItems", () => {
     const wrapper = mount(ItemLink, {
       shallow: true,
       plugins: [Router],
-      global: {
-        mocks: {
-          $store: store
-        }
-      }
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -155,6 +152,14 @@ describe("tests of MenuItems", () => {
 
   test('mount test of ItemLine', async () => {
     const wrapper = mount(ItemLine, {
+      shallow: true,
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  test('mount test of ItemBook', async () => {
+    const wrapper = mount(ItemBook, {
       shallow: true,
     })
 
@@ -178,6 +183,29 @@ describe("tests of MenuItems", () => {
 
     expect(wrapper.vm.itemFunction()).toBe("22")
     expect(wrapper.exists()).toBe(true)
+  })
+
+  test('remove book by ItemBook', async () => {
+    const wrapper = mount(ItemBook, {
+      shallow: true,
+      props: {
+        itemFunction: () => {
+          return "22"
+        },
+        serviceOfBooks: {
+          removeBook: () => {
+            return appBook
+          }
+        }
+      },
+      global: {
+        mocks: {
+          $store: store
+        }
+      }
+    })
+
+    expect(wrapper.vm.serviceOfBooks.removeBook(appBook.id)).toBe(appBook)
   })
 })
 

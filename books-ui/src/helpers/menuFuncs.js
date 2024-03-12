@@ -8,8 +8,8 @@ const bookToMenuItem = (book) => {
     title: book.title,
     icon: "book-marked-line",
     link: `/book/${book.id}`,
-    type: "link",
-    name: `${book.id}`
+    type: "book",
+    name: `${book.id}`,
   }
 }
 

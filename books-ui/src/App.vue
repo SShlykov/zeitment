@@ -37,19 +37,19 @@ export default {
 <template>
   <div
     v-if="pageName && pageName !== 'auth'"
-    class="flex h-[99.9vh]"
+    class="flex h-[99.9vh] "
   >
     <SideMenu />
     <div class="flex flex-col flex-grow">
       <Head v-if="false" />
-      <div class="flex-grow relative">
+      <div class="flex-grow relative overflow-auto">
         <router-view />
       </div>
     </div>
   </div>
   <div
     v-if="pageName == 'auth'"
-    class="relative"
+    class="relative "
   >
     <router-view />
   </div>

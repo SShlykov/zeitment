@@ -1,8 +1,12 @@
 <script>
 import moment from 'moment';
+import { directive } from 'vue-tippy';
 
 export default {
   name: 'BooksViewerCard',
+  directives: {
+    tippy: directive
+  },
   props: {
     id: {
       type: String,
