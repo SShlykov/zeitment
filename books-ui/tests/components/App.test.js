@@ -39,7 +39,7 @@ describe("tests of App", async () => {
       }
     }
   })
-  axios.get.mockResolvedValue({data: apiBooksResponse})
+  axios.post.mockResolvedValue({data: apiBooksResponse})
 
   test('mount test of App', async () => {
     const wrapper = mount(App, {
