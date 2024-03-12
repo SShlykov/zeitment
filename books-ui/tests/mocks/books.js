@@ -58,6 +58,10 @@ class AdapterOfBooks {
   async createBook() {
     return appBook
   }
+
+  async deleteBookById() {
+    return appBook
+  }
 }
 
 const bookStore = {

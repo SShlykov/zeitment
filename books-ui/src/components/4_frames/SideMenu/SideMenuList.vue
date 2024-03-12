@@ -3,10 +3,12 @@
     <MenuItems
       :isOpenMenu="isOpenMenu"
       :menuList="topMenuList"
+      :serviceOfBooks="serviceOfBooks"
     />
     <MenuItems
       :isOpenMenu="isOpenMenu"
       :menuList="bottomMenuList"
+      :serviceOfBooks="serviceOfBooks"
     />
   </div>
 </template>
@@ -25,6 +27,10 @@ export default {
     isOpenMenu: {
       default: false,
       type: Boolean
+    },
+    serviceOfBooks: {
+      default: () => {},
+      type: Object
     }
   },
   computed: {

@@ -1,13 +1,9 @@
 <script>
-import { directive } from 'vue-tippy'
 import InteractivePopup from "@molecules/InteractivePopup.vue";
 
 export default {
   name: 'ItemBook',
   components: {InteractivePopup},
-  directives: {
-    tippy: directive
-  },
   props: {
     icon: {
       default: "",
@@ -28,23 +24,32 @@ export default {
     isOpenMenu: {
       type: Boolean,
       default: false
+    },
+    serviceOfBooks: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  data() {
+    return {
+      isRemoving: false
     }
   },
   computed: {
+    id() {
+      return this.name
+    },
     pageName() {
       if (!this.$route) return ""
       return this.$route.name
     },
-    bookAction() {
-      const layout = `
-
-      `
-      return { content: layout, allowHTML: true, interactive: true, trigger: 'click', placement: 'bottom-start', arrow: false}
-    }
   },
   methods: {
-    test: () => {
-      console.log(1234)
+    removeBook(id)  {
+      this.serviceOfBooks.removeBook(id)
+    },
+    toggleRemoving() {
+      this.isRemoving = !this.isRemoving
     }
   }
 }
@@ -65,22 +70,39 @@ export default {
         class="text-slate-700 truncate"
       >{{ title }}</span>
     </router-link>
-    <InteractivePopup class="z-20">
+    <InteractivePopup>
       <template #target>
         <div
-          class="absolute right-[10px] top-[50%] -translate-y-1/2 transition-all opacity-0 group-hover:opacity-100 hover:bg-gray-300 cursor-pointer h-6 w-6 rounded-md flex items-center justify-center"
+          class="absolute z-10 right-[10px] top-[50%] -translate-y-1/2 transition-all opacity-0 group-hover:opacity-100 hover:bg-gray-300 cursor-pointer h-6 w-6 rounded-md flex items-center justify-center"
         >
           <i class="ri-more-2-line transition-all" />
         </div>
       </template>
       <template #popup>
-        <div class="flex z-10 flex-col absolute top-[100%] right-[-30%] bg-white p-2 rounded-md shadow-md border border-gray-100">
-          <div
-            class="transition-all flex text-sky-800 text-sm p-2 cursor-pointer rounded-md hover:bg-slate-200"
-            @click="test"
-          >
-            <i class="ri-delete-bin-line mr-2" />
-            Удалить
+        <div class="flex z-20 flex-col absolute top-[100%] right-[-30%] bg-white p-2 rounded-md shadow-md border border-gray-100">
+          <div class="flex items-center">
+            <div
+              v-if="!isRemoving"
+              class="transition-all flex text-sky-800 text-sm p-2 cursor-pointer rounded-md hover:bg-slate-200"
+              @click="toggleRemoving"
+            >
+              <i class="ri-delete-bin-line mr-2" />
+              Удалить
+            </div>
+            <div
+              v-if="isRemoving"
+              class="transition-all flex text-sky-800 text-sm p-2 cursor-pointer rounded-md text-white bg-red-700 hover:bg-red-800 mr-2"
+              @click="removeBook(id)"
+            >
+              Удалить
+            </div>
+            <div
+              v-if="isRemoving"
+              class="transition-all flex text-sky-800 text-sm p-2 cursor-pointer rounded-md text-white bg-gray-700 hover:bg-gray-800"
+              @click="toggleRemoving"
+            >
+              Отмена
+            </div>
           </div>
         </div>
       </template>

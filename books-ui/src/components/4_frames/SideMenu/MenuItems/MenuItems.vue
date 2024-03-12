@@ -15,6 +15,10 @@ export default {
     isOpenMenu: {
       type: Boolean,
       default: false
+    },
+    serviceOfBooks: {
+      type: Object,
+      default: () => {}
     }
   }
 }
@@ -43,6 +47,7 @@ export default {
         :link="link"
         :name="name"
         :isOpenMenu="isOpenMenu"
+        :serviceOfBooks="serviceOfBooks"
       />
       <ItemLine v-if="type === 'line'" />
       <ItemButton

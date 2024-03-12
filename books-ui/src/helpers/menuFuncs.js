@@ -9,7 +9,7 @@ const bookToMenuItem = (book) => {
     icon: "book-marked-line",
     link: `/book/${book.id}`,
     type: "book",
-    name: `${book.id}`
+    name: `${book.id}`,
   }
 }
 

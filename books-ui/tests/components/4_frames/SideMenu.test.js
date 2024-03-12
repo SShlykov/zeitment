@@ -12,6 +12,7 @@ import {createStore} from "vuex";
 import {bookMock} from '@helpers/staticData.js'
 import menuList from "@store/modules/layout/menuList.js";
 import Router from "@router"
+import {appBook} from "@mocks/books.js";
 
 const store = createStore({
   plugins: [],
@@ -182,6 +183,29 @@ describe("tests of MenuItems", () => {
 
     expect(wrapper.vm.itemFunction()).toBe("22")
     expect(wrapper.exists()).toBe(true)
+  })
+
+  test('remove book by ItemBook', async () => {
+    const wrapper = mount(ItemBook, {
+      shallow: true,
+      props: {
+        itemFunction: () => {
+          return "22"
+        },
+        serviceOfBooks: {
+          removeBook: () => {
+            return appBook
+          }
+        }
+      },
+      global: {
+        mocks: {
+          $store: store
+        }
+      }
+    })
+
+    expect(wrapper.vm.serviceOfBooks.removeBook(appBook.id)).toBe(appBook)
   })
 })
 

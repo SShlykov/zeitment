@@ -10,6 +10,7 @@
     <MenuList
       :menuList="flattenMenuList"
       :isOpenMenu="isOpenMenu"
+      :serviceOfBooks="serviceOfBooks"
     />
   </div>
 </template>
@@ -21,11 +22,22 @@ import MenuList from './SideMenuList.vue'
 import {booksListToMenuList} from '@helpers/menuFuncs'
 import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
 import ServiceOfBooks from "@services/ServiceOfBooks.js";
+import {useStore} from "@store";
 
 export default {
   name: 'SideMenu',
   components: {MenuHead, MenuList},
   data() {
+  },
+  setup() {
+    const url = import.meta.env.VITE_API_ADDR
+    const adapterOfBooks = new AdapterOfBooks(url)
+    const store = useStore()
+
+    const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
+    return {
+      serviceOfBooks
+    }
   },
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
@@ -50,9 +62,6 @@ export default {
       const booksMenu = booksListToMenuList(this.userBooks)
       return [newBook, ...booksMenu, ...this.menuList]
     },
-    pageName() {
-      return this.$route.name
-    }
   },
   methods: {
     ...mapMutations('layout', ['toggleMenu']),

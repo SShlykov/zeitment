@@ -1,11 +1,8 @@
 <script>
-import {ClickOutside} from '@directives/ClickOutside';
+
 
 export default {
   name: 'InteractivePopup',
-  directives: {
-    'click-outside': ClickOutside
-  },
   components: {},
   data() {
     return {
@@ -14,15 +11,29 @@ export default {
   },
   computed: {},
   mounted() {
-
+    // Listen for clicks outside the dropdown
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeUnmount() {
+    // Remove click outside listener when component is unmounted
+    document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
     toggle() {
       this.isOpen = !this.isOpen
     },
     close() {
-      console.log(123)
       this.isOpen = false
+    },
+    handleStopPropagation(event) {
+      // Prevent clicking inside the dropdown from closing it
+      event.stopPropagation();
+    },
+    handleClickOutside(event) {
+      const dropdown = this.$refs.popup;
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.isOpen = false;
+      }
     }
   }
 }
@@ -30,9 +41,7 @@ export default {
 </script>
 
 <template>
-  <div
-    v-click-outside="close"
-  >
+  <div @click="handleStopPropagation">
     <div
       @click="toggle"
     >
@@ -40,7 +49,7 @@ export default {
     </div>
     <div
       v-if="isOpen"
-
+      ref="popup"
     >
       <slot name="popup" />
     </div>
