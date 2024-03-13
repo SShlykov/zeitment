@@ -1,11 +1,11 @@
 package endpoint
 
 import (
-	"log/slog"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"net/http"
 )
 
-func RunServer(handler *Handler, logger *slog.Logger) error {
+func RunServer(handler *Handler, logger loggerPkg.Logger) error {
 	httpServer := &http.Server{
 		ReadHeaderTimeout: handler.Timeout,
 		ReadTimeout:       handler.Timeout,

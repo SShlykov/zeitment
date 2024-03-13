@@ -2,7 +2,7 @@ package pgrepo
 
 import (
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	"github.com/SShlykov/zeitment/postgres"
 )
 
 // BookEventsRepo описывает репозиторий для работы с событиями книг.

@@ -8,12 +8,12 @@ import (
 	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/postgres"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 )
 
-func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewParagraphRepository(database)
 	service := services.NewParagraphService(repo)
 	cnt := controllers.NewParagraphController(service, metrics, logger, ctx)
