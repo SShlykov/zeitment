@@ -32,6 +32,7 @@ const actions = {
     commit('resetStore');
   },
   saveEditableBook({ commit }, book) {
+    console.log(book)
     commit('setEditableBook', book);
   },
 };

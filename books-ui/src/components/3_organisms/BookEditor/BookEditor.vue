@@ -28,12 +28,15 @@ export default {
   methods: {
     updateBookTitle(e) {
       this.serviceOfBooks.storeEditableBookAttribute('title', e.target.value)
+      return "ok"
     },
     updateBookAuthor(e) {
       this.serviceOfBooks.storeEditableBookAttribute('author', e.target.value)
+      return "ok"
     },
     saveBook() {
       this.bookManager.saveBookWithPage()
+      return "ok"
     }
   }
 }
