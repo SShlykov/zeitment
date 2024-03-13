@@ -43,7 +43,10 @@ export default {
 
 <template>
   <div class="w-[70vw] flex items-center max-w-[400px] min-w-[300px] bg-white shadow-md border border-gray-200 p-2 rounded-md appearFromTop">
-    <i class="mr-2" :class="icon" />
+    <i
+      class="mr-2"
+      :class="icon"
+    />
     <span class="text-gray-500">{{ message }}</span>
   </div>
 </template>
