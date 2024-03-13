@@ -3,7 +3,7 @@ package transaction
 import (
 	"context"
 	"errors"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	"github.com/SShlykov/zeitment/postgres"
 	"github.com/jackc/pgx/v5"
 )
 

@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/pkg/logger"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -12,16 +11,23 @@ import (
 
 type key string
 
+type Logger interface {
+	Warn(msg string, attrs ...any)
+	Info(msg string, attrs ...any)
+	Debug(msg string, attrs ...any)
+	Error(msg string, attrs ...any)
+}
+
 const (
 	TxKey key = "tx"
 )
 
 type Postgres struct {
 	Pool   *pgxpool.Pool
-	logger logger.Logger
+	logger Logger
 }
 
-func NewDB(dbc *pgxpool.Pool, logger logger.Logger) DB {
+func NewDB(dbc *pgxpool.Pool, logger Logger) DB {
 	return &Postgres{Pool: dbc, logger: logger}
 }
 
@@ -108,7 +114,7 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
 
-func logQuery(_ context.Context, logger logger.Logger, q Query, args ...interface{}) {
+func logQuery(_ context.Context, logger Logger, q Query, args ...interface{}) {
 	logger.Debug(
 		"executing query",
 		slog.String("sql", q.Name),
