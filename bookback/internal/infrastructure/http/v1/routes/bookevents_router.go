@@ -13,7 +13,7 @@ import (
 	"log/slog"
 )
 
-func BookEvent(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func BookEvent(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewBookEventsRepository(database)
 	service := services.NewBookEventsService(repo)
 	cntr := controllers.NewBookEventController(service, metrics, logger, ctx)

@@ -13,7 +13,7 @@ import (
 	"log/slog"
 )
 
-func Page(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Page(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewPageRepository(database)
 	service := services.NewPageService(repo)
 	cnt := controllers.NewPageController(service, metrics, logger, ctx)

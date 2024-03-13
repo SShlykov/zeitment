@@ -3,7 +3,7 @@ package app
 import (
 	"errors"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	"github.com/SShlykov/zeitment/postgres"
 	"time"
 )
 

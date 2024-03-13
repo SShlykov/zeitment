@@ -22,12 +22,12 @@ type bookService interface {
 type BookController struct {
 	Service bookService
 	Metrics metrics.Metrics
-	Logger  *slog.Logger
+	Logger  loggerPkg.Logger
 	Ctx     context.Context
 }
 
 // NewBookController создает новый экземпляр Controller.
-func NewBookController(srv bookService, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *BookController {
+func NewBookController(srv bookService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *BookController {
 	return &BookController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 

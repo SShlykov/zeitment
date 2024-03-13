@@ -11,7 +11,7 @@ import (
 	"log/slog"
 )
 
-func Health(e *echo.Echo, _ postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Health(e *echo.Echo, _ postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	cntr := controllers.NewHealthController(metrics, logger, ctx)
 
 	group := e.Group(v1.HealthPath)

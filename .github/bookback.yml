@@ -2,9 +2,13 @@ name: go
 
 on:
   push:
+    paths:
+      - bookback/**
     branches:
       - main
   pull_request:
+    paths:
+      - bookback/**
     branches:
       - main
 

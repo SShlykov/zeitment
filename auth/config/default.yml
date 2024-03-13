@@ -1,0 +1,3 @@
+shutdown_timeout: 10s
+logger:
+  level: "debug"

@@ -13,7 +13,7 @@ import (
 	"log/slog"
 )
 
-func MapVariables(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func MapVariables(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewMapVariablesRepository(database)
 	service := services.NewMapVariablesService(repo)
 	cnt := controllers.NewMapVariablesController(service, metrics, logger, ctx)

@@ -13,7 +13,7 @@ import (
 	"log/slog"
 )
 
-func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewParagraphRepository(database)
 	service := services.NewParagraphService(repo)
 	cnt := controllers.NewParagraphController(service, metrics, logger, ctx)

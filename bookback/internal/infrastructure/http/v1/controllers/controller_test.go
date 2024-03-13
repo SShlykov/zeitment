@@ -9,7 +9,7 @@ import (
 )
 
 type TestFixture struct {
-	Logger             *slog.Logger
+	Logger             loggerPkg.Logger
 	Metrics            localMetrics.Metrics
 	Context            ctx.Context
 	RequestPageOptions string

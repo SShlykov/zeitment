@@ -22,12 +22,12 @@ type paragraphService interface {
 type ParagraphController struct {
 	Service paragraphService
 	Metrics metrics.Metrics
-	Logger  *slog.Logger
+	Logger  loggerPkg.Logger
 	Ctx     context.Context
 }
 
 // NewParagraphController создает новый экземпляр ParagraphController.
-func NewParagraphController(srv paragraphService, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *ParagraphController {
+func NewParagraphController(srv paragraphService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *ParagraphController {
 	return &ParagraphController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 

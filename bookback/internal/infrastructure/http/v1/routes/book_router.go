@@ -10,11 +10,10 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 )
 
 // Book регистрирует контроллер книг в маршрутизаторе.
-func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	repo := pgrepo.NewBookRepository(database)
 	service := services.NewBookService(repo)
 	cntr := controllers.NewBookController(service, metrics, logger, ctx)

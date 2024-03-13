@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func LoggerConfiguration(logger *slog.Logger) echo.MiddlewareFunc {
+func LoggerConfiguration(logger loggerPkg.Logger) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,

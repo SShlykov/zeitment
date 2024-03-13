@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/Masterminds/squirrel"
+	"github.com/SShlykov/zeitment/bookback/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
 	"time"
@@ -24,7 +25,7 @@ type pgClient struct {
 	builder squirrel.StatementBuilderType
 }
 
-func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, error) {
+func NewClient(ctx context.Context, logger logger.Logger, dsn string) (Client, error) {
 	client := &pgClient{
 		builder:      squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
 		maxPoolSize:  _defaultMaxPoolSize,
@@ -43,7 +44,7 @@ func NewClient(ctx context.Context, logger *slog.Logger, dsn string) (Client, er
 	return client.Connect(ctx, logger, poolConfig)
 }
 
-func (c *pgClient) Connect(ctx context.Context, logger *slog.Logger, poolConfig *pgxpool.Config) (Client, error) {
+func (c *pgClient) Connect(ctx context.Context, logger logger.Logger, poolConfig *pgxpool.Config) (Client, error) {
 	logger.Debug(
 		"connecting to db",
 		slog.Int("attempts", c.connAttempts),

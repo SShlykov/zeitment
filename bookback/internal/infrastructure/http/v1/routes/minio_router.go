@@ -13,7 +13,7 @@ import (
 )
 
 // Minio регистрирует контроллер minio в маршрутизаторе.
-func Minio(e *echo.Echo, client *minio.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Minio(e *echo.Echo, client *minio.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	srv := usecase.NewMinioUseCase(client)
 	cntr := controllers.NewMinioController(srv, metrics, logger, ctx)
 

@@ -22,11 +22,11 @@ type pageService interface {
 type PageController struct {
 	Service pageService
 	Metrics metrics.Metrics
-	Logger  *slog.Logger
+	Logger  loggerPkg.Logger
 	Ctx     context.Context
 }
 
-func NewPageController(srv pageService, metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *PageController {
+func NewPageController(srv pageService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *PageController {
 	return &PageController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 

@@ -13,7 +13,7 @@ import (
 	"log/slog"
 )
 
-func Chapter(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Chapter(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	chapterRepo := pgrepo.NewChapterRepository(database)
 	service := services.NewChapterService(chapterRepo)
 	cnt := controllers.NewChapterController(service, metrics, logger, ctx)

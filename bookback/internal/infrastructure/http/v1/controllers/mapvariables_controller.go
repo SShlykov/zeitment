@@ -25,12 +25,12 @@ type mapVariablesService interface {
 type MapVariablesController struct {
 	Service mapVariablesService
 	Metrics metrics.Metrics
-	Logger  *slog.Logger
+	Logger  loggerPkg.Logger
 	Ctx     context.Context
 }
 
 // NewMapVariablesController создает новый экземпляр MapVariablesController.
-func NewMapVariablesController(srv mapVariablesService, metric metrics.Metrics, logger *slog.Logger,
+func NewMapVariablesController(srv mapVariablesService, metric metrics.Metrics, logger loggerPkg.Logger,
 	ctx context.Context) *MapVariablesController {
 	return &MapVariablesController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
