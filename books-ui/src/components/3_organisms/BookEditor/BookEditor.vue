@@ -49,7 +49,7 @@ export default {
           :onInput="updateBookTitle"
           :style="`width: ${(1 + editableBook.title.length)}ch`"
           placeholder="Название"
-          class="h-full pl-0 font-w-700 text-xl !ring-0 bg-white transition-all
+          class="h-full pl-2 rounded-md font-w-700 text-xl !ring-0 bg-white transition-all
                  min-w-[150px] max-w-[350px]
                  border-0 !outline-0
                  focus:bg-gray-100 hover:bg-gray-100"
@@ -61,7 +61,7 @@ export default {
           :onInput="updateBookAuthor"
           :style="`width: ${(1 + editableBook.author.length)}ch`"
           placeholder="Автор"
-          class="h-full pl-2 mr-2 text-md !ring-0 bg-white transition-all
+          class="h-full pl-2 rounded-md mr-2 text-md !ring-0 bg-white transition-all
                  min-w-[100px] max-w-[350px]
                  border-0 !outline-0
                  focus:bg-gray-100 hover:bg-gray-100"
