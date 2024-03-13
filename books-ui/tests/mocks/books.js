@@ -51,8 +51,11 @@ class AdapterOfBooks {
     return [appBook]
   }
 
-  async updateBook() {
-    return appBook
+  async updateBook(newBook) {
+    return {
+      ...appBook,
+      ...newBook
+    }
   }
 
   async createBook() {
@@ -60,6 +63,10 @@ class AdapterOfBooks {
   }
 
   async deleteBookById() {
+    return appBook
+  }
+
+  async getBookById() {
     return appBook
   }
 }

@@ -4,6 +4,7 @@ import App from "@/App.vue";
 import {createStore} from "vuex";
 import axios  from "axios";
 import {apiBooksResponse, appBook} from "@mocks/books.js";
+import { store as books } from '@/store/modules/books';
 
 vi.mock('axios')
 
@@ -16,25 +17,7 @@ describe("tests of App", async () => {
           initScreenSizeRecalc() { }
         },
       },
-      books: {
-        namespaced: true,
-        state: {
-          userBooks: []
-        },
-        mutations: {
-          setUserBooks(state, userBooks) {
-            state.userBooks = userBooks
-          }
-        },
-        getters: {
-          userBooks: (state) => state.userBooks
-        },
-        actions: {
-          async saveUserBooks({commit}, userBooks) {
-            commit('setUserBooks', userBooks)
-          }
-        }
-      }
+      books
     }
   })
   axios.post.mockResolvedValue({data: apiBooksResponse})

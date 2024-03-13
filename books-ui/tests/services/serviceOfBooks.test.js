@@ -1,37 +1,13 @@
 import {expect, test, describe, beforeEach} from 'vitest'
-import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {createStore} from "vuex";
+import { store as books } from '@/store/modules/books';
+import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {AdapterOfBooks, appBook} from "@mocks/books.js"
-
 
 describe('serviceOfBooks', () => {
   const store = createStore({
     modules: {
-      books: {
-        namespaced: true,
-        state: {
-          userBooks: []
-        },
-        mutations: {
-          setUserBooks(state, userBooks) {
-            state.userBooks = userBooks
-          },
-          resetStore(state) {
-            state.userBooks = []
-          }
-        },
-        getters: {
-          userBooks: (state) => state.userBooks
-        },
-        actions: {
-          async saveUserBooks({commit}, userBooks) {
-            commit('setUserBooks', userBooks)
-          },
-          resetStore({commit}) {
-            commit('resetStore')
-          }
-        }
-      }
+      books
     }
   })
 
@@ -62,8 +38,73 @@ describe('serviceOfBooks', () => {
     expect(books).toEqual([appBook])
   })
 
+  test("update book", async () => {
+    const updatedBook = {
+      ...appBook,
+      title: "new title"
+    }
+    const book = await serviceOfBooks.updateBook(updatedBook)
+    expect(book).toEqual(updatedBook)
+  })
+
   test("remove book", async () => {
     const book = await serviceOfBooks.removeBook(appBook.id)
     expect(book).toEqual(appBook)
+  })
+
+  test("test of storeEditableBookAttribute", async () => {
+    await store.dispatch('books/saveEditableBook', appBook)
+    await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+
+    const editableBook = store.getters['books/editableBook']
+
+    expect(editableBook).toEqual({
+      ...appBook,
+      title: "new title"
+    })
+  })
+
+  test("test of storeEditableBookAttribute with no editableBook", async () => {
+    await store.dispatch('books/saveEditableBook', null)
+    const editableBook = store.getters['books/editableBook']
+    expect(editableBook).toEqual(null)
+
+    const updatedBook = await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+    expect(updatedBook).toEqual(null)
+  })
+
+  test("get book by id", async () => {
+    const book = await serviceOfBooks.getBookById(appBook.id)
+    expect(book).toEqual(appBook)
+  })
+
+  test("save editable book to server", async () => {
+    await store.dispatch('books/saveEditableBook', appBook)
+    await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+    const storedEditableBook = store.getters['books/editableBook']
+
+    await serviceOfBooks.saveEditableBookToServer()
+
+    let book = await serviceOfBooks.getBookById(appBook.id)
+    book = {
+      ...book,
+      title: "new title"
+    }
+    expect(book).toEqual(storedEditableBook)
+  })
+
+  test("save editable book to server with no editableBook", async () => {
+    await store.dispatch('books/saveEditableBook', null)
+    const storedEditableBook = store.getters['books/editableBook']
+    expect(storedEditableBook).toEqual(null)
+
+    const updatedBook = await serviceOfBooks.saveEditableBookToServer()
+    expect(updatedBook).toEqual(null)
+  })
+
+  test("fetch editable book", async () => {
+    await serviceOfBooks.fetchEditableBook(appBook.id)
+    const editableBook = store.getters['books/editableBook']
+    expect(editableBook).toEqual(appBook)
   })
 })

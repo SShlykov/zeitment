@@ -52,6 +52,15 @@ const store = createStore({
 
 describe("tests of SideMenu", () => {
 
+  const mockRoute = {
+    params: {
+      id: 1
+    }
+  }
+  const mockRouter = {
+    push: vi.fn()
+  }
+
   test('mount test of SideMenu', async () => {
     const wrapper = mount(SideMenu, {
       shallow: true,
@@ -90,15 +99,14 @@ describe("tests of SideMenu", () => {
   })
 
   test('create book from menu', async () => {
-    await Router.push('/')
-    await Router.isReady()
 
     const wrapper = mount(SideMenu, {
-      plugins: [Router],
       shallow: true,
       global: {
         mocks: {
-          $store: store
+          $store: store,
+          $route: mockRoute,
+          $router: mockRouter
         },
       }
     })
@@ -130,6 +138,15 @@ describe("tests of SideMenuHead", () => {
 })
 
 describe("tests of MenuItems", () => {
+  const mockRoute = {
+    params: {
+      id: 1
+    }
+  }
+  const mockRouter = {
+    push: vi.fn()
+  }
+
   test('mount test of MenuItems', async () => {
     const wrapper = mount(MenuItems, {
       shallow: true,
@@ -139,12 +156,15 @@ describe("tests of MenuItems", () => {
   })
 
   test('mount test of ItemLink', async () => {
-    await Router.push('/')
-    await Router.isReady()
 
     const wrapper = mount(ItemLink, {
       shallow: true,
-      plugins: [Router],
+      global: {
+        mocks: {
+          $route: mockRoute,
+          $router: mockRouter
+        }
+      }
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -161,9 +181,38 @@ describe("tests of MenuItems", () => {
   test('mount test of ItemBook', async () => {
     const wrapper = mount(ItemBook, {
       shallow: true,
+      global: {
+        mocks: {
+          $route: mockRoute,
+          $router: mockRouter
+        }
+      }
     })
 
     expect(wrapper.exists()).toBe(true)
+  })
+
+  test('remove book by ItemBook', async () => {
+
+    const wrapper = mount(ItemBook, {
+      shallow: true,
+      props: {
+        serviceOfBooks: {
+          removeBook: () => {
+            return appBook
+          }
+        }
+      },
+      global: {
+        mocks: {
+          $store: store,
+          $route: mockRoute,
+          $router: mockRouter
+        }
+      }
+    })
+
+    expect(wrapper.vm.serviceOfBooks.removeBook(appBook.id)).toBe(appBook)
   })
 
   test('mount test of ItemButton', async () => {
@@ -183,29 +232,6 @@ describe("tests of MenuItems", () => {
 
     expect(wrapper.vm.itemFunction()).toBe("22")
     expect(wrapper.exists()).toBe(true)
-  })
-
-  test('remove book by ItemBook', async () => {
-    const wrapper = mount(ItemBook, {
-      shallow: true,
-      props: {
-        itemFunction: () => {
-          return "22"
-        },
-        serviceOfBooks: {
-          removeBook: () => {
-            return appBook
-          }
-        }
-      },
-      global: {
-        mocks: {
-          $store: store
-        }
-      }
-    })
-
-    expect(wrapper.vm.serviceOfBooks.removeBook(appBook.id)).toBe(appBook)
   })
 })
 

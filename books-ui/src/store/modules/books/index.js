@@ -1,5 +1,6 @@
 const initialState = {
   userBooks: [],
+  editableBook: null
 }
 
 const state = {
@@ -7,7 +8,8 @@ const state = {
 };
 
 const getters = {
-  userBooks: state => state.userBooks,
+  userBooks:    state => state.userBooks,
+  editableBook: state => state.editableBook,
 };
 
 const mutations = {
@@ -17,11 +19,20 @@ const mutations = {
   setUserBooks(state, userBooks) {
     state.userBooks = userBooks;
   },
+  setEditableBook(state, book) {
+    state.editableBook = book;
+  },
 };
 
 const actions = {
-  async saveUserBooks({ commit }, userBooks) {
+  saveUserBooks({ commit }, userBooks) {
     commit('setUserBooks', userBooks);
+  },
+  resetStore({ commit }) {
+    commit('resetStore');
+  },
+  saveEditableBook({ commit }, book) {
+    commit('setEditableBook', book);
   },
 };
 

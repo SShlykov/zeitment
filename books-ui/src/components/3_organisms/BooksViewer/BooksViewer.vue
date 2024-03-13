@@ -10,12 +10,6 @@ export default {
   computed: {
     ...mapGetters('books', ['userBooks'])
   },
-  mounted() {
-    this.fetchUserBooks()
-  },
-  methods: {
-    ...mapActions('books', ['fetchUserBooks'])
-  }
 }
 
 </script>
