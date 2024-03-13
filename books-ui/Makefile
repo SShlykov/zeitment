@@ -45,5 +45,5 @@ ifeq ($(commit),)
 	$(error mn is not set)
 endif
 	make prehook
-	git add . && git commit -m "feat($(commit)):" && git push
+	git add . && git commit -m "$(commit)" && git push
 

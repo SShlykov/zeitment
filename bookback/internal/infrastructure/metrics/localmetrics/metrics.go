@@ -1,6 +1,7 @@
 package localmetrics
 
 import (
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"log/slog"
 	"sync"
 )
@@ -12,13 +13,13 @@ type MetricValue struct {
 
 // LocalMetrics структура для локального хранения метрик.
 type LocalMetrics struct {
-	logger    *slog.Logger
+	logger    loggerPkg.Logger
 	mu        sync.RWMutex
 	counters  map[string]int
 	summaries map[string]MetricValue
 }
 
-func NewLocalMetrics(logger *slog.Logger) *LocalMetrics {
+func NewLocalMetrics(logger loggerPkg.Logger) *LocalMetrics {
 	return &LocalMetrics{
 		logger:    logger,
 		counters:  make(map[string]int),

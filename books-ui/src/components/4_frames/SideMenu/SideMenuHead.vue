@@ -27,7 +27,7 @@ export default {
         class="mr-2"
         height="25"
         width="25"
-        src="/icon.svg"
+        src="/icons/logo.svg"
         alt="logo"
       >
       <div>

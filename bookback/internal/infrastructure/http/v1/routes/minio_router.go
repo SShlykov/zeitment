@@ -7,13 +7,13 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/minio/minio-go/v7"
-	"log/slog"
 )
 
 // Minio регистрирует контроллер minio в маршрутизаторе.
-func Minio(e *echo.Echo, client *minio.Client, metrics metrics.Metrics, logger *slog.Logger, ctx context.Context) {
+func Minio(e *echo.Echo, client *minio.Client, metrics metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) {
 	srv := usecase.NewMinioUseCase(client)
 	cntr := controllers.NewMinioController(srv, metrics, logger, ctx)
 

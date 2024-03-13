@@ -30,7 +30,7 @@ describe("bookToMenuItem", () => {
       "title": "Тестовая книга",
       "icon": "book-marked-line",
       "link": `/book/${bookMock.id}`,
-      "type": "link",
+      "type": "book",
       "name": `${bookMock.id}`
     }
 
@@ -46,7 +46,7 @@ describe("booksListToMenuList", () => {
         "title": "Тестовая книга",
         "icon": "book-marked-line",
         "link": `/book/${bookMock.id}`,
-        "type": "link",
+        "type": "book",
         "name": `${bookMock.id}`
       }
     ]

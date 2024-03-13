@@ -3,19 +3,19 @@ package controllers
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 	"net/http"
 )
 
 type HealthController struct {
 	Metrics metrics.Metrics
-	Logger  *slog.Logger
+	Logger  loggerPkg.Logger
 	Ctx     context.Context
 }
 
 // NewHealthController создает новый экземпляр Controller.
-func NewHealthController(metric metrics.Metrics, logger *slog.Logger, ctx context.Context) *HealthController {
+func NewHealthController(metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *HealthController {
 	return &HealthController{Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
