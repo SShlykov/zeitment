@@ -1,6 +1,7 @@
 package localmetrics
 
 import (
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"log/slog"
 	"sync"
 )

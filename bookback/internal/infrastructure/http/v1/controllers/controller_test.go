@@ -4,8 +4,7 @@ import (
 	ctx "context"
 	localMetrics "github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
-	loggerPkg "github.com/SShlykov/zeitment/bookback/pkg/logger"
-	"log/slog"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 )
 
 type TestFixture struct {

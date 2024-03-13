@@ -2,7 +2,7 @@ package app
 
 import (
 	"errors"
-	"github.com/SShlykov/zeitment/bookback/pkg/logger"
+	"github.com/SShlykov/zeitment/logger"
 )
 
 func (app *App) initLogger() error {

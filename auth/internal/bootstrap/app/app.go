@@ -3,7 +3,8 @@ package app
 import (
 	"context"
 	"github.com/SShlykov/zeitment/auth/pkg/config"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/postgres"
 )
 
 type App struct {

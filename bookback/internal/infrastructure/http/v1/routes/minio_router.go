@@ -7,9 +7,9 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/minio/minio-go/v7"
-	"log/slog"
 )
 
 // Minio регистрирует контроллер minio в маршрутизаторе.

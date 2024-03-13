@@ -1,7 +1,7 @@
 package endpoint
 
 import (
-	"log/slog"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"net/http"
 )
 
