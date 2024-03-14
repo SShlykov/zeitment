@@ -8,10 +8,4 @@ COPY .. .
 
 RUN go build -o /app/main ./cmd/bookback
 
-#FROM alpine:latest
-#WORKDIR /app
-#COPY --from=builder /app/main /app/main
-#
-#EXPOSE $PORT
-
 CMD [ "/app/main" ]

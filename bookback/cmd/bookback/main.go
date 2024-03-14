@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-var configPath string
-
 // @title Book API
 // @version 0.1
 // @description Это API для работы с книгами
@@ -18,7 +16,9 @@ var configPath string
 // @produces application/json
 // @consumes application/json
 func main() {
+	var configPath string
 	flag.StringVar(&configPath, "config", "./config", "path to the configuration files")
+
 	app, err := pkg.NewApp(configPath)
 	if err != nil {
 		fmt.Printf("failed to create app: %+v\n", err)
