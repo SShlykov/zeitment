@@ -1,4 +1,4 @@
-import {expect, test, describe, beforeEach} from 'vitest'
+import {expect, test, describe, beforeEach, expectTypeOf} from 'vitest'
 import {createStore} from "vuex";
 import { store as books } from '@/store/modules/books';
 import ServiceOfBooks from '@services/ServiceOfBooks.js'
@@ -68,7 +68,6 @@ describe('serviceOfBooks', () => {
     await store.dispatch('books/saveEditableBook', null)
     const editableBook = store.getters['books/editableBook']
     expect(editableBook).toEqual(null)
-
     const updatedBook = await serviceOfBooks.storeEditableBookAttribute("title", "new title")
     expect(updatedBook).toEqual(null)
   })
@@ -83,6 +82,7 @@ describe('serviceOfBooks', () => {
     await serviceOfBooks.storeEditableBookAttribute("title", "new title")
     const storedEditableBook = store.getters['books/editableBook']
 
+    expectTypeOf(storedEditableBook.id).toBeString()
     await serviceOfBooks.saveEditableBookToServer()
 
     let book = await serviceOfBooks.getBookById(appBook.id)

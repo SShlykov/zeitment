@@ -74,6 +74,7 @@ describe("tests of AdapterOfBooks ", () => {
     axios.put.mockResolvedValue({data: apiBookResponse})
 
     const booksData = await BooksService.updateBook(appBook)
+    expect(appBook.id).toBeDefined()
     expect(booksData).toEqual(appBook)
   })
 

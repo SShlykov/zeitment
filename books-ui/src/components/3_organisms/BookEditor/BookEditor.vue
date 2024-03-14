@@ -42,6 +42,7 @@ export default {
 
 <template>
   <div class="w-full h-full">
+
     <BookEditorHeader class="flex justify-between">
       <div class="flex items-center">
         <input
