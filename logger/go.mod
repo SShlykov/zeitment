@@ -4,7 +4,6 @@ go 1.22.0
 
 require (
 	github.com/fatih/color v1.16.0
-	gorm.io/gorm v1.25.7
 )
 
 require (
