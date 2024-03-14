@@ -1,13 +1,12 @@
 package middleware
 
 import (
-	"context"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"log/slog"
 )
 
-func LoggerConfiguration(logger *slog.Logger) echo.MiddlewareFunc {
+func LoggerConfiguration(logger loggerPkg.Logger) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,
@@ -15,15 +14,15 @@ func LoggerConfiguration(logger *slog.Logger) echo.MiddlewareFunc {
 		HandleError: true,
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
 			if v.Error == nil {
-				logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
+				logger.Info("REQUEST",
+					loggerPkg.String("uri", v.URI),
+					loggerPkg.Int("status", v.Status),
 				)
 			} else {
-				logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
-					slog.String("err", v.Error.Error()),
+				logger.Error("REQUEST_ERROR",
+					loggerPkg.String("uri", v.URI),
+					loggerPkg.Int("status", v.Status),
+					loggerPkg.String("err", v.Error.Error()),
 				)
 			}
 			return nil

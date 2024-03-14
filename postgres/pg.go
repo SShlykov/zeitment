@@ -11,16 +11,23 @@ import (
 
 type key string
 
+type Logger interface {
+	Warn(msg string, attrs ...any)
+	Info(msg string, attrs ...any)
+	Debug(msg string, attrs ...any)
+	Error(msg string, attrs ...any)
+}
+
 const (
 	TxKey key = "tx"
 )
 
 type Postgres struct {
 	Pool   *pgxpool.Pool
-	logger *slog.Logger
+	logger Logger
 }
 
-func NewDB(dbc *pgxpool.Pool, logger *slog.Logger) DB {
+func NewDB(dbc *pgxpool.Pool, logger Logger) DB {
 	return &Postgres{Pool: dbc, logger: logger}
 }
 
@@ -107,7 +114,7 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
 
-func logQuery(_ context.Context, logger *slog.Logger, q Query, args ...interface{}) {
+func logQuery(_ context.Context, logger Logger, q Query, args ...interface{}) {
 	logger.Debug(
 		"executing query",
 		slog.String("sql", q.Name),

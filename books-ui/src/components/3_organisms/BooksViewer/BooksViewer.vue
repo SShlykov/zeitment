@@ -1,5 +1,5 @@
 <script>
-import {mapActions, mapGetters} from "vuex";
+import {mapGetters} from "vuex";
 import BooksViewerCard from './BooksViewerCard.vue'
 import BooksViewerContainer from './BooksViewerContainer.vue'
 

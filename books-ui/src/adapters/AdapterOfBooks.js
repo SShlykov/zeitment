@@ -62,9 +62,7 @@ class AdapterOfBooks {
       "page": 1
     }
     const {page, page_size} = fetchParamsByDefaultObject(params, defaultParams)
-    console.log(params)
     if (!is(Number, page) || !is(Number, page_size) || page < 0 || page_size < 0) return  []
-    console.log(`${this.url}/books/list`)
     let {data: books} = await post(`${this.url}/books/list`, {
       "options": {page, page_size}
     })

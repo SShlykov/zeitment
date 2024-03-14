@@ -7,7 +7,7 @@ import BookEditorBody from "@organisms/BookEditor/BookEditorBody.vue";
 import { store as books } from '@/store/modules/books';
 import {createStore} from "vuex";
 import axios from "axios";
-import {apiBookResponse} from "@mocks/books.js";
+import {apiBookResponse, appBook} from "@mocks/books.js";
 
 vi.mock('axios')
 
@@ -28,6 +28,10 @@ describe("tests of BookEditor", () => {
     push: vi.fn()
   }
 
+  beforeEach(() => {
+    store.commit('books/resetStore')
+  })
+
   test('mount test of BookEditor', async () => {
     axios.get.mockResolvedValue({data: apiBookResponse})
 
@@ -43,6 +47,42 @@ describe("tests of BookEditor", () => {
     })
 
     expect(wrapper.exists()).toBe(true)
+  })
+
+  test('methods test of BookEditor', async () => {
+    store.dispatch('books/setEditableBook', appBook)
+    axios.get.mockResolvedValue({data: apiBookResponse})
+
+    const wrapper = mount(BookEditor, {
+      shallow: true,
+      props: {
+        serviceOfBooks: {
+          storeEditableBookAttribute: vi.fn(),
+          saveEditableBookToServer: vi.fn(),
+          fetchEditableBook: vi.fn()
+        },
+        bookManager: {
+          saveBookWithPage: vi.fn()
+        }
+      },
+      global: {
+        mocks: {
+          $store: store,
+          $route: mockRoute,
+          $router: mockRouter
+        }
+      }
+    })
+
+    const event = {
+      target: {
+        value: "test"
+      }
+    }
+
+    expect(wrapper.vm.updateBookTitle(event)).toBe("ok")
+    expect(wrapper.vm.updateBookAuthor(event)).toBe("ok")
+    expect(wrapper.vm.saveBook()).toBe("ok")
   })
 })
 

@@ -2,7 +2,7 @@ package pgrepo
 
 import (
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
-	"github.com/SShlykov/zeitment/bookback/pkg/postgres"
+	"github.com/SShlykov/zeitment/postgres"
 )
 
 // MapVariablesRepo описывает репозиторий для работы с переменными карты.

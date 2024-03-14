@@ -4,7 +4,8 @@ const state = {
   height:      0,
   width:       0,
   inited:      false,
-  isOpenMenu:  true
+  isOpenMenu:  true,
+  notifications: []
 };
 
 const getters = {
@@ -12,7 +13,8 @@ const getters = {
   width:                   (state) => state.width,
   isOpenMenu:              (state) => state.isOpenMenu,
   menuWidth:               (state) => state.isOpenMenu ? 300 : 70,
-  menuList:                ()      => menuList
+  notifications:           (state) => state.notifications,
+  menuList:                ()      => menuList,
 };
 
 const mutations = {
@@ -30,14 +32,27 @@ const mutations = {
   },
   toggleMenu: (state) => {
     state.isOpenMenu = !state.isOpenMenu
-  }
+  },
+  setNotifications: (state, notifications) => {
+    state.notifications = notifications
+  },
 };
 
 const actions = {
   initScreenSizeRecalc: ({commit}) => {
     commit("enableScreenListener")
   },
-
+  setNotifications: ({commit}, notifications) => {
+    commit("setNotifications", notifications)
+  },
+  addNotification: ({commit, state}, notification) => {
+    const notifications = [...state.notifications, notification]
+    commit("setNotifications", notifications)
+  },
+  removeNotification: ({commit, state}, id) => {
+    const notifications = state.notifications.filter(n => n.id !== id)
+    commit("setNotifications", notifications)
+  },
 };
 
 export const store = {

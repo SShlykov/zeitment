@@ -5,6 +5,7 @@ import BookEditor from "@organisms/BookEditor/BookEditor.vue";
 import ContentLoader from "@molecules/ContentLoader.vue";
 import {mapGetters} from "vuex";
 import BookManager from "@useCases/BookManager.js";
+import ServiceOfLayout from "@services/ServiceOfLayout.js";
 
 export default {
   name: 'BookPage',
@@ -27,7 +28,9 @@ export default {
       this.$router.push('/')
     }
     const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
-    const bookManager = new BookManager(serviceOfBooks)
+    const layoutService = new ServiceOfLayout(store)
+    const bookManager = new BookManager(serviceOfBooks, layoutService)
+
     serviceOfBooks.fetchEditableBook(bookId)
 
     this.bookManager = bookManager
