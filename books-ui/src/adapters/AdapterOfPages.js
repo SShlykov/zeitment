@@ -134,7 +134,6 @@ class AdapterOfPages {
     logFunction(books)
     logFunction("Список страниц в главе")
     const pagesByBook = await this.getPagesByChapterId("af3ff4ad-bc7d-4e64-acf8-bbd874d4516b")
-    console.log(pagesByBook)
     logFunction("Создание страницы")
     const newPage = await this.createPage({
       "title": "Page 4",

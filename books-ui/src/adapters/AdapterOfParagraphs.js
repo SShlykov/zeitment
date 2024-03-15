@@ -65,7 +65,6 @@ class AdapterOfParagraphs {
       "page": 1
     }
     const {page, page_size} = fetchParamsByDefaultObject(params, defaultParams)
-    console.log({page, page_size})
     if (!is(Number, page) || !is(Number, page_size) || page < 0 || page_size < 0) return  []
     let {data: paragraphs} = await post(`${this.url}/paragraphs/pages/${chapterId}`, {
       "options": {page, page_size}

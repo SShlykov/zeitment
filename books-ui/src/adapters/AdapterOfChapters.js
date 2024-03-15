@@ -136,7 +136,6 @@ class AdapterOfChapters {
     logFunction(books)
     logFunction("Список глав по книге")
     const chaptersByBook = await this.getChaptersByBookId("fb5e7d1d-38cd-4831-bae9-07b36080e3e7")
-    console.log(chaptersByBook)
     logFunction("Создание главы")
     const newChapter = await this.createChapter({
       "title": "Chapter 1",
