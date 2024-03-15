@@ -2,9 +2,9 @@ package controllers
 
 import (
 	ctx "context"
-	localMetrics "github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics/localmetrics"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
+	localMetrics "github.com/SShlykov/zeitment/metrics"
+	"github.com/SShlykov/zeitment/metrics/localmetrics"
 )
 
 type TestFixture struct {

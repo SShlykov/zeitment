@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/errors"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -27,7 +27,8 @@ type ParagraphController struct {
 }
 
 // NewParagraphController создает новый экземпляр ParagraphController.
-func NewParagraphController(srv paragraphService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *ParagraphController {
+func NewParagraphController(srv paragraphService, metric metrics.Metrics,
+	logger loggerPkg.Logger, ctx context.Context) *ParagraphController {
 	return &ParagraphController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 

@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/errors"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
 	"log/slog"
 	"net/http"

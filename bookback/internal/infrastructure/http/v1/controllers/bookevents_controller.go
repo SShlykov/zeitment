@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/errors"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
 	"log/slog"
 	"net/http"
@@ -32,7 +32,8 @@ type BookEventController struct {
 }
 
 // NewBookEventController создает новый экземпляр BookEventController.
-func NewBookEventController(srv bookEventService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *BookEventController {
+func NewBookEventController(srv bookEventService, metric metrics.Metrics,
+	logger loggerPkg.Logger, ctx context.Context) *BookEventController {
 	return &BookEventController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 

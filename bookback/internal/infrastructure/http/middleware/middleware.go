@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
 	"time"
 )

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
