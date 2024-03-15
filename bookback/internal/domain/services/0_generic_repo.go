@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
+	"github.com/SShlykov/zeitment/postgres/dbutils"
 )
 
 // SimpleRepo описывает базовый интерфейс для DI репозиториев.

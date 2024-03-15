@@ -2,12 +2,12 @@ package routes
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/services"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
 	v1 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/pgrepo"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/postgres"
 	"github.com/labstack/echo/v4"

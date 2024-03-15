@@ -2,8 +2,8 @@ package pgrepo
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
 	"github.com/SShlykov/zeitment/postgres"
+	"github.com/SShlykov/zeitment/postgres/dbutils"
 	"github.com/jackc/pgx/v5"
 	"strings"
 )

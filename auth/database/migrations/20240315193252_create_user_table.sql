@@ -15,7 +15,7 @@ create table if not exists users
     email              varchar(255),
     password_hash      varchar(255),
 
-    deleted_by         integer,
+    deleted_by         uuid references users(id) on delete cascade,
     access_template_id integer,
     update_after       bigint
 );

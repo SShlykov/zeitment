@@ -5,7 +5,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
+	"github.com/SShlykov/zeitment/postgres/dbutils"
 )
 
 // BookService описывает сервис для работы с книгами.

@@ -7,7 +7,7 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/adapters"
 	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
-	"github.com/SShlykov/zeitment/bookback/internal/models/dbutils"
+	"github.com/SShlykov/zeitment/postgres/dbutils"
 )
 
 //go:generate mockgen -destination=../../../tests/mocks/domain/services/chapter_service_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/services ChapterService
