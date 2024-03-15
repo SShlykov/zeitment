@@ -41,7 +41,7 @@ export default {
     },
     pageName() {
       if (!this.$route) return ""
-      return this.$route.name
+      return this.$route.params.id
     },
   },
   methods: {
@@ -58,10 +58,12 @@ export default {
 
 
 <template>
-  <div class="w-full h-full relative flex p-2 rounded-md transition-all hover:bg-gray-200 items-center group">
+  <div
+    class="w-full h-full relative flex rounded-md transition-all hover:bg-gray-200 items-center group"
+    :class="{'bg-gray-200': pageName === name}"
+  >
     <router-link
-      class="w-full"
-      :class="{'bg-gray-200': pageName === name}"
+      class="w-full h-full p-2"
       :to="link"
     >
       <i :class="`ri-${icon} text-slate-600 mr-2 `" />

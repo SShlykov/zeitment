@@ -37,8 +37,6 @@ export default {
       serviceOfBooks
     }
   },
-  data() {
-  },
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
     ...mapGetters('books', ['userBooks']),
@@ -46,16 +44,6 @@ export default {
       const newBook = {
         "title": "Создать книгу",
         "icon": "file-add-line",
-        "itemFunction": async () => {
-          const url = import.meta.env.VITE_API_ADDR
-          const adapterOfBooks = new AdapterOfBooks(url)
-          const store = this.$store
-
-          const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
-          const book = await serviceOfBooks.createBook()
-
-          this.$router.push(`/book/${book.id}`)
-        },
         "type": "button",
         "name": "new_book"
       }

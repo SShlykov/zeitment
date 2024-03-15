@@ -2,7 +2,6 @@
 export default {
   name: 'VueTemplate',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

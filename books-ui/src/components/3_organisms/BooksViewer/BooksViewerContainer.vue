@@ -2,7 +2,6 @@
 export default {
   name: 'BooksViewerContainer',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

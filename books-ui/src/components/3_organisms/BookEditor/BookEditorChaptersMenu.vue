@@ -2,7 +2,6 @@
 export default {
   name: 'BookEditorChaptersMenu',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}
@@ -11,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <div class="">
+  <div class="w-[100px] h-full border-r border-gray-200">
     template
   </div>
 </template>

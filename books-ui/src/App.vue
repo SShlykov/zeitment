@@ -1,6 +1,7 @@
 <script>
 import Head from '@frames/Head.vue';
 import SideMenu from '@frames/SideMenu/SideMenu.vue';
+import AppNotifications from "@frames/AppNotifications/AppNotifications.vue";
 import {mapGetters} from "vuex";
 import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
 import ServiceOfBooks from "@services/ServiceOfBooks.js";
@@ -11,12 +12,14 @@ export default {
   components: {
     Head,
     SideMenu,
+    AppNotifications
   },
   data() {
     return {}
   },
   computed: {
     ...mapGetters('books', ['userBooks']),
+    ...mapGetters('layout', ['notifications']),
     pageName() {
       if (!this.$route) return "pending"
       return this.$route.name
@@ -29,7 +32,6 @@ export default {
 
     const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
     serviceOfBooks.fetchUserBooks()
-
   },
 }
 </script>
@@ -53,4 +55,5 @@ export default {
   >
     <router-view />
   </div>
+  <AppNotifications :notifications="notifications" />
 </template>

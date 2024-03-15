@@ -54,33 +54,34 @@ describe("tests AdapterOfBooks for get books", () => {
 describe("tests of AdapterOfBooks ", () => {
   const url = "http://localhost:8000/api/v1/books/"
 
-  const BooksService = new AdapterOfBooks(url)
+  const booksAdapter = new AdapterOfBooks(url)
 
   test("get books list", async () => {
     axios.post.mockResolvedValue({data: apiBooksResponse})
 
-    const booksData = await BooksService.getBooks()
+    const booksData = await booksAdapter.getBooks(null)
     expect(booksData).toEqual([appBook])
   })
 
   test("create book (save book)", async () => {
     axios.post.mockResolvedValue({data: apiBookResponse})
 
-    const booksData = await BooksService.createBook(appBook)
+    const booksData = await booksAdapter.createBook(appBook)
     expect(booksData).toEqual(appBook)
   })
 
   test("update book", async () => {
     axios.put.mockResolvedValue({data: apiBookResponse})
 
-    const booksData = await BooksService.updateBook(appBook)
+    const booksData = await booksAdapter.updateBook(appBook)
+    expect(appBook.id).toBeDefined()
     expect(booksData).toEqual(appBook)
   })
 
   test("get book by id", async () => {
     axios.get.mockResolvedValue({data: apiBookResponse})
 
-    const booksData = await BooksService.getBookById(1)
+    const booksData = await booksAdapter.getBookById(1)
     expect(booksData).toEqual(appBook)
 
   })
@@ -88,7 +89,7 @@ describe("tests of AdapterOfBooks ", () => {
   test("delete book", async () => {
     axios.delete.mockResolvedValue({data: apiBookResponse})
 
-    const booksData = await BooksService.deleteBookById(appBook.id)
+    const booksData = await booksAdapter.deleteBookById(appBook.id)
     expect(booksData).toEqual(appBook)
   })
 })
