@@ -2,7 +2,6 @@
 export default {
   name: 'BookEditorBody',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

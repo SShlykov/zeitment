@@ -4,7 +4,6 @@
 export default {
   name: 'BookEditorHeader',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}
@@ -13,5 +12,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-10 border-b border-slate-300" />
+  <div class="w-full h-12 p-2 border-b border-slate-300 overflow-hidden">
+    <slot />
+  </div>
 </template>

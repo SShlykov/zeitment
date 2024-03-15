@@ -2,7 +2,6 @@
 export default {
   name: 'VCardsContainer',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

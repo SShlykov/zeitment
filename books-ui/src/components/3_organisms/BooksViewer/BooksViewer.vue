@@ -1,21 +1,14 @@
 <script>
-import {mapActions, mapGetters} from "vuex";
+import {mapGetters} from "vuex";
 import BooksViewerCard from './BooksViewerCard.vue'
 import BooksViewerContainer from './BooksViewerContainer.vue'
 
 export default {
   name: 'BooksViewer',
   components: {BooksViewerCard, BooksViewerContainer},
-  data() {},
   computed: {
     ...mapGetters('books', ['userBooks'])
   },
-  mounted() {
-    this.fetchUserBooks()
-  },
-  methods: {
-    ...mapActions('books', ['fetchUserBooks'])
-  }
 }
 
 </script>

@@ -3,6 +3,7 @@ import { store as layout } from '@/store/modules/layout';
 import { store as auth } from '@/store/modules/auth';
 import { store as books } from '@/store/modules/books';
 import { store as test } from '@/store/modules/test';
+import { store as chapters } from '@/store/modules/chapters';
 
 
 // eslint-disable-next-line no-undef
@@ -17,7 +18,8 @@ export const store = createStore({
     layout,
     auth,
     books,
-    test
+    test,
+    chapters
   },
 });
 
