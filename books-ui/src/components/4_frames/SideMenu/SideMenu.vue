@@ -37,8 +37,6 @@ export default {
       serviceOfBooks
     }
   },
-  data() {
-  },
   computed: {
     ...mapGetters('layout', ['isOpenMenu', 'menuList']),
     ...mapGetters('books', ['userBooks']),

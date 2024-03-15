@@ -14,7 +14,9 @@ const getters = {
 
 const mutations = {
   resetStore(state) {
-    Object.assign(state, initialState);
+    for (let key in state) {
+      state[key] = initialState[key]
+    }
   },
   setUserBooks(state, userBooks) {
     state.userBooks = userBooks;
@@ -32,7 +34,6 @@ const actions = {
     commit('resetStore');
   },
   saveEditableBook({ commit }, book) {
-    console.log(book)
     commit('setEditableBook', book);
   },
 };

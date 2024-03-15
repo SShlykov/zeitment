@@ -1,4 +1,4 @@
-import {expect, describe, test, vi} from 'vitest'
+import {expect, describe, test, vi, beforeEach} from 'vitest'
 import {mount} from "@vue/test-utils";
 import BookEditor from "@organisms/BookEditor/BookEditor.vue";
 import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader.vue";
@@ -47,34 +47,9 @@ describe("tests of BookEditor", () => {
     })
 
     expect(wrapper.exists()).toBe(true)
+    expect(wrapper.text()).contains('Книги не существует')
   })
 
-  test('methods test of BookEditor', async () => {
-    store.dispatch('books/setEditableBook', appBook)
-    axios.get.mockResolvedValue({data: apiBookResponse})
-
-    const wrapper = mount(BookEditor, {
-      shallow: true,
-      props: {
-        serviceOfBooks: {
-          storeEditableBookAttribute: vi.fn(),
-          saveEditableBookToServer: vi.fn(),
-          fetchEditableBook: vi.fn()
-        },
-        bookManager: {
-          saveBookWithPage: vi.fn()
-        }
-      },
-      global: {
-        mocks: {
-          $store: store,
-          $route: mockRoute,
-          $router: mockRouter
-        }
-      }
-    })
-
-  })
 })
 
 describe("tests of BookEditorHeader", () => {

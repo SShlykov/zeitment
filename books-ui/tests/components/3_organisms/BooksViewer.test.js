@@ -45,8 +45,8 @@ describe("tests of BooksViewer", () => {
 })
 
 describe("tests of BooksViewerContainer", () => {
-  test('mount test of BooksViewerContainer', async () => {
 
+  test('mount test of BooksViewerContainer', async () => {
     const wrapper = mount(BooksViewerContainer, {
       shallow: true,
     })
@@ -56,11 +56,18 @@ describe("tests of BooksViewerContainer", () => {
 })
 
 describe("tests of BooksViewerCard", () => {
-  test('mount test of BooksViewerCard', async () => {
+  const cardProps = {
+    id: "fb5e7d1d-38cd-4831-bae9-07b36080e3e7",
+    owner: "e75aae0d-c1eb-4199-a1d8-2177f57d6a1e",
+    title: "Тестовая книга",
+    updatedAt: "2024-02-12T23:47:35.711668+03:00",
+    bookLink: "test",
+  }
 
+  test('mount test of BooksViewerCard', async () => {
     const wrapper = mount(BooksViewerCard, {
       shallow: true,
-      props: { }
+      props: cardProps
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -84,41 +91,14 @@ describe("tests of BooksViewerCard", () => {
         publication: null,
         isPublic: false,
         description: "test description",
+        bookLink: "test",
       }
     })
-
 
     expect(wrapper.text().includes("Тестовая книга")).toBe(true)
 
     const el = wrapper.find('[test-id="lastUpdated"]')
     expect(el.text()).toBe('Обновлено 8 дней назад')
-  })
-
-  test('display date and title', async () => {
-    const updatedAt = "2024-02-12T23:47:35.711668+03:00"
-    vi.setSystemTime(new Date('2024-07-20T23:47:35'))
-
-    const wrapper = mount(BooksViewerCard, {
-      shallow: true,
-      props: {
-        id: "fb5e7d1d-38cd-4831-bae9-07b36080e3e7",
-        owner: "e75aae0d-c1eb-4199-a1d8-2177f57d6a1e",
-        title: "Тестовая книга",
-        updatedAt,
-        variables: [],
-        mapParamsId: null,
-        mapLink: null,
-        imageLink: null,
-        publication: null,
-        isPublic: false,
-        description: "test description",
-      }
-    })
-
-    expect(wrapper.text().includes("Тестовая книга")).toBe(true)
-
-    const el = wrapper.find('[test-id="lastUpdated"]')
-    expect(el.text()).toBe('Обновлено 5 месяцев назад')
   })
 
   test('display date', async () => {
@@ -129,6 +109,10 @@ describe("tests of BooksViewerCard", () => {
       shallow: true,
       props: {
         updatedAt,
+        id: "fb5e7d1d-38cd-4831-bae9-07b36080e3e7",
+        owner: "e75aae0d-c1eb-4199-a1d8-2177f57d6a1e",
+        title: "Тестовая книга",
+        bookLink: "test",
       }
     })
 

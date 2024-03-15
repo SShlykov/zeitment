@@ -2,7 +2,6 @@
 export default {
   name: 'UserSettings',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

@@ -2,7 +2,6 @@
 export default {
   name: 'BooksCompendium',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

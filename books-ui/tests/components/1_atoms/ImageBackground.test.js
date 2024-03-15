@@ -7,6 +7,9 @@ describe("tests of BackgroundImage", () => {
 
     const wrapper = mount(BackgroundImage, {
       shallow: true,
+      props: {
+        imageLink: "https://test.com"
+      }
     })
 
     expect(wrapper.exists()).toBe(true)

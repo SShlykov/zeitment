@@ -4,16 +4,24 @@ import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader/BookEditorH
 import BookEditorHeaderContainer from "@organisms/BookEditor/BookEditorHeader/BookEditorHeaderContainer.vue";
 
 describe("tests of BookEditorHeader", () => {
-
-  const event = {
-    target: {
-      value: "test"
+  const props = {
+    serviceOfBooks: {
+      storeEditableBookAttribute: vi.fn(),
+      saveEditableBookToServer: vi.fn(),
+      fetchEditableBook: vi.fn()
+    },
+    bookManager: {
+      saveBookWithPage: vi.fn()
+    },
+    editableBook: {
+      title: "test",
     }
   }
 
   test('mount test of BookEditorHeader', async () => {
     const wrapper = mount(BookEditorHeader, {
       shallow: true,
+      props
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -22,16 +30,7 @@ describe("tests of BookEditorHeader", () => {
   test('test functions in BookEditorHeader', async () => {
     const wrapper = mount(BookEditorHeader, {
       shallow: true,
-      props: {
-        serviceOfBooks: {
-          storeEditableBookAttribute: vi.fn(),
-          saveEditableBookToServer: vi.fn(),
-          fetchEditableBook: vi.fn()
-        },
-        bookManager: {
-          saveBookWithPage: vi.fn()
-        }
-      },
+      props
     })
 
     const event = {

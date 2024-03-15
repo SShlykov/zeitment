@@ -6,7 +6,6 @@ import BooksViewerContainer from './BooksViewerContainer.vue'
 export default {
   name: 'BooksViewer',
   components: {BooksViewerCard, BooksViewerContainer},
-  data() {},
   computed: {
     ...mapGetters('books', ['userBooks'])
   },

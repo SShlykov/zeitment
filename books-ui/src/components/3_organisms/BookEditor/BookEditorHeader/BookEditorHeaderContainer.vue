@@ -4,7 +4,6 @@
 export default {
   name: 'BookEditorHeaderContainer',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}

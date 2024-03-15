@@ -22,36 +22,12 @@ export default {
     },
     author: {
       type: String,
-      required: true
+      default: ""
     },
     description: {
       type: String,
-      required: true
+      default: ""
     },
-    // is_public: {
-    //   type: Boolean,
-    //   required: true
-    // },
-    // publication: {
-    //   type: String,
-    //   required: false
-    // },
-    // image_link: {
-    //   type: String,
-    //   required: false
-    // },
-    // map_link: {
-    //   type: String,
-    //   required: false
-    // },
-    // map_params_id: {
-    //   type: String,
-    //   required: false
-    // },
-    // variables: {
-    //   type: Array,
-    //   required: false
-    // },
     updatedAt: {
       type: String,
       required: true
@@ -61,7 +37,6 @@ export default {
       required: true
     }
   },
-  data() {},
   computed: {
     formattedUpdatedAt() {
       return moment(this.updatedAt).format('MMMM Do YYYY, h:mm:ss a');

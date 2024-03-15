@@ -1,11 +1,15 @@
 import menuList from "./menuList.js"
 
-const state = {
+const initialState = {
   height:      0,
   width:       0,
   inited:      false,
   isOpenMenu:  true,
   notifications: []
+}
+
+const state = {
+  ...initialState
 };
 
 const getters = {
@@ -36,6 +40,11 @@ const mutations = {
   setNotifications: (state, notifications) => {
     state.notifications = notifications
   },
+  resetStore: (state) => {
+    for (let key in state) {
+      state[key] = initialState[key]
+    }
+  }
 };
 
 const actions = {
@@ -52,6 +61,9 @@ const actions = {
   removeNotification: ({commit, state}, id) => {
     const notifications = state.notifications.filter(n => n.id !== id)
     commit("setNotifications", notifications)
+  },
+  resetStore: ({commit}) => {
+    commit("setNotifications", [])
   },
 };
 

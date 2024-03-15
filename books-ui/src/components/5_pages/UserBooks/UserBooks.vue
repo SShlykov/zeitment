@@ -17,11 +17,8 @@ export default {
       serviceOfBooks
     }
   },
-  data() {},
   computed: {},
-  mounted() {
-
-  },
+  mounted() {},
   methods: {}
 }
 

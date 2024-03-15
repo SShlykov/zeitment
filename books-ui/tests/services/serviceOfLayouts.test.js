@@ -1,12 +1,14 @@
 import {expect, test, describe, beforeEach} from 'vitest'
 import {createStore} from "vuex";
 import { store as layout } from '@/store/modules/layout';
+import { store as books } from '@/store/modules/layout';
 import ServiceOfLayout from '@services/ServiceOfLayout.js'
 
 describe('serviceOfBooks', () => {
   const store = createStore({
     modules: {
-      layout
+      layout,
+      books
     }
   })
 

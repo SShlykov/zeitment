@@ -5,18 +5,15 @@ import {createStore} from "vuex";
 import axios  from "axios";
 import {apiBooksResponse, appBook} from "@mocks/books.js";
 import { store as books } from '@/store/modules/books';
+import { store as layout } from '@/store/modules/layout';
+import Router from "@router";
 
 vi.mock('axios')
 
 describe("tests of App", async () => {
   const store = createStore({
     modules: {
-      layout: {
-        namespaced: true,
-        actions: {
-          initScreenSizeRecalc() { }
-        },
-      },
+      layout,
       books
     }
   })
@@ -26,6 +23,7 @@ describe("tests of App", async () => {
     const wrapper = mount(App, {
       shallow: true,
       global: {
+        plugins: [Router],
         mocks: {
           $store: store
         }
@@ -39,6 +37,7 @@ describe("tests of App", async () => {
     mount(App, {
       shallow: true,
       global: {
+        plugins: [Router],
         mocks: {
           $store: store
         }

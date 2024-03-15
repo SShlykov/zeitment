@@ -18,7 +18,6 @@ export default {
       default: () => {}
     }
   },
-  data() {},
   computed: {
     ...mapGetters('books', ['editableBook'])
   },
@@ -32,7 +31,10 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col">
+  <div
+    v-if="editableBook"
+    class="w-full h-full flex flex-col"
+  >
     <BookEditorHeader
       :serviceOfBooks="serviceOfBooks"
       :editableBook="editableBook"
@@ -41,6 +43,13 @@ export default {
     <div class="w-full flex flex-grow">
       <BookEditorChaptersMenu />
       <BookEditorBody />
+    </div>
+  </div>
+  <div v-if="!editableBook">
+    <div class="flex justify-center items-center h-full">
+      <div class="text-2xl text-slate-400">
+        Книги не существует
+      </div>
     </div>
   </div>
 </template>

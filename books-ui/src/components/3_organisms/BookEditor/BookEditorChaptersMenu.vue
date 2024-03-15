@@ -2,7 +2,6 @@
 export default {
   name: 'BookEditorChaptersMenu',
   components: {},
-  data() {},
   computed: {},
   mounted() {},
   methods: {}
