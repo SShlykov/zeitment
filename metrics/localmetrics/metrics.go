@@ -14,7 +14,7 @@ type MetricValue struct {
 // LocalMetrics структура для локального хранения метрик.
 type LocalMetrics struct {
 	logger    loggerPkg.Logger
-	mu        sync.RWMutex
+	mu        sync.Mutex
 	counters  map[string]int
 	summaries map[string]MetricValue
 }

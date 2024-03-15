@@ -3,9 +3,9 @@ package app
 import (
 	"context"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/endpoint"
-	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/metrics"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
 	"github.com/SShlykov/zeitment/logger"
+	"github.com/SShlykov/zeitment/metrics"
 	"github.com/SShlykov/zeitment/postgres"
 	"github.com/minio/minio-go/v7"
 

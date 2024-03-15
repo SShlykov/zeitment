@@ -5,4 +5,5 @@ use (
 	./bookback
 	./logger
 	./postgres
+	./metrics
 )
