@@ -3,8 +3,6 @@ import { createStore } from 'vuex';
 import { store as books } from '@/store/modules/books';
 import { appBook } from "@mocks/books.js";
 
-vi.mock('axios')
-
 describe("tests books store with vuex", () => {
   const store = createStore({
     plugins: [],

@@ -19,7 +19,7 @@ class ServiceOfBooks {
 
   /**
    * функция создания книги
-   * @param {Number} book
+   * @param {Object} book
    * @returns {Promise<*|void|Object|{owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string}>}
    */
   async createBook(book) {
@@ -102,7 +102,7 @@ class ServiceOfBooks {
 
   /**
    * функция получения книги по id и сохранения ее в store
-   * @param {Numver} id
+   * @param {Number} id
    * @returns {Promise<*|Object|{owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string}|{owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string}>}
    */
   async fetchEditableBook(id) {

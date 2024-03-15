@@ -5,6 +5,53 @@ import {appChapter, apiChaptersResponse, apiChapterResponse} from '@mocks/chapte
 
 vi.mock('axios')
 
+describe("tests AdapterOfChapters for getChaptersByBookId", () => {
+  const url = "http://localhost:8000/api/v1/chapters/"
+  axios.post.mockResolvedValue({data: apiChaptersResponse})
+  const chaptersAdapter = new AdapterOfChapters(url)
+
+
+  test("get chapters list by book id", async () => {
+    const chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id)
+    expect(chaptersData).toEqual([appChapter])
+  })
+
+  test("get chapters list by book id with bad param", async () => {
+    let chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id, {
+      foo: "bar"
+    })
+    expect(chaptersData).toEqual([appChapter])
+  })
+
+  test("get chapters list by book id with bad page= -1", async () => {
+    let chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id, {
+      page: -1,
+    })
+    expect(chaptersData).toEqual([])
+  })
+
+  test("get chapters list by book id with bad page_size= -1", async () => {
+    let chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id, {
+      page_size: -1,
+    })
+    expect(chaptersData).toEqual([])
+  })
+
+  test("get chapters list by book id with bad page is string", async () => {
+    let chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id, {
+      page: "foo",
+    })
+    expect(chaptersData).toEqual([])
+  })
+
+  test("get chapters list by book id with bad page is null", async () => {
+    let chaptersData = await chaptersAdapter.getChaptersByBookId(appChapter.id, {
+      page: null,
+    })
+    expect(chaptersData).toEqual([appChapter])
+  })
+})
+
 describe("tests AdapterOfChapters for get chapters", () => {
   const url = "http://localhost:8000/api/v1/chapters/"
   axios.post.mockResolvedValue({data: apiChaptersResponse})
@@ -21,6 +68,7 @@ describe("tests AdapterOfChapters for get chapters", () => {
     })
     expect(chaptersData).toEqual([appChapter])
   })
+
 
   test("get chapters list with bad page= -1", async () => {
     let chaptersData = await chaptersAdapter.getChapters({

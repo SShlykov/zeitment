@@ -36,4 +36,38 @@ const apiChapterResponse = {
   status: "ok"
 }
 
-export {apiChapter, apiChapterResponse, apiChaptersResponse, appChapter}
+
+class AdapterOfChapters {
+  constructor(url) {
+    this.url = url
+  }
+
+  async getChapters() {
+    return [appChapter]
+  }
+
+  async updateChapter(newChapter) {
+    return {
+      ...appChapter,
+      ...newChapter
+    }
+  }
+
+  async createChapter() {
+    return appChapter
+  }
+
+  async getChapterById() {
+    return appChapter
+  }
+
+  async deleteChapterById() {
+    return appChapter
+  }
+
+  async getChaptersByBookId() {
+    return [appChapter]
+  }
+}
+
+export {apiChapter, apiChapterResponse, apiChaptersResponse, appChapter, AdapterOfChapters}

@@ -58,6 +58,25 @@ class AdapterOfChapters {
 
   /**
    *
+   * @param {String} bookId
+   * @param {Object | undefined} params
+   * @returns {Promise<Object[]>}
+   */
+  async getChaptersByBookId(bookId, params) {
+    const defaultParams = {
+      "page_size": 10,
+      "page": 1
+    }
+    const {page, page_size} = fetchParamsByDefaultObject(params, defaultParams)
+    if (!is(Number, page) || !is(Number, page_size) || page < 0 || page_size < 0) return  []
+    const {data: chapters} = await post(`${this.url}/chapters/book/${bookId}`, {
+      "options": {page, page_size}
+    })
+    return convertList(chapters, {config: this.adapterFromApiConfig})
+  }
+
+  /**
+   *
    * @param {Object} book
    * @returns {Promise<*|void|Object>}
    */
@@ -115,6 +134,9 @@ class AdapterOfChapters {
     logFunction("Список глав")
     const books = await this.getChapters()
     logFunction(books)
+    logFunction("Список глав по книге")
+    const chaptersByBook = await this.getChaptersByBookId("fb5e7d1d-38cd-4831-bae9-07b36080e3e7")
+    console.log(chaptersByBook)
     logFunction("Создание главы")
     const newChapter = await this.createChapter({
       "title": "Chapter 1",

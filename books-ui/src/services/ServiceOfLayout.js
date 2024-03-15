@@ -1,9 +1,17 @@
 class ServiceOfLayout {
 
+  /**
+   *
+   * @param {Object} store
+   */
   constructor(store) {
     this.store = store;
   }
 
+  /**
+   *
+   * @param {Object} notification
+   */
   addNotification(notification) {
     const id = Math.random().toString(36).slice(-4)
     const timer = notification.timer || 1000
