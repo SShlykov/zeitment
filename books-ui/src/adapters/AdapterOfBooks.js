@@ -52,9 +52,11 @@ class AdapterOfBooks {
     this.url = url
   }
 
+
   /**
    *
-   * @returns {Promise<Object[]>}
+   * @param {Object | undefined} params
+   * @returns {Promise<Object[]|*[]>}
    */
   async getBooks(params) {
     const defaultParams = {

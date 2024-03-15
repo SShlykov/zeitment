@@ -1,6 +1,8 @@
 <script>
+
+
 export default {
-  name: 'BookEditorChaptersMenu',
+  name: 'BookEditorHeaderContainer',
   components: {},
   data() {},
   computed: {},
@@ -11,7 +13,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-[100px] h-full border-r border-gray-200">
-    template
+  <div class="w-full h-12 p-2 border-b border-slate-300 overflow-hidden">
+    <slot />
   </div>
 </template>

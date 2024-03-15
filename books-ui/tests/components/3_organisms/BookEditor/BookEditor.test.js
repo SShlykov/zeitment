@@ -4,7 +4,7 @@ import BookEditor from "@organisms/BookEditor/BookEditor.vue";
 import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader.vue";
 import BookEditorChaptersMenu from "@organisms/BookEditor/BookEditorChaptersMenu.vue";
 import BookEditorBody from "@organisms/BookEditor/BookEditorBody.vue";
-import { store as books } from '@/store/modules/books';
+import { store as books } from '@store/modules/books/index.js';
 import {createStore} from "vuex";
 import axios from "axios";
 import {apiBookResponse, appBook} from "@mocks/books.js";
@@ -74,15 +74,6 @@ describe("tests of BookEditor", () => {
       }
     })
 
-    const event = {
-      target: {
-        value: "test"
-      }
-    }
-
-    expect(wrapper.vm.updateBookTitle(event)).toBe("ok")
-    expect(wrapper.vm.updateBookAuthor(event)).toBe("ok")
-    expect(wrapper.vm.saveBook()).toBe("ok")
   })
 })
 

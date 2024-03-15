@@ -42,7 +42,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-[70vw] flex items-center max-w-[400px] min-w-[300px] bg-white shadow-md border border-gray-200 p-2 rounded-md appearFromTop">
+  <div class="w-[70vw] flex items-center max-w-[400px] min-w-[300px] bg-white shadow-md border border-gray-200 p-2 rounded-md appearFromTop-3">
     <i
       class="mr-2"
       :class="icon"

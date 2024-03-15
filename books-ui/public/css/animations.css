@@ -2,6 +2,10 @@
   animation: appearFromTop 1s forwards;
 }
 
+.appearFromTop-3 {
+  animation: appearFromTop 0.3s forwards;
+}
+
 @keyframes appearFromTop {
   from {
     transform: translateY(-100px);

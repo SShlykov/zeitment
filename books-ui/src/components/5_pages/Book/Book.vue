@@ -28,8 +28,8 @@ export default {
       this.$router.push('/')
     }
     const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
-    const layoutService = new ServiceOfLayout(store)
-    const bookManager = new BookManager(serviceOfBooks, layoutService)
+    const layoutService  = new ServiceOfLayout(store)
+    const bookManager    = new BookManager(serviceOfBooks, layoutService)
 
     serviceOfBooks.fetchEditableBook(bookId)
 
