@@ -2,12 +2,14 @@ package app
 
 import (
 	"context"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/server"
 	"github.com/SShlykov/zeitment/auth/pkg/config"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/metrics"
 	"github.com/SShlykov/zeitment/postgres"
 	"os"
 	"os/signal"
+	"sync"
 )
 
 type App struct {
@@ -43,9 +45,17 @@ func (app *App) Run() error {
 	ctx, stop := signal.NotifyContext(app.ctx, os.Interrupt)
 	defer stop()
 
+	var wg sync.WaitGroup
+
 	logg := app.logger
 	logg.Info("starting auth app")
 	logg.Debug("debug messages enabled")
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_ = server.NewServer(logg, app.db)
+	}()
 
 	<-ctx.Done()
 	return nil

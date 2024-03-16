@@ -1,5 +1,5 @@
 import {expect, describe, test, vi, beforeEach} from 'vitest'
-import {mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils.proto";
 import BookEditor from "@organisms/BookEditor/BookEditor.vue";
 import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader.vue";
 import BookEditorChaptersMenu from "@organisms/BookEditor/BookEditorChaptersMenu.vue";

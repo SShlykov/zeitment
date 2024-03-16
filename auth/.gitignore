@@ -3,3 +3,4 @@ tmp/*.go
 /vendor/
 Makefile
 .env
+bin

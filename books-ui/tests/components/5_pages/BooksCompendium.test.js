@@ -1,5 +1,5 @@
 import {test, describe, expect} from 'vitest'
-import { mount} from '@vue/test-utils'
+import { mount} from '@vue/test-utils.proto'
 import BooksCompendium from '@pages/BooksCompendium/BooksCompendium.vue';
 
 describe("tests of BooksCompendium", () => {

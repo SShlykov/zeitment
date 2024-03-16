@@ -1,5 +1,5 @@
 import {expect, describe, test, vi} from 'vitest'
-import {mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils.proto";
 import App from "@/App.vue";
 import {createStore} from "vuex";
 import axios  from "axios";

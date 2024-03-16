@@ -15,8 +15,8 @@ type User struct {
 	LoggedAt    sql.Null[time.Time]
 	ConfirmedAt sql.Null[time.Time]
 
-	Login string // index
-	Email string // index
+	Login string           // index
+	Email sql.Null[string] // index
 
 	PasswordHash string
 

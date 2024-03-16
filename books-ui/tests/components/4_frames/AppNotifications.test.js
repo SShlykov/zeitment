@@ -1,5 +1,5 @@
 import {test, describe, expect} from 'vitest'
-import { mount} from '@vue/test-utils'
+import { mount} from '@vue/test-utils.proto'
 import AppNotifications from '@frames/AppNotifications/AppNotifications.vue';
 import AppNotification from '@frames/AppNotifications/AppNotificationsItem.vue';
 

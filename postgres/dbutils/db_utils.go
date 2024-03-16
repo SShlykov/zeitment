@@ -38,6 +38,10 @@ func NewPagination(pageOptions PagedOptions) PaginationImpl {
 	return PaginationImpl{Limit: pageSize, Offset: (page - 1) * pageSize}
 }
 
+func NewPaginationWithLimitOffset(page, pageSize uint64) PaginationImpl {
+	return PaginationImpl{Limit: pageSize, Offset: (page - 1) * pageSize}
+}
+
 type FilterImpl struct {
 	Key   string
 	Value any

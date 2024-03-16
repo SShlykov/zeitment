@@ -8,8 +8,8 @@ create table if not exists users
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     deleted_at TIMESTAMP WITH TIME ZONE,
 
-    logged_at          TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-    confirmed_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    logged_at          TIMESTAMP WITH TIME ZONE,
+    confirmed_at       TIMESTAMP WITH TIME ZONE,
 
     login              varchar(255),
     email              varchar(255),

@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package user_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/proto/user_v1;user_v1";
+
+service UserService {
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+}
+
+message User {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  google.protobuf.Timestamp logged_at = 5;
+  google.protobuf.Timestamp confirmed_at = 6;
+
+  string login = 7;
+  google.protobuf.StringValue email = 8;
+
+  google.protobuf.StringValue deleted_by = 9;
+  google.protobuf.Int32Value access_template_id = 10;
+  google.protobuf.Int64Value update_after = 11;
+}
+
+message ListUsersRequest {
+  GetOptions options = 1;
+}
+
+message ListUsersResponse {
+  string status = 1;
+  repeated User users = 2;
+  PaginationMetadata pagination_metadata = 3;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  string status = 2;
+  User user = 3;
+}
+
+message CreateUserRequest {
+  User user = 1;
+}
+
+message CreateUserResponse {
+  string id = 1;
+  string status = 2;
+  User user = 3;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  User user = 2;
+}
+
+message UpdateUserResponse {
+  string id = 1;
+  string status = 2;
+  User user = 3;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message GetOptions {
+  Pagination pagination = 1;
+}
+
+message PaginationMetadata {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total = 3;
+  int32 total_pages = 4;
+}
+
+message Pagination {
+  uint64 page = 1;
+  uint64 page_size = 2;
+}
+
+message Filter {
+  string field = 1;
+  string value = 2;
+  Operator operator = 3;
+}
+
+enum Operator {
+  EQUAL = 0;
+  NOT_EQUAL = 1;
+  GREATER_THAN = 2;
+  GREATER_THAN_OR_EQUAL = 3;
+  LESS_THAN = 4;
+  LESS_THAN_OR_EQUAL = 5;
+  LIKE = 6;
+  NOT_LIKE = 7;
+  IN = 8;
+  NOT_IN = 9;
+  IS_NULL = 10;
+  IS_NOT_NULL = 11;
+}
