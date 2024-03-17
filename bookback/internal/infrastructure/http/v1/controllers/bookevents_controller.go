@@ -7,7 +7,6 @@ import (
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 	"net/http"
 )
 
@@ -21,6 +20,8 @@ type bookEventService interface {
 	GetBookEventsByChapterID(ctx context.Context, chapterID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
 	GetBookEventsByPageID(ctx context.Context, pageID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
 	GetBookEventsByParagraphID(ctx context.Context, paragraphID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleBookEventRequest) (*models.BookEvent, error)
 }
 
 // BookEventController структура для HTTP-контроллера событий книги.
@@ -37,6 +38,22 @@ func NewBookEventController(srv bookEventService, metric metrics.Metrics,
 	return &BookEventController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
+func (bec *BookEventController) TogglePublic(c echo.Context) error {
+	var request models.ToggleBookEventRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	event, err := bec.Service.TogglePublic(bec.Ctx, request)
+	if err != nil {
+		bec.Logger.Info("error", loggerPkg.Err(err))
+		bec.Metrics.IncCounter("controller.BookEvent.TogglePublic.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+
+	return c.JSON(http.StatusOK, models.WebResponse[*models.BookEvent]{Data: event, Status: "ok"})
+}
+
 func (bec *BookEventController) GetBookEventByID(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -45,7 +62,7 @@ func (bec *BookEventController) GetBookEventByID(c echo.Context) error {
 
 	event, err := bec.Service.GetBookEventByID(bec.Ctx, id)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.GetBookEventByID.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotFound)
 	}
@@ -61,7 +78,7 @@ func (bec *BookEventController) CreateBookEvent(c echo.Context) error {
 
 	createdEvent, err := bec.Service.CreateBookEvent(bec.Ctx, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.CreateBookEvent.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotCreated)
 	}
@@ -81,7 +98,7 @@ func (bec *BookEventController) UpdateBookEvent(c echo.Context) error {
 
 	event, err := bec.Service.UpdateBookEvent(bec.Ctx, id, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.UpdateBookEvent.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -97,7 +114,7 @@ func (bec *BookEventController) DeleteBookEvent(c echo.Context) error {
 
 	deletedEvent, err := bec.Service.DeleteBookEvent(bec.Ctx, id)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.DeleteBookEvent.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotDeleted)
 	}
@@ -118,7 +135,7 @@ func (bec *BookEventController) GetBookEventsByBookID(c echo.Context) error {
 
 	events, err := bec.Service.GetBookEventsByBookID(bec.Ctx, id, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.GetBookEventsByBookID.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotFound)
 	}
@@ -138,7 +155,7 @@ func (bec *BookEventController) GetBookEventsByChapterID(c echo.Context) error {
 
 	events, err := bec.Service.GetBookEventsByChapterID(bec.Ctx, id, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.GetBookEventsByChapterID.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotFound)
 	}
@@ -159,7 +176,7 @@ func (bec *BookEventController) GetBookEventsByPageID(c echo.Context) error {
 
 	events, err := bec.Service.GetBookEventsByPageID(bec.Ctx, id, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.GetBookEventsByPageID.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotFound)
 	}
@@ -180,7 +197,7 @@ func (bec *BookEventController) GetBookEventsByParagraphID(c echo.Context) error
 
 	events, err := bec.Service.GetBookEventsByParagraphID(bec.Ctx, id, request)
 	if err != nil {
-		bec.Logger.Info("error", slog.String("err", err.Error()))
+		bec.Logger.Info("error", loggerPkg.Err(err))
 		bec.Metrics.IncCounter("controller.BookEvent.GetBookEventsByPageID.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookEventNotFound)
 	}

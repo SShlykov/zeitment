@@ -23,8 +23,9 @@ func Paragraph(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, 
 
 	group.POST(v1.ListSubPath, cnt.ListParagraphs)
 	group.POST("", cnt.CreateParagraph)
+	group.POST("/pages"+v1.IDVar, cnt.GetParagraphsByPageID)
 	group.GET(v1.IDVar, cnt.GetParagraphByID)
 	group.PUT(v1.IDVar, cnt.UpdateParagraph)
+	group.PUT(v1.ToggleSubPath, cnt.TogglePublic)
 	group.DELETE(v1.IDVar, cnt.DeleteParagraph)
-	group.POST("/pages"+v1.IDVar, cnt.GetParagraphsByPageID)
 }

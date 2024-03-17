@@ -7,7 +7,6 @@ import (
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 	"net/http"
 )
 
@@ -44,7 +43,7 @@ func (mvc *MapVariablesController) GetMapVariableByID(c echo.Context) error {
 
 	variable, err := mvc.Service.GetMapVariableByID(mvc.Ctx, id)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.GetMapVariableByID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -65,7 +64,7 @@ func (mvc *MapVariablesController) UpdateMapVariable(c echo.Context) error {
 
 	variable, err := mvc.Service.UpdateMapVariable(mvc.Ctx, id, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.UpdateMapVariable.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -81,7 +80,7 @@ func (mvc *MapVariablesController) DeleteMapVariable(c echo.Context) error {
 
 	variable, err := mvc.Service.DeleteMapVariable(mvc.Ctx, id)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.DeleteMapVariable.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotDeleted)
 	}
@@ -102,7 +101,7 @@ func (mvc *MapVariablesController) GetMapVariablesByBookID(c echo.Context) error
 
 	variables, err := mvc.Service.GetMapVariablesByBookID(mvc.Ctx, id, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.GetMapVariablesByBookID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -123,7 +122,7 @@ func (mvc *MapVariablesController) GetMapVariablesByChapterID(c echo.Context) er
 
 	variables, err := mvc.Service.GetMapVariablesByChapterID(mvc.Ctx, id, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.GetMapVariablesByChapterID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -144,7 +143,7 @@ func (mvc *MapVariablesController) GetMapVariablesByPageID(c echo.Context) error
 
 	variables, err := mvc.Service.GetMapVariablesByPageID(mvc.Ctx, id, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.GetMapVariablesByPageID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -165,7 +164,7 @@ func (mvc *MapVariablesController) GetMapVariablesByParagraphID(c echo.Context) 
 
 	variables, err := mvc.Service.GetMapVariablesByParagraphID(mvc.Ctx, id, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.GetMapVariablesByParagraphID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.MapVariablesNotFound)
 	}
@@ -181,7 +180,7 @@ func (mvc *MapVariablesController) CreateMapVariable(c echo.Context) error {
 
 	variable, err := mvc.Service.CreateMapVariable(mvc.Ctx, request)
 	if err != nil {
-		mvc.Logger.Info("error", slog.String("err", err.Error()))
+		mvc.Logger.Info("error", loggerPkg.Err(err))
 		mvc.Metrics.IncCounter("controller.MapVariablesController.CreateMapVariable.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.MapVariablesNotCreated)
 	}

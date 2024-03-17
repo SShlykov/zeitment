@@ -7,7 +7,6 @@ import (
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/metrics"
 	"github.com/labstack/echo/v4"
-	"log/slog"
 	"net/http"
 )
 
@@ -18,6 +17,8 @@ type chapterService interface {
 	DeleteChapter(ctx context.Context, id string) (*models.Chapter, error)
 	ListChapters(ctx context.Context, request models.RequestChapter) ([]*models.Chapter, error)
 	GetChapterByBookID(ctx context.Context, bookID string, request models.RequestChapter) ([]*models.Chapter, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleChapterRequest) (*models.Chapter, error)
 }
 
 type ChapterController struct {
@@ -32,6 +33,21 @@ func NewChapterController(srv chapterService, metric metrics.Metrics, logger log
 	return &ChapterController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
+func (ch *ChapterController) TogglePublic(c echo.Context) error {
+	var request models.ToggleChapterRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	chapter, err := ch.Service.TogglePublic(ch.Ctx, request)
+	if err != nil {
+		ch.Logger.Info("error", loggerPkg.Err(err))
+		ch.Metrics.IncCounter("controller.chapter.TogglePublic.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Chapter]{Data: chapter, Status: "ok"})
+}
+
 func (ch *ChapterController) ListChapters(c echo.Context) error {
 	var request models.RequestChapter
 	if err := c.Bind(&request); err != nil {
@@ -40,7 +56,7 @@ func (ch *ChapterController) ListChapters(c echo.Context) error {
 
 	chapters, err := ch.Service.ListChapters(ch.Ctx, request)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.ListChapters.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -55,7 +71,7 @@ func (ch *ChapterController) CreateChapter(c echo.Context) error {
 
 	createdChapter, err := ch.Service.CreateChapter(ch.Ctx, chap)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.CreateChapter.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.ChapterNotCreated)
 	}
@@ -70,7 +86,7 @@ func (ch *ChapterController) GetChapterByID(c echo.Context) error {
 
 	chapter, err := ch.Service.GetChapterByID(ch.Ctx, id)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.GetChapterByID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.ChapterNotFound)
 	}
@@ -90,7 +106,7 @@ func (ch *ChapterController) UpdateChapter(c echo.Context) error {
 
 	chapter, err := ch.Service.UpdateChapter(ch.Ctx, id, request)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.UpdateChapter.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -105,7 +121,7 @@ func (ch *ChapterController) DeleteChapter(c echo.Context) error {
 
 	chapter, err := ch.Service.DeleteChapter(ch.Ctx, id)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.DeleteChapter.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotAcceptable, errors.ChapterNotDeleted)
 	}
@@ -125,7 +141,7 @@ func (ch *ChapterController) GetChapterByBookID(c echo.Context) error {
 
 	chapters, err := ch.Service.GetChapterByBookID(ch.Ctx, id, request)
 	if err != nil {
-		ch.Logger.Info("error", slog.String("err", err.Error()))
+		ch.Logger.Info("error", loggerPkg.Err(err))
 		ch.Metrics.IncCounter("controller.chapter.DeleteChapter.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.ChapterNotFound)
 	}

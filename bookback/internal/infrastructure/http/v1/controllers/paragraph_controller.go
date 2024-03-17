@@ -17,6 +17,8 @@ type paragraphService interface {
 	DeleteParagraph(ctx context.Context, id string) (*models.Paragraph, error)
 	ListParagraphs(ctx context.Context, request models.RequestParagraph) ([]*models.Paragraph, error)
 	GetParagraphsByPageID(ctx context.Context, pageID string, request models.RequestParagraph) ([]*models.Paragraph, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleParagraphRequest) (*models.Paragraph, error)
 }
 
 type ParagraphController struct {
@@ -30,6 +32,21 @@ type ParagraphController struct {
 func NewParagraphController(srv paragraphService, metric metrics.Metrics,
 	logger loggerPkg.Logger, ctx context.Context) *ParagraphController {
 	return &ParagraphController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
+}
+
+func (p *ParagraphController) TogglePublic(c echo.Context) error {
+	var request models.ToggleParagraphRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	paragraph, err := p.Service.TogglePublic(p.Ctx, request)
+	if err != nil {
+		p.Logger.Info("error", loggerPkg.Err(err))
+		p.Metrics.IncCounter("controller.Paragraph.TogglePublic.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Paragraph]{Data: paragraph, Status: "ok"})
 }
 
 func (p *ParagraphController) ListParagraphs(c echo.Context) error {

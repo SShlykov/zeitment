@@ -25,6 +25,10 @@ type UpdateParagraphRequest struct {
 	Paragraph *Paragraph `json:"paragraph"`
 }
 
+type ToggleParagraphRequest struct {
+	ParagraphID string `json:"paragraph_id"`
+}
+
 type RequestParagraph struct {
 	Options   PageOptions `json:"options,omitempty"`
 	Paragraph *Paragraph  `json:"paragraph,omitempty"`

@@ -115,6 +115,21 @@ func (mr *MockChapterServiceMockRecorder) ListChapters(arg0, arg1 any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListChapters", reflect.TypeOf((*MockChapterService)(nil).ListChapters), arg0, arg1)
 }
 
+// TogglePublic mocks base method.
+func (m *MockChapterService) TogglePublic(arg0 context.Context, arg1 models.ToggleChapterRequest) (*models.Chapter, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TogglePublic", arg0, arg1)
+	ret0, _ := ret[0].(*models.Chapter)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TogglePublic indicates an expected call of TogglePublic.
+func (mr *MockChapterServiceMockRecorder) TogglePublic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TogglePublic", reflect.TypeOf((*MockChapterService)(nil).TogglePublic), arg0, arg1)
+}
+
 // UpdateChapter mocks base method.
 func (m *MockChapterService) UpdateChapter(arg0 context.Context, arg1 string, arg2 models.UpdateChapterRequest) (*models.Chapter, error) {
 	m.ctrl.T.Helper()

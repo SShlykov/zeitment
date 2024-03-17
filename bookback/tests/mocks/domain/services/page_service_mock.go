@@ -115,6 +115,21 @@ func (mr *MockPageServiceMockRecorder) ListPages(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPages", reflect.TypeOf((*MockPageService)(nil).ListPages), arg0, arg1)
 }
 
+// TogglePublic mocks base method.
+func (m *MockPageService) TogglePublic(arg0 context.Context, arg1 models.TogglePageRequest) (*models.Page, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TogglePublic", arg0, arg1)
+	ret0, _ := ret[0].(*models.Page)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TogglePublic indicates an expected call of TogglePublic.
+func (mr *MockPageServiceMockRecorder) TogglePublic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TogglePublic", reflect.TypeOf((*MockPageService)(nil).TogglePublic), arg0, arg1)
+}
+
 // UpdatePage mocks base method.
 func (m *MockPageService) UpdatePage(arg0 context.Context, arg1 string, arg2 models.UpdatePageRequest) (*models.Page, error) {
 	m.ctrl.T.Helper()

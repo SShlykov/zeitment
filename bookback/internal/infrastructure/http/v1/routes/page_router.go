@@ -22,9 +22,10 @@ func Page(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logge
 	group.Use(middleware.MetricsLogger(metrics))
 
 	group.POST(v1.ListSubPath, cnt.ListPages)
+	group.POST("/chapters"+v1.IDVar, cnt.GetPagesByChapterID)
 	group.POST("", cnt.CreatePage)
 	group.GET(v1.IDVar, cnt.GetPageByID)
 	group.PUT(v1.IDVar, cnt.UpdatePage)
+	group.PUT(v1.ToggleSubPath, cnt.TogglePublic)
 	group.DELETE(v1.IDVar, cnt.DeletePage)
-	group.POST("/chapters"+v1.IDVar, cnt.GetPagesByChapterID)
 }

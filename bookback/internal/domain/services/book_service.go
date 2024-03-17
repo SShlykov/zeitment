@@ -19,6 +19,7 @@ type BookService interface {
 	ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error)
 
 	GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error)
+	TogglePublic(ctx context.Context, request models.ToggleBookRequest) (*models.Book, error)
 }
 
 type BookRepo interface {
@@ -121,6 +122,21 @@ func (s *bookService) GetTableOfContentsByBookID(ctx context.Context, request mo
 	toc.Sections = joinSections(chapters, pages)
 
 	return toc, nil
+}
+
+func (s *bookService) TogglePublic(ctx context.Context, request models.ToggleBookRequest) (*models.Book, error) {
+	book, err := s.repo.FindByID(ctx, request.BookID)
+	if err != nil {
+		return nil, err
+	}
+	
+	book.IsPublic = !book.IsPublic
+	book, err = s.repo.Update(ctx, request.BookID, book)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapters.BookEntityToModel(book), nil
 }
 
 func joinSections(chapters, pages []*entity.Section) []*models.Section {

@@ -22,9 +22,11 @@ func Chapter(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, lo
 	group.Use(middleware.MetricsLogger(metrics))
 
 	group.POST(v1.ListSubPath, cnt.ListChapters)
+	group.POST("/book"+v1.IDVar, cnt.GetChapterByBookID)
 	group.POST("", cnt.CreateChapter)
+
 	group.GET(v1.IDVar, cnt.GetChapterByID)
+	group.PUT(v1.ToggleSubPath, cnt.TogglePublic)
 	group.PUT(v1.IDVar, cnt.UpdateChapter)
 	group.DELETE(v1.IDVar, cnt.DeleteChapter)
-	group.POST("/book"+v1.IDVar, cnt.GetChapterByBookID)
 }

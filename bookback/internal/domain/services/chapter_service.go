@@ -19,6 +19,8 @@ type ChapterService interface {
 	ListChapters(ctx context.Context, request models.RequestChapter) ([]*models.Chapter, error)
 
 	GetChapterByBookID(ctx context.Context, bookID string, request models.RequestChapter) ([]*models.Chapter, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleChapterRequest) (*models.Chapter, error)
 }
 
 type chapterService struct {
@@ -27,6 +29,22 @@ type chapterService struct {
 
 func NewChapterService(chapterRepo SimpleRepo[*entity.Chapter]) ChapterService {
 	return &chapterService{chapterRepo: chapterRepo}
+}
+
+func (ch *chapterService) TogglePublic(ctx context.Context, request models.ToggleChapterRequest) (*models.Chapter, error) {
+	chapter, err := ch.chapterRepo.FindByID(ctx, request.ChapterID)
+	if err != nil {
+		return nil, err
+	}
+	chapter.IsPublic = !chapter.IsPublic
+
+	var updated *entity.Chapter
+	updated, err = ch.chapterRepo.Update(ctx, request.ChapterID, chapter)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapters.ChapterEntityToModel(updated), nil
 }
 
 func (ch *chapterService) CreateChapter(ctx context.Context, request models.CreateChapterRequest) (*models.Chapter, error) {

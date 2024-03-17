@@ -32,7 +32,7 @@ func (p Page) AllFields() []string {
 
 // InsertOrUpdateFields возвращает список полей, используемых при вставке новой записи
 func (p Page) InsertOrUpdateFields() []string {
-	return []string{"title", "order", "text", "chapter_id", "is_public", "map_params_id"}
+	return []string{"title", "number", "text", "chapter_id", "is_public", "map_params_id"}
 }
 
 // EntityToInsertValues преобразует сущность Page в список значений для вставки

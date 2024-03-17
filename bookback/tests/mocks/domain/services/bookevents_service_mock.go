@@ -145,6 +145,21 @@ func (mr *MockBookEventsServiceMockRecorder) GetBookEventsByParagraphID(arg0, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBookEventsByParagraphID", reflect.TypeOf((*MockBookEventsService)(nil).GetBookEventsByParagraphID), arg0, arg1, arg2)
 }
 
+// TogglePublic mocks base method.
+func (m *MockBookEventsService) TogglePublic(arg0 context.Context, arg1 models.ToggleBookEventRequest) (*models.BookEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TogglePublic", arg0, arg1)
+	ret0, _ := ret[0].(*models.BookEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TogglePublic indicates an expected call of TogglePublic.
+func (mr *MockBookEventsServiceMockRecorder) TogglePublic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TogglePublic", reflect.TypeOf((*MockBookEventsService)(nil).TogglePublic), arg0, arg1)
+}
+
 // UpdateBookEvent mocks base method.
 func (m *MockBookEventsService) UpdateBookEvent(arg0 context.Context, arg1 string, arg2 models.UpdateBookEventRequest) (*models.BookEvent, error) {
 	m.ctrl.T.Helper()

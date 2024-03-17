@@ -18,6 +18,8 @@ type PageService interface {
 	ListPages(ctx context.Context, request models.RequestPage) ([]*models.Page, error)
 
 	GetPagesByChapterID(ctx context.Context, chapterID string, request models.RequestPage) ([]*models.Page, error)
+
+	TogglePublic(ctx context.Context, request models.TogglePageRequest) (*models.Page, error)
 }
 
 type pageService struct {
@@ -26,6 +28,22 @@ type pageService struct {
 
 func NewPageService(repo SimpleRepo[*entity.Page]) PageService {
 	return &pageService{repo}
+}
+
+func (s *pageService) TogglePublic(ctx context.Context, request models.TogglePageRequest) (*models.Page, error) {
+	page, err := s.repo.FindByID(ctx, request.PageID)
+	if err != nil {
+		return nil, err
+	}
+	page.IsPublic = !page.IsPublic
+
+	var updated *entity.Page
+	updated, err = s.repo.Update(ctx, request.PageID, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapters.PageEntityToModel(updated), nil
 }
 
 func (s *pageService) CreatePage(ctx context.Context, request models.CreatePageRequest) (*models.Page, error) {

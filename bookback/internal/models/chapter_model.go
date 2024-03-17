@@ -27,6 +27,10 @@ type UpdateChapterRequest struct {
 	Chapter *Chapter `json:"chapter"`
 }
 
+type ToggleChapterRequest struct {
+	ChapterID string `json:"chapter_id"`
+}
+
 type RequestChapter struct {
 	Options PageOptions `json:"options,omitempty"`
 	Chapter *Chapter    `json:"chapter,omitempty"`

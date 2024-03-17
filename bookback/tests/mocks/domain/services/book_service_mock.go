@@ -115,6 +115,21 @@ func (mr *MockBookServiceMockRecorder) ListBooks(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBooks", reflect.TypeOf((*MockBookService)(nil).ListBooks), arg0, arg1)
 }
 
+// TogglePublic mocks base method.
+func (m *MockBookService) TogglePublic(arg0 context.Context, arg1 models.ToggleBookRequest) (*models.Book, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TogglePublic", arg0, arg1)
+	ret0, _ := ret[0].(*models.Book)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TogglePublic indicates an expected call of TogglePublic.
+func (mr *MockBookServiceMockRecorder) TogglePublic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TogglePublic", reflect.TypeOf((*MockBookService)(nil).TogglePublic), arg0, arg1)
+}
+
 // UpdateBook mocks base method.
 func (m *MockBookService) UpdateBook(arg0 context.Context, arg1 string, arg2 models.UpdateBookRequest) (*models.Book, error) {
 	m.ctrl.T.Helper()

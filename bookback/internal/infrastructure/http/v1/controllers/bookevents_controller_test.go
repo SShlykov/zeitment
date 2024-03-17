@@ -13,6 +13,35 @@ import (
 	"testing"
 )
 
+func TestBookEventController_TogglePublic(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	fixture := NewTestFixture(v1.BookEventsPath)
+
+	service := mocks.NewMockBookEventsService(ctrl)
+	bookEvent := &models.BookEvent{ID: fixture.ID}
+	service.EXPECT().TogglePublic(gomock.Any(), gomock.Any()).Return(bookEvent, nil)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, v1.BookEventsPath+v1.ToggleSubPath, strings.NewReader(fixture.RequestPageOptions))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	bc := NewBookEventController(service, fixture.Metrics, fixture.Logger, fixture.Context)
+	err := bc.TogglePublic(c)
+	if err != nil {
+		return
+	}
+
+	assert.Empty(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.True(t, strings.Contains(rec.Body.String(), `"status":"ok"`))
+	assert.True(t, strings.Contains(rec.Body.String(), `"data":`))
+	assert.True(t, strings.Contains(rec.Body.String(), fixture.ID))
+}
+
 func TestBookEventController_GetBookEventByID(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)

@@ -115,6 +115,21 @@ func (mr *MockParagraphServiceMockRecorder) ListParagraphs(arg0, arg1 any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListParagraphs", reflect.TypeOf((*MockParagraphService)(nil).ListParagraphs), arg0, arg1)
 }
 
+// TogglePublic mocks base method.
+func (m *MockParagraphService) TogglePublic(arg0 context.Context, arg1 models.ToggleParagraphRequest) (*models.Paragraph, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TogglePublic", arg0, arg1)
+	ret0, _ := ret[0].(*models.Paragraph)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TogglePublic indicates an expected call of TogglePublic.
+func (mr *MockParagraphServiceMockRecorder) TogglePublic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TogglePublic", reflect.TypeOf((*MockParagraphService)(nil).TogglePublic), arg0, arg1)
+}
+
 // UpdateParagraph mocks base method.
 func (m *MockParagraphService) UpdateParagraph(arg0 context.Context, arg1 string, arg2 models.UpdateParagraphRequest) (*models.Paragraph, error) {
 	m.ctrl.T.Helper()

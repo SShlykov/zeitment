@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/errors"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
@@ -19,6 +20,7 @@ type bookService interface {
 	ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error)
 
 	GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error)
+	TogglePublic(ctx context.Context, request models.ToggleBookRequest) (*models.Book, error)
 }
 
 // BookController структура для HTTP-контроллера книг.
@@ -32,6 +34,23 @@ type BookController struct {
 // NewBookController создает новый экземпляр Controller.
 func NewBookController(srv bookService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *BookController {
 	return &BookController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
+}
+
+func (bc *BookController) TogglePublic(c echo.Context) error {
+	var request models.ToggleBookRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	book, err := bc.Service.TogglePublic(bc.Ctx, request)
+	if err != nil {
+		bc.Logger.Info("error", loggerPkg.Err(err))
+		bc.Metrics.IncCounter("controller.book.TogglePublic.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+
+	fmt.Println("book", book)
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Book]{Data: book, Status: "ok"})
 }
 
 func (bc *BookController) GetTableOfContentsByBookID(c echo.Context) error {
@@ -72,7 +91,7 @@ func (bc *BookController) GetBookByID(c echo.Context) error {
 
 	book, err := bc.Service.GetBookByID(bc.Ctx, id)
 	if err != nil {
-		bc.Logger.Info("error", slog.String("id", id), slog.String("err", err.Error()))
+		bc.Logger.Info("error", slog.String("id", id), loggerPkg.Err(err))
 		bc.Metrics.IncCounter("controller.book.GetBookByID.error", err.Error())
 		return echo.NewHTTPError(http.StatusNotFound, errors.BookNotFound)
 	}
@@ -88,7 +107,7 @@ func (bc *BookController) CreateBook(c echo.Context) error {
 
 	createdBook, err := bc.Service.CreateBook(bc.Ctx, request)
 	if err != nil {
-		bc.Logger.Info("error", slog.String("err", err.Error()))
+		bc.Logger.Info("error", loggerPkg.Err(err))
 		bc.Metrics.IncCounter("controller.book.CreateBook.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookNotCreated)
 	}
@@ -108,7 +127,7 @@ func (bc *BookController) UpdateBook(c echo.Context) error {
 
 	updatedBook, err := bc.Service.UpdateBook(bc.Ctx, id, request)
 	if err != nil {
-		bc.Logger.Info("error", slog.String("err", err.Error()))
+		bc.Logger.Info("error", loggerPkg.Err(err))
 		bc.Metrics.IncCounter("controller.book.UpdateBook.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}
@@ -123,7 +142,7 @@ func (bc *BookController) DeleteBook(c echo.Context) error {
 
 	book, err := bc.Service.DeleteBook(bc.Ctx, id)
 	if err != nil {
-		bc.Logger.Info("error", slog.String("err", err.Error()))
+		bc.Logger.Info("error", loggerPkg.Err(err))
 		bc.Metrics.IncCounter("controller.book.DeleteBook.error", err.Error())
 		return echo.NewHTTPError(http.StatusBadRequest, errors.BookNotDeleted)
 	}

@@ -15,4 +15,5 @@ const (
 	BookSubPath    = "/book"
 	ChapterSubPath = "/chapter"
 	ListSubPath    = "/list"
+	ToggleSubPath  = "/toggle"
 )

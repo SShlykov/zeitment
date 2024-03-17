@@ -26,6 +26,8 @@ func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logge
 	group.POST(v1.ListSubPath, cntr.ListBooks)
 	group.POST("", cntr.CreateBook)
 	group.GET(v1.IDVar, cntr.GetBookByID)
+
+	group.PUT(v1.ToggleSubPath, cntr.TogglePublic)
 	group.PUT(v1.IDVar, cntr.UpdateBook)
 	group.DELETE(v1.IDVar, cntr.DeleteBook)
 }

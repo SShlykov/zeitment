@@ -17,6 +17,8 @@ type ParagraphService interface {
 	ListParagraphs(ctx context.Context, request models.RequestParagraph) ([]*models.Paragraph, error)
 
 	GetParagraphsByPageID(ctx context.Context, pageID string, request models.RequestParagraph) ([]*models.Paragraph, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleParagraphRequest) (*models.Paragraph, error)
 }
 
 type paragraphService struct {
@@ -25,6 +27,22 @@ type paragraphService struct {
 
 func NewParagraphService(repo SimpleRepo[*entity.Paragraph]) ParagraphService {
 	return &paragraphService{repo}
+}
+
+func (s *paragraphService) TogglePublic(ctx context.Context, request models.ToggleParagraphRequest) (*models.Paragraph, error) {
+	paragraph, err := s.repo.FindByID(ctx, request.ParagraphID)
+	if err != nil {
+		return nil, err
+	}
+	paragraph.IsPublic = !paragraph.IsPublic
+
+	var updated *entity.Paragraph
+	updated, err = s.repo.Update(ctx, request.ParagraphID, paragraph)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapters.ParagraphEntityToModel(updated), nil
 }
 
 func (s *paragraphService) CreateParagraph(ctx context.Context, request models.CreateParagraphRequest) (*models.Paragraph, error) {

@@ -30,6 +30,9 @@ type CreateBookEventRequest struct {
 type UpdateBookEventRequest struct {
 	BookEvent *BookEvent `json:"book_event"`
 }
+type ToggleBookEventRequest struct {
+	BookEventID string `json:"book_event_id"`
+}
 
 type RequestBookEvent struct {
 	Options   PageOptions `json:"options,omitempty"`

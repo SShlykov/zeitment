@@ -25,6 +25,10 @@ type UpdatePageRequest struct {
 	Page *Page `json:"page"`
 }
 
+type TogglePageRequest struct {
+	PageID string `json:"page_id"`
+}
+
 type RequestPage struct {
 	Options PageOptions `json:"options,omitempty"`
 	Page    *Page       `json:"page,omitempty"`

@@ -13,6 +13,32 @@ import (
 	"testing"
 )
 
+func TestPageController_TogglePublic(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	fixture := NewTestFixture(v1.PagesPath)
+
+	service := mocks.NewMockPageService(ctrl)
+	page := &models.Page{ID: fixture.ID}
+	service.EXPECT().TogglePublic(gomock.Any(), gomock.Any()).Return(page, nil)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, v1.PagesPath+v1.ToggleSubPath, strings.NewReader(fixture.RequestPageOptions))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	cc := NewPageController(service, fixture.Metrics, fixture.Logger, fixture.Context)
+	err := cc.TogglePublic(c)
+
+	assert.Empty(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.True(t, strings.Contains(rec.Body.String(), `"status":"ok"`))
+	assert.True(t, strings.Contains(rec.Body.String(), `"data":`))
+	assert.True(t, strings.Contains(rec.Body.String(), fixture.ID))
+}
+
 func TestPageController_ListPages(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)

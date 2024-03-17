@@ -20,6 +20,8 @@ type BookEventsService interface {
 	GetBookEventsByChapterID(ctx context.Context, chapterID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
 	GetBookEventsByPageID(ctx context.Context, pageID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
 	GetBookEventsByParagraphID(ctx context.Context, paragraphID string, request models.RequestBookEvent) ([]*models.BookEvent, error)
+
+	TogglePublic(ctx context.Context, request models.ToggleBookEventRequest) (*models.BookEvent, error)
 }
 
 type bookEventsService struct {
@@ -28,6 +30,22 @@ type bookEventsService struct {
 
 func NewBookEventsService(repo SimpleRepo[*entity.BookEvent]) BookEventsService {
 	return &bookEventsService{repo}
+}
+
+func (s *bookEventsService) TogglePublic(ctx context.Context, request models.ToggleBookEventRequest) (*models.BookEvent, error) {
+	bookEvent, err := s.repo.FindByID(ctx, request.BookEventID)
+	if err != nil {
+		return nil, err
+	}
+	bookEvent.IsPublic = !bookEvent.IsPublic
+	
+	var updated *entity.BookEvent
+	updated, err = s.repo.Update(ctx, request.BookEventID, bookEvent)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapters.BookEventEntityToModel(updated), nil
 }
 
 func (s *bookEventsService) CreateBookEvent(ctx context.Context, request models.CreateBookEventRequest) (*models.BookEvent, error) {

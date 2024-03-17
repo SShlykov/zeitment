@@ -17,6 +17,8 @@ type pageService interface {
 	DeletePage(ctx context.Context, id string) (*models.Page, error)
 	ListPages(ctx context.Context, page models.RequestPage) ([]*models.Page, error)
 	GetPagesByChapterID(ctx context.Context, chapterID string, page models.RequestPage) ([]*models.Page, error)
+
+	TogglePublic(ctx context.Context, request models.TogglePageRequest) (*models.Page, error)
 }
 
 type PageController struct {
@@ -28,6 +30,21 @@ type PageController struct {
 
 func NewPageController(srv pageService, metric metrics.Metrics, logger loggerPkg.Logger, ctx context.Context) *PageController {
 	return &PageController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
+}
+
+func (p *PageController) TogglePublic(c echo.Context) error {
+	var request models.TogglePageRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	page, err := p.Service.TogglePublic(p.Ctx, request)
+	if err != nil {
+		p.Logger.Info("error", loggerPkg.Err(err))
+		p.Metrics.IncCounter("controller.Page.TogglePublic.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.Page]{Data: page, Status: "ok"})
 }
 
 func (p *PageController) ListPages(c echo.Context) error {

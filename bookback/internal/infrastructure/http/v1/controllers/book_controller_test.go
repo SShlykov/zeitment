@@ -24,7 +24,7 @@ func TestBookController_GetTableOfContentsByBookID(t *testing.T) {
 	service.EXPECT().GetTableOfContentsByBookID(gomock.Any(), gomock.Any()).Return(toc, nil)
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, v1.BooksPath+"/table_of_content", strings.NewReader(fixture.RequestPageOptions))
+	req := httptest.NewRequest(http.MethodPost, v1.BooksPath+v1.ToggleSubPath, strings.NewReader(fixture.RequestPageOptions))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

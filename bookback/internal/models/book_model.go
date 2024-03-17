@@ -28,6 +28,10 @@ type UpdateBookRequest struct {
 	Book *Book `json:"book"`
 }
 
+type ToggleBookRequest struct {
+	BookID string `json:"book_id"`
+}
+
 type RequestBook struct {
 	Options PageOptions `json:"options"`
 	Book    *Book       `json:"book,omitempty"`
