@@ -1,13 +1,13 @@
 <script>
 import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader/BookEditorHeader.vue";
-import BookEditorChaptersMenu from "@organisms/BookEditor/BookEditorChaptersMenu.vue";
+import BookEditorMenu from "@organisms/BookEditor/BookEditorMenu/BookEditorMenu.vue";
 import BookEditorBody from "@organisms/BookEditor/BookEditorBody.vue";
 import {mapGetters} from "vuex";
 
 
 export default {
   name: 'BookEditor',
-  components: {BookEditorHeader, BookEditorChaptersMenu, BookEditorBody},
+  components: {BookEditorHeader, BookEditorMenu, BookEditorBody},
   props: {
     serviceOfBooks: {
       type: Object,
@@ -41,7 +41,7 @@ export default {
       :bookManager="bookManager"
     />
     <div class="w-full flex flex-grow">
-      <BookEditorChaptersMenu />
+      <BookEditorMenu />
       <BookEditorBody />
     </div>
   </div>

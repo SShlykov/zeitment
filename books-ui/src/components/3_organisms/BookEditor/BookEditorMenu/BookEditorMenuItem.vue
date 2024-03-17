@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'BookEditorChaptersMenu',
+  name: 'BookEditorMenuItem',
   components: {},
   computed: {},
   mounted() {},

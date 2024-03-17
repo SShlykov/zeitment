@@ -110,6 +110,11 @@ class ServiceOfBooks {
     await this.store.dispatch('books/saveEditableBook', book);
     return book;
   }
+
+  async fetchTableOfContent(bookId) {
+    const tableOfContent = await this.adapterOfBooks.getTableOfContent(bookId);
+    this.store.dispatch('books/saveTableOfContent', tableOfContent);
+  }
 }
 
 export default ServiceOfBooks;

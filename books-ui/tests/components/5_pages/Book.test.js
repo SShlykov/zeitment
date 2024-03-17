@@ -1,5 +1,5 @@
 import {test, describe, expect, vi} from 'vitest'
-import { mount} from '@vue/test-utils.proto'
+import { mount} from '@vue/test-utils'
 import BookPage from '@pages/Book/Book.vue';
 import {createStore} from "vuex";
 import {store as books} from "@store/modules/books/index.js";

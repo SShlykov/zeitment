@@ -1,8 +1,9 @@
 <script>
-import AdapterOfBooks from '@/adapters/AdapterOfBooks'
+import AdapterOfBooks from '@adapters/AdapterOfBooks/AdapterOfBooks'
 import AdapterOfChapters from '@/adapters/AdapterOfChapters'
 import AdapterOfPages from '@/adapters/AdapterOfPages'
 import AdapterOfParagraphs from '@/adapters/AdapterOfParagraphs'
+import AdapterOfEvents from '@/adapters/AdapterOfEvents'
 
 const startIntegrationTests = (adapter, logFunction) => {
   adapter.integrationTests(logFunction)
@@ -26,6 +27,11 @@ export default {
         ...this.testData,
         data
       ]
+    },
+    testEvent() {
+      const eventsAdapter = new AdapterOfEvents(this.url)
+      this.testData = []
+      return startIntegrationTests(eventsAdapter, this.logFunction)
     },
     testBook() {
       const booksAdapter = new AdapterOfBooks(this.url)
@@ -87,6 +93,13 @@ export default {
         @click="testParagraph"
       >
         Тесты параграфов
+      </button>
+      <button
+        type="button"
+        class="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-xs px-3 py-2 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+        @click="testEvent"
+      >
+        Тесты событий
       </button>
     </div>
     <pre>

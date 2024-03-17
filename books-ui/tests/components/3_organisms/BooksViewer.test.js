@@ -1,5 +1,5 @@
 import {test, describe, expect, vi} from 'vitest'
-import { mount} from '@vue/test-utils.proto'
+import { mount} from '@vue/test-utils'
 import {createStore} from "vuex";
 import BooksViewer from '@organisms/BooksViewer/BooksViewer.vue';
 import BooksViewerContainer from '@organisms/BooksViewer/BooksViewerContainer.vue';

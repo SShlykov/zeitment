@@ -69,7 +69,7 @@ class AdapterOfPages {
     let {data: pages} = await post(`${this.url}/pages/chapters/${chapterId}`, {
       "options": {page, page_size}
     })
-    pages = pages || []
+    // pages = pages || []
     return convertList(pages, {config: this.adapterFromApiConfig})
   }
 
@@ -134,6 +134,7 @@ class AdapterOfPages {
     logFunction(books)
     logFunction("Список страниц в главе")
     const pagesByBook = await this.getPagesByChapterId("af3ff4ad-bc7d-4e64-acf8-bbd874d4516b")
+    logFunction(pagesByBook)
     logFunction("Создание страницы")
     const newPage = await this.createPage({
       "title": "Page 4",

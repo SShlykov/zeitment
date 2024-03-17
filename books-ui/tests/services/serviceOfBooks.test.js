@@ -3,6 +3,7 @@ import {createStore} from "vuex";
 import { store as books } from '@/store/modules/books';
 import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {AdapterOfBooks, appBook} from "@mocks/books.js"
+import {appTableOfContent} from "@mocks/tableOfContent.js"
 
 describe('serviceOfBooks', () => {
   const store = createStore({
@@ -106,5 +107,11 @@ describe('serviceOfBooks', () => {
     await serviceOfBooks.fetchEditableBook(appBook.id)
     const editableBook = store.getters['books/editableBook']
     expect(editableBook).toEqual(appBook)
+  })
+
+  test("fetch table of content", async () => {
+    await serviceOfBooks.fetchTableOfContent(appBook.id)
+    const tableOfContent = store.getters['books/tableOfContent']
+    expect(tableOfContent).toEqual(appTableOfContent)
   })
 })

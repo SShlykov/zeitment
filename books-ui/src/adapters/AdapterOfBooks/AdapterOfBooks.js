@@ -2,23 +2,7 @@ import {get, post, put, remove} from '@helpers/apiHelpers.js'
 import {convertList, convertObject} from '@helpers/adapter/adapter.js'
 import {fetchParamsByDefaultObject, reverseObject} from '@helpers/objectUtils'
 import {is} from "ramda";
-
-const adapterConfig = {
-  "id": "id",
-  "created_at": "createdAt",
-  "updated_at": "updatedAt",
-  "deleted_at": "deletedAt",
-  "owner": "owner",
-  "title": "title",
-  "author": "author",
-  "description": "description",
-  "is_public": "isPublic",
-  "publication": "publication",
-  "image_link": "imageLink",
-  "map_link": "mapLink",
-  "map_params_id": "mapParamsId",
-  "variables": "variables"
-}
+import {adapterConfig, adapterTOCConfig, adapterTOCItemConfig} from "./configs.js"
 
 
 /**
@@ -48,7 +32,11 @@ class AdapterOfBooks {
    */
   constructor(url) {
     this.adapterFromApiConfig = adapterConfig
+    this.adapterFromApiTOCConfig = adapterTOCConfig
+    this.adapterFromApiTOCItemConfig = adapterTOCItemConfig
     this.adapterToApiConfig = reverseObject(this.adapterFromApiConfig)
+    this.adapterToApiTOCConfig = reverseObject(this.adapterFromApiTOCConfig)
+    this.adapterToApiTOCItemConfig = reverseObject(this.adapterFromApiTOCItemConfig)
     this.url = url
   }
 
@@ -124,10 +112,28 @@ class AdapterOfBooks {
   }
 
   /**
+   *
+   * @param {Number} bookId
+   * @returns {Promise<{[p: string]: *}>}
+   */
+  async getTableOfContent(bookId) {
+    let {data: tableOfContent} = await post(`${this.url}/books/table_of_content`, {
+      "book_id": bookId
+    })
+    tableOfContent = convertObject(tableOfContent, {config: this.adapterFromApiTOCConfig})
+    const sections = convertList(tableOfContent.sections, {config: this.adapterFromApiTOCItemConfig})
+    tableOfContent = {...tableOfContent, sections}
+    return tableOfContent
+  }
+
+  /**
    * @param {Function} logFunction
    * @returns {Promise<null>}
    */
   async integrationTests(logFunction) {
+    logFunction("Оглавление книги")
+    const tableOfContent = await this.getTableOfContent("fb5e7d1d-38cd-4831-bae9-07b36080e3e7")
+    logFunction(tableOfContent)
     logFunction("Список книг")
     const books = await this.getBooks()
     logFunction(books)

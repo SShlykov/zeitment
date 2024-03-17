@@ -1,3 +1,5 @@
+import {appTableOfContent} from "@mocks/tableOfContent.js";
+
 const appBook = {
   "id": "fb5e7d1d-38cd-4831-bae9-07b36080e3e7",
   "createdAt": "2024-03-01T23:47:35.711668+03:00",
@@ -31,6 +33,7 @@ const apiBook = {
   "map_params_id": null,
   "variables": []
 }
+
 
 const apiBooksResponse = {
   data: [apiBook],
@@ -68,6 +71,10 @@ class AdapterOfBooks {
 
   async getBookById() {
     return appBook
+  }
+
+  async getTableOfContent() {
+    return appTableOfContent
   }
 }
 

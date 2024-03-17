@@ -1,5 +1,5 @@
 import {expect, describe, test, vi, beforeEach} from 'vitest'
-import {mount} from "@vue/test-utils.proto";
+import {mount} from "@vue/test-utils";
 import SideMenu from "@frames/SideMenu/SideMenu.vue";
 import SideMenuList from "@frames/SideMenu/SideMenuList.vue";
 import SideMenuHead from "@frames/SideMenu/SideMenuHead.vue";

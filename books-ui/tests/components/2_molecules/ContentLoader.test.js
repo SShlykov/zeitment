@@ -1,5 +1,5 @@
 import {test, describe, expect} from 'vitest'
-import { mount} from '@vue/test-utils.proto'
+import { mount} from '@vue/test-utils'
 import ContentLoader from '@molecules/VCardsContainer.vue';
 
 describe("tests of ContentLoader", () => {
