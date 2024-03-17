@@ -32,3 +32,7 @@ type RequestBook struct {
 	Options PageOptions `json:"options"`
 	Book    *Book       `json:"book,omitempty"`
 }
+
+type RequestTOC struct {
+	BookID string `json:"book_id"`
+}

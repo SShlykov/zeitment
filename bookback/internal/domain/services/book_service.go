@@ -17,14 +17,22 @@ type BookService interface {
 	UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error)
 	DeleteBook(ctx context.Context, id string) (*models.Book, error)
 	ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error)
+
+	GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error)
+}
+
+type BookRepo interface {
+	SimpleRepo[*entity.Book]
+	GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity.Section, error)
+	GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity.Section, error)
 }
 
 type bookService struct {
-	repo SimpleRepo[*entity.Book]
+	repo BookRepo
 }
 
 // NewBookService создает новый экземпляр Service.
-func NewBookService(repo SimpleRepo[*entity.Book]) BookService {
+func NewBookService(repo BookRepo) BookService {
 	return &bookService{repo}
 }
 
@@ -83,4 +91,61 @@ func (s *bookService) ListBooks(ctx context.Context, request models.RequestBook)
 	}
 
 	return adapters.BooksEntityToModel(books), nil
+}
+
+func (s *bookService) GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error) {
+	book, err := s.repo.FindByID(ctx, request.BookID)
+	if err != nil {
+		return nil, err
+	}
+
+	toc := &models.TableOfContents{
+		BookID:    book.ID,
+		BookTitle: book.Title,
+		Author:    book.Owner,        // TODO: change to author name when Auth service will be implemented
+		Tags:      make([]string, 0), // TODO: implement tags
+	}
+
+	var chapters []*entity.Section
+	chapters, err = s.repo.GetTOCSectionsFromChapters(ctx, request.BookID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pages []*entity.Section
+	pages, err = s.repo.GetTOCSectionsFromPages(ctx, request.BookID)
+	if err != nil {
+		return nil, err
+	}
+
+	toc.Sections = joinSections(chapters, pages)
+
+	return toc, nil
+}
+
+func joinSections(chapters, pages []*entity.Section) []*models.Section {
+	sections := make([]*models.Section, 0)
+	pageSectionSet := make(map[string][]*models.Section)
+
+	for _, page := range pages { // тут страницы отсортированы верно
+		pageSection := adapters.TocSectionEntityToModel(page)
+		pageSectionSet[page.ParentID] = append(pageSectionSet[page.ParentID], pageSection)
+	}
+
+	for _, chapter := range chapters {
+		var chapID = chapter.ID
+		var chapIsPublic = chapter.IsPublic
+		chapOrder := chapter.Order * 1_000 // предполагаем, что у нас не будет больше 1000 страниц в главе
+		chapterSection := adapters.TocSectionEntityToModel(chapter)
+		chapterSection.Order = chapOrder
+		sections = append(sections, chapterSection)
+
+		for _, pageSection := range pageSectionSet[chapID] {
+			pageSection.Order = chapOrder + pageSection.Order
+			pageSection.IsPublic = chapIsPublic && pageSection.IsPublic
+			sections = append(sections, pageSection)
+		}
+	}
+
+	return sections
 }

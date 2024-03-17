@@ -17,6 +17,8 @@ type bookService interface {
 	UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error)
 	DeleteBook(ctx context.Context, id string) (*models.Book, error)
 	ListBooks(ctx context.Context, request models.RequestBook) ([]*models.Book, error)
+
+	GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error)
 }
 
 // BookController структура для HTTP-контроллера книг.
@@ -32,6 +34,21 @@ func NewBookController(srv bookService, metric metrics.Metrics, logger loggerPkg
 	return &BookController{Service: srv, Metrics: metric, Logger: logger, Ctx: ctx}
 }
 
+func (bc *BookController) GetTableOfContentsByBookID(c echo.Context) error {
+	var request models.RequestTOC
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.ValidationFailed)
+	}
+
+	toc, err := bc.Service.GetTableOfContentsByBookID(bc.Ctx, request)
+	if err != nil {
+		bc.Logger.Info("error", loggerPkg.Err(err))
+		bc.Metrics.IncCounter("controller.book.GetTableOfContentsByBookID.error", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
+	}
+	return c.JSON(http.StatusOK, models.WebResponse[*models.TableOfContents]{Data: toc, Status: "ok"})
+}
+
 func (bc *BookController) ListBooks(c echo.Context) error {
 	var request models.RequestBook
 	if err := c.Bind(&request); err != nil {
@@ -40,7 +57,7 @@ func (bc *BookController) ListBooks(c echo.Context) error {
 
 	books, err := bc.Service.ListBooks(bc.Ctx, request)
 	if err != nil {
-		bc.Logger.Info("error", slog.Group("err", err))
+		bc.Logger.Info("error", loggerPkg.Err(err))
 		bc.Metrics.IncCounter("controller.book.ListBooks.error", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, errors.Unknown)
 	}

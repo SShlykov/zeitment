@@ -22,6 +22,7 @@ func Book(e *echo.Echo, database postgres.Client, metrics metrics.Metrics, logge
 	group := e.Group(v1.BooksPath)
 	group.Use(middleware.MetricsLogger(metrics))
 
+	group.POST("/table_of_content", cntr.GetTableOfContentsByBookID)
 	group.POST(v1.ListSubPath, cntr.ListBooks)
 	group.POST("", cntr.CreateBook)
 	group.GET(v1.IDVar, cntr.GetBookByID)

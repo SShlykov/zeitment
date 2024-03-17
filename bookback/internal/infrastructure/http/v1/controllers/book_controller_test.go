@@ -13,6 +13,36 @@ import (
 	"testing"
 )
 
+func TestBookController_GetTableOfContentsByBookID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	fixture := NewTestFixture(v1.BooksPath)
+
+	service := mocks.NewMockBookService(ctrl)
+	toc := &models.TableOfContents{BookID: fixture.ID}
+	service.EXPECT().GetTableOfContentsByBookID(gomock.Any(), gomock.Any()).Return(toc, nil)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, v1.BooksPath+"/table_of_content", strings.NewReader(fixture.RequestPageOptions))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	bc := NewBookController(service, fixture.Metrics, fixture.Logger, fixture.Context)
+	err := bc.GetTableOfContentsByBookID(c)
+	if err != nil {
+		return
+	}
+	body := rec.Body.String()
+
+	assert.Empty(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.True(t, strings.Contains(body, `"status":"ok"`))
+	assert.True(t, strings.Contains(body, `"data":`))
+	assert.True(t, strings.Contains(body, `"book_id":"12b9b045-0845-462c-b372-0fca3180a6af"`))
+}
+
 func TestBookController_ListBooks(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

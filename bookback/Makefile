@@ -23,7 +23,7 @@ ifeq ($(mn),)
 	$(error mn is not set)
 endif
 	mkdir -p migrations
-	goose -dir migrations create $(mn) sql
+	goose -dir database/migrations create $(mn) sql
 
 migrate:
 	goose -dir migrations postgres ... up

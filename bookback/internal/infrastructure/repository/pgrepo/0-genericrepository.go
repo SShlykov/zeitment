@@ -196,7 +196,7 @@ func (r *repository[T]) readItem(row pgx.Row) (*T, error) {
 }
 
 func (r *repository[T]) readList(rows pgx.Rows) ([]*T, error) {
-	var result []*T
+	result := make([]*T, 0)
 	defer rows.Close()
 
 	for rows.Next() {

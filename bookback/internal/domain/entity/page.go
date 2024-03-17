@@ -13,6 +13,7 @@ type Page struct {
 	UpdatedAt   time.Time
 	DeletedAt   sql.NullTime
 	Title       string
+	Number      int
 	Text        string
 	ChapterID   string
 	IsPublic    bool
@@ -26,23 +27,23 @@ func (p Page) TableName() string {
 
 // AllFields возвращает список всех полей структуры Page
 func (p Page) AllFields() []string {
-	return []string{"id", "created_at", "updated_at", "deleted_at", "title", "text", "chapter_id", "is_public", "map_params_id"}
+	return []string{"id", "created_at", "updated_at", "deleted_at", "title", "number", "text", "chapter_id", "is_public", "map_params_id"}
 }
 
-// InsertFields возвращает список полей, используемых при вставке новой записи
+// InsertOrUpdateFields возвращает список полей, используемых при вставке новой записи
 func (p Page) InsertOrUpdateFields() []string {
-	return []string{"title", "text", "chapter_id", "is_public", "map_params_id"}
+	return []string{"title", "order", "text", "chapter_id", "is_public", "map_params_id"}
 }
 
 // EntityToInsertValues преобразует сущность Page в список значений для вставки
 func (p Page) EntityToInsertValues(entity *Page) []interface{} {
-	return []interface{}{entity.Title, entity.Text, entity.ChapterID, entity.IsPublic, entity.MapParamsID}
+	return []interface{}{entity.Title, entity.Number, entity.Text, entity.ChapterID, entity.IsPublic, entity.MapParamsID}
 }
 
 // ReadItem читает одну запись из строки запроса
 func (p Page) ReadItem(row pgx.Row) (Page, error) {
 	var page Page
-	err := row.Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt, &page.DeletedAt, &page.Title, &page.Text,
+	err := row.Scan(&page.ID, &page.CreatedAt, &page.UpdatedAt, &page.DeletedAt, &page.Title, &page.Number, &page.Text,
 		&page.ChapterID, &page.IsPublic, &page.MapParamsID)
 	if err != nil {
 		return Page{}, err

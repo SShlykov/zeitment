@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/endpoint"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
-	"log/slog"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"sync"
 )
 
@@ -28,7 +28,7 @@ func (app *App) RunWebServer(wg *sync.WaitGroup) {
 
 		err := endpoint.RunServer(app.web, app.logger)
 		if err != nil {
-			app.logger.Error("HTTP server stopped", slog.Group("err", err))
+			app.logger.Error("HTTP server stopped", loggerPkg.Err(err))
 		}
 	}()
 }

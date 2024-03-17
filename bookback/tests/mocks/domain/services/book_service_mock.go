@@ -85,6 +85,21 @@ func (mr *MockBookServiceMockRecorder) GetBookByID(arg0, arg1 any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBookByID", reflect.TypeOf((*MockBookService)(nil).GetBookByID), arg0, arg1)
 }
 
+// GetTableOfContentsByBookID mocks base method.
+func (m *MockBookService) GetTableOfContentsByBookID(arg0 context.Context, arg1 models.RequestTOC) (*models.TableOfContents, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTableOfContentsByBookID", arg0, arg1)
+	ret0, _ := ret[0].(*models.TableOfContents)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTableOfContentsByBookID indicates an expected call of GetTableOfContentsByBookID.
+func (mr *MockBookServiceMockRecorder) GetTableOfContentsByBookID(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTableOfContentsByBookID", reflect.TypeOf((*MockBookService)(nil).GetTableOfContentsByBookID), arg0, arg1)
+}
+
 // ListBooks mocks base method.
 func (m *MockBookService) ListBooks(arg0 context.Context, arg1 models.RequestBook) ([]*models.Book, error) {
 	m.ctrl.T.Helper()
