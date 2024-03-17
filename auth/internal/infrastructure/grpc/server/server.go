@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/pkg/user_v1"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/services"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/pgrepo"
+	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	logPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/postgres"
 	"google.golang.org/grpc"
@@ -23,7 +23,7 @@ func NewServer(logger logPkg.Logger, db postgres.Client) error {
 	s := grpc.NewServer()
 
 	reflection.Register(s)
-	
+
 	RegisterUserService(s, db)
 
 	logger.Info("gRPC server started", logPkg.Int("port", port))

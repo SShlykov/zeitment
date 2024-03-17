@@ -1,0 +1,6 @@
+tmp/*.db
+tmp/*.go
+/vendor/
+Makefile
+.env
+bin

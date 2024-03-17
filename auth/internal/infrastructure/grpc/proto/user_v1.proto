@@ -5,15 +5,47 @@ package user_v1;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
+import "annotations.proto";
 
 option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/proto/user_v1;user_v1";
 
 service UserService {
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
-  rpc GetUser(GetUserRequest) returns (GetUserResponse);
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+  //Регистрация пользователя
+  rpc SignUp (SignUpRequest) returns (SignUpResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/signup"
+    };
+  }
+
+  //Аутентификация пользователя
+  rpc SignIn (SignInRequest) returns (SignInResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/signin"
+    };
+  }
+
+  rpc SignOut (SignOutRequest) returns (SignOutResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/signout"
+    };
+  }
+  //------------------------------------------------------------------------------------------------------------------
+  // CRUD operations
+  //------------------------------------------------------------------------------------------------------------------
+  rpc Create(CreateUserRequest) returns (CreateUserResponse) {};
+  rpc Update(UpdateUserRequest) returns (UpdateUserResponse) {};
+  rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {};
+  rpc Get(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/{id}"
+    };
+  };
+  rpc Find(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user",
+      body: "*"
+    };
+  };
 }
 
 message User {
@@ -32,6 +64,45 @@ message User {
   google.protobuf.Int64Value update_after = 11;
 }
 
+//------------------------------------------------------------------------------------------------------------------
+//  SignUp
+//------------------------------------------------------------------------------------------------------------------
+message SignUpRequest {
+  User user = 1;
+  string Password = 2;
+}
+message SignUpResponse {
+  string Status = 1;
+  string RoleName = 2;
+  string Token = 3;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  SignIn
+//------------------------------------------------------------------------------------------------------------------
+message SignInRequest {
+  string LoginOrEmail = 1;
+  string Password = 2;
+}
+message SignInResponse {
+  string Status = 1;
+  string RoleName = 2;
+  string Token = 3;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  SignOut
+//------------------------------------------------------------------------------------------------------------------
+message SignOutRequest {
+  string Token = 1;
+}
+message SignOutResponse {
+  int32 Status = 1;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  CRUD operations
+//------------------------------------------------------------------------------------------------------------------
 message ListUsersRequest {
   GetOptions options = 1;
 }
