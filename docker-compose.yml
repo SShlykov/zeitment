@@ -2,23 +2,23 @@ version: "3.8"
 
 
 services:
-#  auth:
-#    build:
-#      dockerfile: auth.Dockerfile
-#    container_name: auth
-#    restart: always
-#    hostname: auth
-#    env_file:
-#      - ./auth/.env
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '2'
-#          memory: 250M
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "50m"
+  auth:
+    build:
+      dockerfile: auth.Dockerfile
+    container_name: auth
+    restart: always
+    hostname: auth
+    env_file:
+      - ./auth/.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 250M
 #    healthcheck:
 #      test: [ "CMD", "curl", "-f", "http://localhost:" ]
 #      interval: 1m30s
@@ -33,6 +33,8 @@ services:
     container_name: bookback
     restart: always
     hostname: bookback
+    depends_on:
+      - auth
     env_file:
       - ./bookback/.env
     deploy:
@@ -50,23 +52,28 @@ services:
 #      retries: 5
 #      start_period: 30s
 
-#  api_gateway:
-#    build:
-#      dockerfile: api_gateway.Dockerfile
-#    container_name: api_gateway
-#    restart: always
-#    hostname: api_gateway
-#    env_file:
-#      - ./api_gateway/.env
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '2'
-#          memory: 250M
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "50m"
+  api_gateway:
+    build:
+      dockerfile: api_gateway.Dockerfile
+    container_name: api_gateway
+    restart: always
+    hostname: api_gateway
+    ports:
+      - "8930:8930"
+    depends_on:
+      - auth
+      - bookback
+    env_file:
+      - ./api_gateway/.env
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 250M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
 #    healthcheck:
 #      test: [ "CMD", "curl", "-f", "http://localhost:" ]
 #      interval: 3s
