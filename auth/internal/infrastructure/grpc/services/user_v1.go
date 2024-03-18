@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/SShlykov/zeitment/auth/internal/adapters"
 	"github.com/SShlykov/zeitment/auth/internal/domain/entity"
-	"github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/pkg/user_v1"
+	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"github.com/SShlykov/zeitment/postgres/dbutils"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -28,7 +28,7 @@ func NewUserServiceServer(repository Repository) user_v1.UserServiceServer {
 	return &userServiceServer{repo: repository}
 }
 
-func (uss *userServiceServer) CreateUser(ctx context.Context, in *user_v1.CreateUserRequest) (*user_v1.CreateUserResponse, error) {
+func (uss *userServiceServer) Create(ctx context.Context, in *user_v1.CreateUserRequest) (*user_v1.CreateUserResponse, error) {
 	userId, err := uss.repo.Create(ctx, adapters.ProtoToUser(in.User))
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (uss *userServiceServer) CreateUser(ctx context.Context, in *user_v1.Create
 	return &user_v1.CreateUserResponse{Id: userId, Status: "ok", User: adapters.UserToProto(user)}, nil
 }
 
-func (uss *userServiceServer) UpdateUser(ctx context.Context, in *user_v1.UpdateUserRequest) (*user_v1.UpdateUserResponse, error) {
+func (uss *userServiceServer) Update(ctx context.Context, in *user_v1.UpdateUserRequest) (*user_v1.UpdateUserResponse, error) {
 	user, err := uss.repo.Update(ctx, in.Id, adapters.ProtoToUser(in.User))
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (uss *userServiceServer) UpdateUser(ctx context.Context, in *user_v1.Update
 	return &user_v1.UpdateUserResponse{Id: user.ID, Status: "ok", User: adapters.UserToProto(user)}, nil
 }
 
-func (uss *userServiceServer) DeleteUser(ctx context.Context, in *user_v1.DeleteUserRequest) (*emptypb.Empty, error) {
+func (uss *userServiceServer) Delete(ctx context.Context, in *user_v1.DeleteUserRequest) (*emptypb.Empty, error) {
 	err := uss.repo.HardDelete(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (uss *userServiceServer) DeleteUser(ctx context.Context, in *user_v1.Delete
 	return nil, nil
 }
 
-func (uss *userServiceServer) GetUser(ctx context.Context, in *user_v1.GetUserRequest) (*user_v1.GetUserResponse, error) {
+func (uss *userServiceServer) Get(ctx context.Context, in *user_v1.GetUserRequest) (*user_v1.GetUserResponse, error) {
 	user, err := uss.repo.FindByID(ctx, in.Id)
 	if err != nil {
 		return nil, errors.New("user not found")
@@ -69,7 +69,7 @@ func (uss *userServiceServer) GetUser(ctx context.Context, in *user_v1.GetUserRe
 	return &user_v1.GetUserResponse{Id: user.ID, Status: "ok", User: adapters.UserToProto(user)}, nil
 }
 
-func (uss *userServiceServer) ListUsers(ctx context.Context, in *user_v1.ListUsersRequest) (*user_v1.ListUsersResponse, error) {
+func (uss *userServiceServer) Find(ctx context.Context, in *user_v1.ListUsersRequest) (*user_v1.ListUsersResponse, error) {
 	pagination := dbutils.NewPaginationWithLimitOffset(in.Options.Pagination.Page, in.Options.Pagination.PageSize)
 	users, err := uss.repo.List(ctx, pagination)
 	if err != nil {
