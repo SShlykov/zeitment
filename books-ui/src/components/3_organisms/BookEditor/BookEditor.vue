@@ -19,7 +19,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('books', ['currentBook', 'tableOfContents'])
+    ...mapGetters('books', ['currentBook', 'tableOfContents']),
+    menuItems() {
+      return this.tableOfContents.sections
+    }
   },
   mounted() {
 
@@ -41,7 +44,9 @@ export default {
       :bookManager="bookManager"
     />
     <div class="w-full flex flex-grow">
-      <BookEditorMenu />
+      <BookEditorMenu
+        :menuItems="menuItems"
+      />
       <BookEditorBody />
     </div>
   </div>

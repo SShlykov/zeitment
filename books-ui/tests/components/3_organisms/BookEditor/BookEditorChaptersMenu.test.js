@@ -26,7 +26,6 @@ describe('tests of BookEditorMenu', () => {
 
   test('BookEditorMenu menu list', async () => {
     const wrapper = mount(BookEditorMenu, {
-      shallow: true,
       props: {
         menuItems: [
           {
@@ -37,7 +36,7 @@ describe('tests of BookEditorMenu', () => {
       }
     })
 
-    // expect(wrapper.text()).toContain("test")
+    expect(wrapper.text()).toContain("test")
   })
 })
 

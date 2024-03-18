@@ -19,6 +19,11 @@ export default {
   computed: {
     ...mapGetters('books', ['currentBook'])
   },
+  watch:{
+    $route (to){
+      this.serviceOfBooks.fetchCurrentBook(to.params.id)
+    }
+  },
   mounted() {
     const url = import.meta.env.VITE_API_ADDR
     const adapterOfBooks = new AdapterOfBooks(url)

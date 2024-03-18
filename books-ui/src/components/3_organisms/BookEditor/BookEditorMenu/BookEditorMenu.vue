@@ -1,14 +1,14 @@
 <script>
-import BookEditorMenuItem from "@organisms/BookEditor/BookEditorMenu/BookEditorMenuItem.vue";
+import BookEditorMenuItem from "./BookEditorMenuItem.vue";
 
 export default {
-  name: 'BookEditorMenuItem',
+  name: 'BookEditorMenu',
   components: {BookEditorMenuItem},
   props: {
     menuItems: {
       type: Array,
       default: () => []
-    }
+    },
   },
   data() {
     return {
@@ -26,12 +26,15 @@ export default {
 
 </script>
 
+
 <template>
-  <div class="w-[100px] h-full border-r border-gray-200">
+  <div class="w-[200px] h-full border-r border-gray-200 p-2">
     <BookEditorMenuItem
       v-for="item in menuItems"
       :key="item.id"
-      :item="item"
+      :title="item.title"
+      :order="item.order"
+      :level="item.level"
     />
   </div>
 </template>
