@@ -54,10 +54,10 @@ describe('serviceOfBooks', () => {
   })
 
   test("test of storeEditableBookAttribute", async () => {
-    await store.dispatch('books/saveEditableBook', appBook)
+    await store.dispatch('books/saveCurrentBook', appBook)
     await serviceOfBooks.storeEditableBookAttribute("title", "new title")
 
-    const editableBook = store.getters['books/editableBook']
+    const editableBook = store.getters['books/currentBook']
 
     expect(editableBook).toEqual({
       ...appBook,
@@ -66,8 +66,8 @@ describe('serviceOfBooks', () => {
   })
 
   test("test of storeEditableBookAttribute with no editableBook", async () => {
-    await store.dispatch('books/saveEditableBook', null)
-    const editableBook = store.getters['books/editableBook']
+    await store.dispatch('books/saveCurrentBook', null)
+    const editableBook = store.getters['books/currentBook']
     expect(editableBook).toEqual(null)
     const updatedBook = await serviceOfBooks.storeEditableBookAttribute("title", "new title")
     expect(updatedBook).toEqual(null)
@@ -79,12 +79,12 @@ describe('serviceOfBooks', () => {
   })
 
   test("save editable book to server", async () => {
-    await store.dispatch('books/saveEditableBook', appBook)
+    await store.dispatch('books/saveCurrentBook', appBook)
     await serviceOfBooks.storeEditableBookAttribute("title", "new title")
-    const storedEditableBook = store.getters['books/editableBook']
+    const storedEditableBook = store.getters['books/currentBook']
 
     expectTypeOf(storedEditableBook.id).toBeString()
-    await serviceOfBooks.saveEditableBookToServer()
+    await serviceOfBooks.saveCurrentBookToServer()
 
     let book = await serviceOfBooks.getBookById(appBook.id)
     book = {
@@ -95,23 +95,34 @@ describe('serviceOfBooks', () => {
   })
 
   test("save editable book to server with no editableBook", async () => {
-    await store.dispatch('books/saveEditableBook', null)
-    const storedEditableBook = store.getters['books/editableBook']
+    await store.dispatch('books/saveCurrentBook', null)
+    const storedEditableBook = store.getters['books/currentBook']
     expect(storedEditableBook).toEqual(null)
 
-    const updatedBook = await serviceOfBooks.saveEditableBookToServer()
+    const updatedBook = await serviceOfBooks.saveCurrentBookToServer()
     expect(updatedBook).toEqual(null)
   })
 
   test("fetch editable book", async () => {
-    await serviceOfBooks.fetchEditableBook(appBook.id)
-    const editableBook = store.getters['books/editableBook']
+    const book = await serviceOfBooks.fetchEditableBook(appBook.id)
+    const editableBook = store.getters['books/currentBook']
     expect(editableBook).toEqual(appBook)
+    expect(book).toEqual(appBook)
+  })
+
+  test("fetch currentBook", async () => {
+    const book = await serviceOfBooks.fetchCurrentBook(appBook.id)
+    const editableBook = store.getters['books/currentBook']
+    const tableOfContents = store.getters['books/tableOfContents']
+    expect(editableBook).toEqual(appBook)
+    expect(tableOfContents).toEqual(appTableOfContent)
+    expect(book.book).toEqual(appBook)
+    expect(book.tableOfContents).toEqual(appTableOfContent)
   })
 
   test("fetch table of content", async () => {
     await serviceOfBooks.fetchTableOfContent(appBook.id)
-    const tableOfContent = store.getters['books/tableOfContent']
-    expect(tableOfContent).toEqual(appTableOfContent)
+    const tableOfContents = store.getters['books/tableOfContents']
+    expect(tableOfContents).toEqual(appTableOfContent)
   })
 })

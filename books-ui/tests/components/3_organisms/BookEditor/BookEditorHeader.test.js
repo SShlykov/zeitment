@@ -13,7 +13,7 @@ describe("tests of BookEditorHeader", () => {
     bookManager: {
       saveBookWithPage: vi.fn()
     },
-    editableBook: {
+    currentBook: {
       title: "test",
     }
   }

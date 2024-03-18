@@ -117,13 +117,13 @@ class AdapterOfBooks {
    * @returns {Promise<{[p: string]: *}>}
    */
   async getTableOfContent(bookId) {
-    let {data: tableOfContent} = await post(`${this.url}/books/table_of_content`, {
+    let {data: tableOfContents} = await post(`${this.url}/books/table_of_content`, {
       "book_id": bookId
     })
-    tableOfContent = convertObject(tableOfContent, {config: this.adapterFromApiTOCConfig})
-    const sections = convertList(tableOfContent.sections, {config: this.adapterFromApiTOCItemConfig})
-    tableOfContent = {...tableOfContent, sections}
-    return tableOfContent
+    tableOfContents = convertObject(tableOfContents, {config: this.adapterFromApiTOCConfig})
+    const sections = convertList(tableOfContents.sections, {config: this.adapterFromApiTOCItemConfig})
+    tableOfContents = {...tableOfContents, sections}
+    return tableOfContents
   }
 
   /**
@@ -132,8 +132,8 @@ class AdapterOfBooks {
    */
   async integrationTests(logFunction) {
     logFunction("Оглавление книги")
-    const tableOfContent = await this.getTableOfContent("fb5e7d1d-38cd-4831-bae9-07b36080e3e7")
-    logFunction(tableOfContent)
+    const tableOfContents = await this.getTableOfContent("fb5e7d1d-38cd-4831-bae9-07b36080e3e7")
+    logFunction(tableOfContents)
     logFunction("Список книг")
     const books = await this.getBooks()
     logFunction(books)

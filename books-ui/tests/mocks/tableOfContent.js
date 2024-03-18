@@ -51,5 +51,9 @@ const apiTableOfContentResponse = {
   status: "ok"
 }
 
-export {appTableOfContent, apiTableOfContentResponse, apiTableOfContent}
+const apiTableOfContents = apiTableOfContent
+const appTableOfContents = appTableOfContent
+const apiTableOfContentsResponse = apiTableOfContentResponse
+
+export {appTableOfContent, apiTableOfContentResponse, apiTableOfContent, apiTableOfContentsResponse, apiTableOfContents, appTableOfContents}
 

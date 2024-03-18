@@ -5,7 +5,7 @@ class BookManager {
   }
 
   async saveBookWithPage() {
-    const book = await this.bookService.saveEditableBookToServer()
+    const book = await this.bookService.saveCurrentBookToServer()
     this.layoutService.addNotification({
       message: "Книга сохранена",
       type: "success",

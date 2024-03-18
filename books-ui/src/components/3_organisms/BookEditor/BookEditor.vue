@@ -19,7 +19,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('books', ['editableBook'])
+    ...mapGetters('books', ['currentBook', 'tableOfContents'])
   },
   mounted() {
 
@@ -32,12 +32,12 @@ export default {
 
 <template>
   <div
-    v-if="editableBook"
+    v-if="currentBook"
     class="w-full h-full flex flex-col"
   >
     <BookEditorHeader
       :serviceOfBooks="serviceOfBooks"
-      :editableBook="editableBook"
+      :currentBook="currentBook"
       :bookManager="bookManager"
     />
     <div class="w-full flex flex-grow">
@@ -45,7 +45,7 @@ export default {
       <BookEditorBody />
     </div>
   </div>
-  <div v-if="!editableBook">
+  <div v-if="!currentBook">
     <div class="flex justify-center items-center h-full">
       <div class="text-2xl text-slate-400">
         Книги не существует

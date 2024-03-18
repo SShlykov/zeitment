@@ -30,7 +30,7 @@ describe('BookManager', () => {
   })
 
   test('test of saveBookWithPage', async () => {
-    await store.dispatch('books/saveEditableBook', appBook)
+    await store.dispatch('books/saveCurrentBook', appBook)
     const {book} = await bookManager.saveBookWithPage(appBook)
     expect(book).toEqual(appBook)
   })

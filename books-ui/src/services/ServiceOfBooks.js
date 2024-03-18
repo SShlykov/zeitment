@@ -69,13 +69,13 @@ class ServiceOfBooks {
    * @returns {Promise<{[p: string]: *}|null>}
    */
   async storeEditableBookAttribute(attribute, value) {
-    const book = this.store.getters['books/editableBook'];
+    const book = this.store.getters['books/currentBook'];
     if (!book) return null
     const updatedBook = {
       ...book,
       [attribute]: value
     };
-    await this.store.dispatch('books/saveEditableBook', updatedBook);
+    await this.store.dispatch('books/saveCurrentBook', updatedBook);
     return updatedBook
   }
 
@@ -92,12 +92,23 @@ class ServiceOfBooks {
    * функция сохранения редактируемой книги на сервер
    * @returns {Promise<*|void|Object|(*&{owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string})|null>}
    */
-  async saveEditableBookToServer() {
-    const book = this.store.getters['books/editableBook'];
+  async saveCurrentBookToServer() {
+    const book = this.store.getters['books/currentBook'];
     if (!book) return null
     const updatedBook = await this.adapterOfBooks.updateBook(book);
-    await this.store.dispatch('books/saveEditableBook', updatedBook);
+    await this.store.dispatch('books/saveCurrentBook', updatedBook);
     return updatedBook
+  }
+
+  /**
+   * функция получения оглавление книги по id и сохранения его в store
+   * @param {Number} bookId
+   * @returns {Promise<void>}
+   */
+  async fetchTableOfContent(bookId) {
+    const tableOfContents = await this.adapterOfBooks.getTableOfContent(bookId);
+    this.store.dispatch('books/saveTableOfContent', tableOfContents);
+    return tableOfContents
   }
 
   /**
@@ -107,13 +118,22 @@ class ServiceOfBooks {
    */
   async fetchEditableBook(id) {
     const book = await this.adapterOfBooks.getBookById(id);
-    await this.store.dispatch('books/saveEditableBook', book);
+    await this.store.dispatch('books/saveCurrentBook', book);
     return book;
   }
 
-  async fetchTableOfContent(bookId) {
-    const tableOfContent = await this.adapterOfBooks.getTableOfContent(bookId);
-    this.store.dispatch('books/saveTableOfContent', tableOfContent);
+  /**
+   * функция получения книги по id и оглавления ее и сохранения их в store
+   * @param {Number} id
+   * @returns {Promise<{book: {owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string}, tableOfContents: *}>}
+   */
+  async fetchCurrentBook(id) {
+    const book = await this.fetchEditableBook(id);
+    const tableOfContents = await this.fetchTableOfContent(id)
+    return {
+      book,
+      tableOfContents
+    }
   }
 }
 

@@ -17,7 +17,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('books', ['editableBook'])
+    ...mapGetters('books', ['currentBook'])
   },
   mounted() {
     const url = import.meta.env.VITE_API_ADDR
@@ -31,7 +31,7 @@ export default {
     const layoutService  = new ServiceOfLayout(store)
     const bookManager    = new BookManager(serviceOfBooks, layoutService)
 
-    serviceOfBooks.fetchEditableBook(bookId)
+    serviceOfBooks.fetchCurrentBook(bookId)
 
     this.bookManager = bookManager
     this.serviceOfBooks = serviceOfBooks
@@ -44,12 +44,12 @@ export default {
 <template>
   <div class="relative w-full h-full">
     <BookEditor
-      v-if="editableBook"
+      v-if="currentBook"
       :serviceOfBooks="serviceOfBooks"
       :bookManager="bookManager"
     />
     <ContentLoader
-      v-if="!editableBook"
+      v-if="!currentBook"
       :loaderSize="30"
       class="flex"
     >

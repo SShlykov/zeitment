@@ -32,8 +32,10 @@ describe("tests of BookEditor", () => {
     store.commit('books/resetStore')
   })
 
+  axios.post.mockResolvedValue({data: []})
+  axios.get.mockResolvedValue({data: []})
+
   test('mount test of BookEditor', async () => {
-    axios.get.mockResolvedValue({data: apiBookResponse})
 
     const wrapper = mount(BookEditor, {
       shallow: true,

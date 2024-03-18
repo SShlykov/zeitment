@@ -22,16 +22,16 @@ describe("tests books store with vuex", () => {
     expect(booksList).toEqual([appBook])
   })
 
-  test('select editable book', async () => {
-    await store.dispatch('books/saveEditableBook', appBook)
-    const editableBook = store.getters['books/editableBook']
+  test('select current book', async () => {
+    await store.dispatch('books/saveCurrentBook', appBook)
+    const editableBook = store.getters['books/currentBook']
     expect(editableBook).toEqual(appBook)
   })
 
   test('test of saveTableOfContent', async () => {
     await store.dispatch('books/saveTableOfContent', appTableOfContent)
-    const tableOfContent = store.getters['books/tableOfContent']
-    expect(tableOfContent).toEqual(appTableOfContent)
+    const tableOfContents = store.getters['books/tableOfContents']
+    expect(tableOfContents).toEqual(appTableOfContent)
   })
 })
 

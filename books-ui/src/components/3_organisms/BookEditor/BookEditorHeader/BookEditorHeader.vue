@@ -5,7 +5,7 @@ export default {
   name: 'BookEditorHeader',
   components: {BookEditorHeaderContainer},
   props: {
-    editableBook: {
+    currentBook: {
       type: Object,
       required: true
     },
@@ -40,9 +40,9 @@ export default {
   <BookEditorHeaderContainer class="flex justify-between">
     <div class="flex items-center">
       <input
-        :value="editableBook.title"
+        :value="currentBook.title"
         :onInput="updateBookTitle"
-        :style="`width: ${(1 + editableBook.title.length)}ch`"
+        :style="`width: ${(1 + currentBook.title.length)}ch`"
         placeholder="Название"
         class="h-full pl-2 rounded-md font-w-700 text-xl !ring-0 bg-white transition-all
                  min-w-[150px] max-w-[350px]
@@ -52,9 +52,9 @@ export default {
     </div>
     <div>
       <input
-        :value="editableBook.author"
+        :value="currentBook.author"
         :onInput="updateBookAuthor"
-        :style="`width: ${(1 + editableBook.author.length)}ch`"
+        :style="`width: ${(1 + currentBook.author.length)}ch`"
         placeholder="Автор"
         class="h-full pl-2 rounded-md mr-2  !ring-0 bg-white transition-all
                  text-md text-end

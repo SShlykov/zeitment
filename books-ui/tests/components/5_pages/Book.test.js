@@ -5,6 +5,7 @@ import {createStore} from "vuex";
 import {store as books} from "@store/modules/books/index.js";
 import axios from "axios";
 import {apiBookResponse} from "@mocks/books.js";
+import {apiTableOfContentResponse} from "@mocks/tableOfContent.js";
 
 vi.mock('axios')
 
@@ -27,6 +28,8 @@ describe("tests of BookPage", () => {
 
   test('mount test of BookPage', async () => {
     axios.get.mockResolvedValue({data: apiBookResponse})
+    axios.post.mockResolvedValue({data: apiTableOfContentResponse})
+
     const wrapper = mount(BookPage, {
       shallow: true,
       global: {
