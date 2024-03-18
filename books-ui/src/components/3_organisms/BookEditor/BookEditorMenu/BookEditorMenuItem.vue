@@ -17,6 +17,6 @@ export default {
 
 <template>
   <div class="w-[100px] transition-all w-full cursor-pointer rounded-md p-1 pl-2 hover:bg-gray-100">
-    {{title}}
+    {{ title }}
   </div>
 </template>
