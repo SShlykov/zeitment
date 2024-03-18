@@ -6,6 +6,6 @@ RUN go mod download
 
 COPY .. .
 
-RUN go build -o /app/main ./cmd/bookback
+RUN go build -o /app/main ./api_gateway/cmd/api_gateway
 
 CMD [ "/app/main" ]
