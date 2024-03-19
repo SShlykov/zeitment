@@ -23,7 +23,6 @@ const (
 	UserService_SignUp_FullMethodName  = "/user_v1.UserService/SignUp"
 	UserService_SignIn_FullMethodName  = "/user_v1.UserService/SignIn"
 	UserService_SignOut_FullMethodName = "/user_v1.UserService/SignOut"
-	UserService_Create_FullMethodName  = "/user_v1.UserService/Create"
 	UserService_Update_FullMethodName  = "/user_v1.UserService/Update"
 	UserService_Delete_FullMethodName  = "/user_v1.UserService/Delete"
 	UserService_Get_FullMethodName     = "/user_v1.UserService/Get"
@@ -42,7 +41,6 @@ type UserServiceClient interface {
 	// ------------------------------------------------------------------------------------------------------------------
 	// CRUD operations
 	// ------------------------------------------------------------------------------------------------------------------
-	Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	Delete(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
@@ -78,15 +76,6 @@ func (c *userServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts 
 func (c *userServiceClient) SignOut(ctx context.Context, in *SignOutRequest, opts ...grpc.CallOption) (*SignOutResponse, error) {
 	out := new(SignOutResponse)
 	err := c.cc.Invoke(ctx, UserService_SignOut_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
-	err := c.cc.Invoke(ctx, UserService_Create_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +130,6 @@ type UserServiceServer interface {
 	// ------------------------------------------------------------------------------------------------------------------
 	// CRUD operations
 	// ------------------------------------------------------------------------------------------------------------------
-	Create(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	Update(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
 	Get(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -161,9 +149,6 @@ func (UnimplementedUserServiceServer) SignIn(context.Context, *SignInRequest) (*
 }
 func (UnimplementedUserServiceServer) SignOut(context.Context, *SignOutRequest) (*SignOutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignOut not implemented")
-}
-func (UnimplementedUserServiceServer) Create(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedUserServiceServer) Update(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
@@ -240,24 +225,6 @@ func _UserService_SignOut_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).SignOut(ctx, req.(*SignOutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).Create(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_Create_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Create(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -352,10 +319,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SignOut",
 			Handler:    _UserService_SignOut_Handler,
-		},
-		{
-			MethodName: "Create",
-			Handler:    _UserService_Create_Handler,
 		},
 		{
 			MethodName: "Update",
