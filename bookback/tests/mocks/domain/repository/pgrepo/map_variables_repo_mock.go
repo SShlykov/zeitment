@@ -11,10 +11,10 @@ package mocks
 
 import (
 	context "context"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/postgres/dbutils"
 	reflect "reflect"
 
-	entity "github.com/SShlykov/zeitment/bookback/internal/domain/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 

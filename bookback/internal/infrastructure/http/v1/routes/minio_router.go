@@ -2,7 +2,7 @@ package routes
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/application/usecase"
+	"github.com/SShlykov/zeitment/bookback/internal/domain/usecase"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/middleware"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1"
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/controllers"

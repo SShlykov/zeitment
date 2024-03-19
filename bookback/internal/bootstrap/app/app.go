@@ -12,7 +12,6 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"sync"
 )
 
 type App struct {
@@ -57,10 +56,10 @@ func (app *App) Run() error {
 	logg := app.logger
 	logg.Info("starting book app", slog.String("at", app.web.Address))
 	logg.Debug("debug messages enabled")
-
-	var wg sync.WaitGroup
-
-	app.RunWebServer(&wg)
+	
+	go func() {
+		app.RunWebServer()
+	}()
 
 	return app.closer(ctx)
 }

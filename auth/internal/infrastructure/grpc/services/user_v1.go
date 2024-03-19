@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"errors"
-	"github.com/SShlykov/zeitment/auth/internal/adapters"
+	"github.com/SShlykov/zeitment/auth/internal/domain/adapters"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"github.com/SShlykov/zeitment/postgres/dbutils"

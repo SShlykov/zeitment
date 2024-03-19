@@ -4,7 +4,8 @@ version: "3.8"
 services:
   auth:
     build:
-      dockerfile: auth.Dockerfile
+      context: .
+      dockerfile: auth/Dockerfile
     container_name: auth
     restart: always
     hostname: auth
@@ -29,7 +30,7 @@ services:
   bookback:
     build:
       context: .
-      dockerfile: bookback.Dockerfile
+      dockerfile: bookback/Dockerfile
     container_name: bookback
     restart: always
     hostname: bookback
@@ -54,7 +55,8 @@ services:
 
   api_gateway:
     build:
-      dockerfile: api_gateway.Dockerfile
+      context: .
+      dockerfile: api_gateway/Dockerfile
     container_name: api_gateway
     restart: always
     hostname: api_gateway

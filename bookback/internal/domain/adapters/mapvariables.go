@@ -2,7 +2,7 @@ package adapters
 
 import (
 	"database/sql"
-	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	"github.com/SShlykov/zeitment/bookback/internal/models/types"
 )
