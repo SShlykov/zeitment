@@ -27,6 +27,7 @@ func NewApp(configPath string) (*App, error) {
 	app := &App{ctx: ctx, closeCtx: closeCtx}
 
 	inits := []func(cfg string) error{
+		app.initConfig,
 		app.initLogger,
 		app.initMetrics,
 		app.initDB,
@@ -54,7 +55,7 @@ func (app *App) Run() error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		_ = server.NewServer(logg, app.db)
+		_ = server.NewServer(logg, app.db, app.config.Port)
 	}()
 
 	<-ctx.Done()

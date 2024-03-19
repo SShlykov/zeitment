@@ -1,3 +1,5 @@
+server:
+  port: 50051
 shutdown_timeout: 10s
 logger:
   level: "debug"
