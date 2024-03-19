@@ -1,7 +1,7 @@
 package adapters
 
 import (
-	"github.com/SShlykov/zeitment/auth/internal/domain/entity"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

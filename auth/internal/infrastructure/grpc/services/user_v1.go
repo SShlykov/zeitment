@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/SShlykov/zeitment/auth/internal/adapters"
-	"github.com/SShlykov/zeitment/auth/internal/domain/entity"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"github.com/SShlykov/zeitment/postgres/dbutils"
 	"google.golang.org/protobuf/types/known/emptypb"
