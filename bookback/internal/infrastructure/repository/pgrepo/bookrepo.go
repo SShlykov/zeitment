@@ -2,7 +2,7 @@ package pgrepo
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
+	entity2 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/postgres"
 	"github.com/jackc/pgx/v5"
 )
@@ -11,26 +11,26 @@ import (
 //
 //go:generate mockgen -destination=../../../../tests/mocks/domain/repository/pgrepo/book_repo_mock.go -package=mocks github.com/SShlykov/zeitment/bookback/internal/domain/repository/pgrepo BookRepo
 type BookRepo interface {
-	Repository[entity.Book]
-	GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity.Section, error)
-	GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity.Section, error)
+	Repository[entity2.Book]
+	GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity2.Section, error)
+	GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity2.Section, error)
 }
 
 type bookRepo struct {
-	repository[entity.Book]
+	repository[entity2.Book]
 }
 
 func NewBookRepository(db postgres.Client) BookRepo {
 	return &bookRepo{
-		repository: repository[entity.Book]{
+		repository: repository[entity2.Book]{
 			Name:   "BookRepository",
-			entity: entity.Book{},
+			entity: entity2.Book{},
 			db:     db,
 		},
 	}
 }
 
-func (br *bookRepo) GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity.Section, error) {
+func (br *bookRepo) GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity2.Section, error) {
 	query, args, err := br.db.Builder().
 		Select("id", "title", "number", "is_public").
 		From("chapters").
@@ -50,9 +50,9 @@ func (br *bookRepo) GetTOCSectionsFromChapters(ctx context.Context, bookID strin
 		return nil, err
 	}
 
-	sections := make([]*entity.Section, 0)
+	sections := make([]*entity2.Section, 0)
 	for rows.Next() {
-		var section entity.Section
+		var section entity2.Section
 		section.Level = "chapter"
 		err = rows.Scan(&section.ID, &section.Title, &section.Order, &section.IsPublic)
 		if err != nil {
@@ -64,7 +64,7 @@ func (br *bookRepo) GetTOCSectionsFromChapters(ctx context.Context, bookID strin
 	return sections, nil
 }
 
-func (br *bookRepo) GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity.Section, error) {
+func (br *bookRepo) GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity2.Section, error) {
 	query, args, err := br.db.Builder().
 		Select("pages.id", "pages.chapter_id", "pages.title", "pages.number", "pages.is_public").
 		From(br.entity.TableName()).
@@ -87,9 +87,9 @@ func (br *bookRepo) GetTOCSectionsFromPages(ctx context.Context, bookID string) 
 		return nil, err
 	}
 
-	sections := make([]*entity.Section, 0)
+	sections := make([]*entity2.Section, 0)
 	for rows.Next() {
-		var section entity.Section
+		var section entity2.Section
 		section.Level = "page"
 		err = rows.Scan(&section.ID, &section.ParentID, &section.Title, &section.Order, &section.IsPublic)
 		if err != nil {

@@ -54,7 +54,6 @@ func NullStringToProto(str sql.Null[string]) *wrapperspb.StringValue {
 		return wrapperspb.String(str.V)
 	}
 	return nil
-
 }
 
 func NullDtToProto(dt sql.Null[time.Time]) *timestamppb.Timestamp {

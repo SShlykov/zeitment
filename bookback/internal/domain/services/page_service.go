@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 	"errors"
-	"github.com/SShlykov/zeitment/bookback/internal/adapters"
-	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
+	"github.com/SShlykov/zeitment/bookback/internal/domain/adapters"
+	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	"github.com/SShlykov/zeitment/postgres/dbutils"
 )

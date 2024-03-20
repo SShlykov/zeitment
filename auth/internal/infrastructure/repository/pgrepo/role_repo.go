@@ -1,7 +1,7 @@
 package pgrepo
 
 import (
-	"github.com/SShlykov/zeitment/auth/internal/domain/entity"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/postgres"
 )
 

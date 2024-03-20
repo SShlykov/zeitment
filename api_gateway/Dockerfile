@@ -10,12 +10,11 @@ COPY ../postgres ./postgres
 COPY ../scripts ./scripts
 COPY ../go.work ./go.work
 
-RUN go build -o /app/main ./bookback/cmd/bookback
+RUN go build -o /app/main ./api_gateway/cmd/api_gateway
 
 FROM alpine:3.12
 WORKDIR /app
 
 COPY --from=builder /app/main /app/main
-COPY --from=builder /app/bookback/config /app/config
 
 CMD [ "/app/main" ]

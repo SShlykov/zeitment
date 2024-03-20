@@ -32,7 +32,6 @@ service UserService {
   //------------------------------------------------------------------------------------------------------------------
   // CRUD operations
   //------------------------------------------------------------------------------------------------------------------
-  rpc Create(CreateUserRequest) returns (CreateUserResponse) {};
   rpc Update(UpdateUserRequest) returns (UpdateUserResponse) {};
   rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {};
   rpc Get(GetUserRequest) returns (GetUserResponse) {
@@ -47,6 +46,10 @@ service UserService {
     };
   };
 }
+
+//------------------------------------------------------------------------------------------------------------------
+//  User
+//------------------------------------------------------------------------------------------------------------------
 
 message User {
   string id = 1;

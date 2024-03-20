@@ -2,8 +2,8 @@ package services
 
 import (
 	"context"
-	"github.com/SShlykov/zeitment/bookback/internal/adapters"
-	"github.com/SShlykov/zeitment/bookback/internal/domain/entity"
+	adapters2 "github.com/SShlykov/zeitment/bookback/internal/domain/adapters"
+	entity2 "github.com/SShlykov/zeitment/bookback/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/bookback/internal/models"
 	"github.com/SShlykov/zeitment/postgres/dbutils"
 )
@@ -23,9 +23,9 @@ type BookService interface {
 }
 
 type BookRepo interface {
-	SimpleRepo[*entity.Book]
-	GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity.Section, error)
-	GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity.Section, error)
+	SimpleRepo[*entity2.Book]
+	GetTOCSectionsFromChapters(ctx context.Context, bookID string) ([]*entity2.Section, error)
+	GetTOCSectionsFromPages(ctx context.Context, bookID string) ([]*entity2.Section, error)
 }
 
 type bookService struct {
@@ -38,7 +38,7 @@ func NewBookService(repo BookRepo) BookService {
 }
 
 func (s *bookService) CreateBook(ctx context.Context, request models.CreateBookRequest) (*models.Book, error) {
-	book := adapters.BookModelToEntity(request.Book)
+	book := adapters2.BookModelToEntity(request.Book)
 
 	if book.Variables == nil {
 		book.Variables = []string{}
@@ -57,16 +57,16 @@ func (s *bookService) GetBookByID(ctx context.Context, id string) (*models.Book,
 		return nil, err
 	}
 
-	return adapters.BookEntityToModel(book), nil
+	return adapters2.BookEntityToModel(book), nil
 }
 
 func (s *bookService) UpdateBook(ctx context.Context, id string, request models.UpdateBookRequest) (*models.Book, error) {
-	book, err := s.repo.Update(ctx, id, adapters.BookModelToEntity(request.Book))
+	book, err := s.repo.Update(ctx, id, adapters2.BookModelToEntity(request.Book))
 	if err != nil {
 		return nil, err
 	}
 
-	return adapters.BookEntityToModel(book), nil
+	return adapters2.BookEntityToModel(book), nil
 }
 
 func (s *bookService) DeleteBook(ctx context.Context, id string) (*models.Book, error) {
@@ -91,7 +91,7 @@ func (s *bookService) ListBooks(ctx context.Context, request models.RequestBook)
 		return nil, err
 	}
 
-	return adapters.BooksEntityToModel(books), nil
+	return adapters2.BooksEntityToModel(books), nil
 }
 
 func (s *bookService) GetTableOfContentsByBookID(ctx context.Context, request models.RequestTOC) (*models.TableOfContents, error) {
@@ -107,13 +107,13 @@ func (s *bookService) GetTableOfContentsByBookID(ctx context.Context, request mo
 		Tags:      make([]string, 0), // TODO: implement tags
 	}
 
-	var chapters []*entity.Section
+	var chapters []*entity2.Section
 	chapters, err = s.repo.GetTOCSectionsFromChapters(ctx, request.BookID)
 	if err != nil {
 		return nil, err
 	}
 
-	var pages []*entity.Section
+	var pages []*entity2.Section
 	pages, err = s.repo.GetTOCSectionsFromPages(ctx, request.BookID)
 	if err != nil {
 		return nil, err
@@ -129,22 +129,22 @@ func (s *bookService) TogglePublic(ctx context.Context, request models.ToggleBoo
 	if err != nil {
 		return nil, err
 	}
-	
+
 	book.IsPublic = !book.IsPublic
 	book, err = s.repo.Update(ctx, request.BookID, book)
 	if err != nil {
 		return nil, err
 	}
 
-	return adapters.BookEntityToModel(book), nil
+	return adapters2.BookEntityToModel(book), nil
 }
 
-func joinSections(chapters, pages []*entity.Section) []*models.Section {
+func joinSections(chapters, pages []*entity2.Section) []*models.Section {
 	sections := make([]*models.Section, 0)
 	pageSectionSet := make(map[string][]*models.Section)
 
 	for _, page := range pages { // тут страницы отсортированы верно
-		pageSection := adapters.TocSectionEntityToModel(page)
+		pageSection := adapters2.TocSectionEntityToModel(page)
 		pageSectionSet[page.ParentID] = append(pageSectionSet[page.ParentID], pageSection)
 	}
 
@@ -152,7 +152,7 @@ func joinSections(chapters, pages []*entity.Section) []*models.Section {
 		var chapID = chapter.ID
 		var chapIsPublic = chapter.IsPublic
 		chapOrder := chapter.Order * 1_000 // предполагаем, что у нас не будет больше 1000 страниц в главе
-		chapterSection := adapters.TocSectionEntityToModel(chapter)
+		chapterSection := adapters2.TocSectionEntityToModel(chapter)
 		chapterSection.Order = chapOrder
 		sections = append(sections, chapterSection)
 

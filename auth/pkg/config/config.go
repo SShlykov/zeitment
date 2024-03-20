@@ -11,10 +11,15 @@ import (
 type Config struct {
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT" env-default:"10s"`
 	Logger          `yaml:"logger"`
+	Server          `yaml:"server"`
 }
 
 type Logger struct {
 	Level string `yaml:"level" env:"LEVEL" env-default:"debug" env-required:"true"`
+}
+
+type Server struct {
+	Port int `yaml:"port" env:"PORT" env-default:"8080"`
 }
 
 func LoadConfig(configPath string) (*Config, error) {

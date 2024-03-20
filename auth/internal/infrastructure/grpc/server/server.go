@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/services"
+	"github.com/SShlykov/zeitment/auth/internal/domain/services"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/pgrepo"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	logPkg "github.com/SShlykov/zeitment/logger"
@@ -12,9 +12,7 @@ import (
 	"net"
 )
 
-func NewServer(logger logPkg.Logger, db postgres.Client) error {
-	port := 50051
-
+func NewServer(logger logPkg.Logger, db postgres.Client, port int) error {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return err

@@ -4,7 +4,6 @@ import (
 	"github.com/SShlykov/zeitment/bookback/internal/infrastructure/http/v1/endpoint"
 	"github.com/SShlykov/zeitment/bookback/pkg/config"
 	loggerPkg "github.com/SShlykov/zeitment/logger"
-	"sync"
 )
 
 func (app *App) initWebServer() error {
@@ -21,16 +20,11 @@ func (app *App) initWebServer() error {
 	return nil
 }
 
-func (app *App) RunWebServer(wg *sync.WaitGroup) {
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		err := endpoint.RunServer(app.web, app.logger)
-		if err != nil {
-			app.logger.Error("HTTP server stopped", loggerPkg.Err(err))
-		}
-	}()
+func (app *App) RunWebServer() {
+	err := endpoint.RunServer(app.web, app.logger)
+	if err != nil {
+		app.logger.Error("HTTP server stopped", loggerPkg.Err(err))
+	}
 }
 
 func getConfig(configPath string) (*endpoint.HTTPServerConfig, error) {

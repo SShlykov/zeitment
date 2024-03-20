@@ -1,7 +1,7 @@
 package adapters
 
 import (
-	"github.com/SShlykov/zeitment/auth/internal/domain/entity"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -22,8 +22,9 @@ func ProtoToUser(protoUser *user_v1.User) *entity.User {
 		DeletedAt:   ProtoToNullDt(protoUser.DeletedAt),
 		LoggedAt:    ProtoToNullDt(protoUser.LoggedAt),
 		ConfirmedAt: ProtoToNullDt(protoUser.ConfirmedAt),
-		Login:       protoUser.Login,
-		Email:       ProtoToNullString(protoUser.Email),
+
+		Login: protoUser.Login,
+		Email: ProtoToNullString(protoUser.Email),
 
 		DeletedBy:        ProtoToNullString(protoUser.DeletedBy),
 		AccessTemplateID: ProtoToNullInt(protoUser.AccessTemplateId),
@@ -31,7 +32,6 @@ func ProtoToUser(protoUser *user_v1.User) *entity.User {
 	}
 
 	return user
-
 }
 
 func UserToProto(user *entity.User) *user_v1.User {
