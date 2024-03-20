@@ -19,9 +19,12 @@ describe("tests of BookPage", () => {
 
   const mockRoute = {
     params: {
-      id: 1
+      book_id: "book_id",
+      type: "page",
+      section_id: "section_id"
     }
   }
+
   const mockRouter = {
     push: vi.fn()
   }
@@ -41,6 +44,7 @@ describe("tests of BookPage", () => {
       }
     })
 
+    expect(wrapper.vm.bookId).toBe("book_id")
     expect(wrapper.exists()).toBe(true)
   })
 })

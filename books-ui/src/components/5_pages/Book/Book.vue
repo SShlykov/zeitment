@@ -17,18 +17,21 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('books', ['currentBook'])
+    ...mapGetters('books', ['currentBook']),
+    bookId() {
+      return this.$route.params.book_id
+    }
   },
   watch:{
     $route (to){
-      this.serviceOfBooks.fetchCurrentBook(to.params.id)
+      this.serviceOfBooks.fetchCurrentBook(to.book_id)
     }
   },
   mounted() {
     const url = import.meta.env.VITE_API_ADDR
     const adapterOfBooks = new AdapterOfBooks(url)
     const store = this.$store
-    const bookId = this.$route.params.id
+    const bookId = this.bookId
     if (!bookId) {
       this.$router.push('/')
     }

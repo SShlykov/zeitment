@@ -1,7 +1,9 @@
 const initialState = {
   userBooks: [],
   currentBook: null,
-  tableOfContents: [],
+  tableOfContents: {
+    sections: []
+  },
 }
 
 const state = {

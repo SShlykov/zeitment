@@ -15,7 +15,6 @@ export default {
       isOpen: true
     }
   },
-  computed: {},
   mounted() {},
   methods: {
     toggle() {
@@ -28,13 +27,15 @@ export default {
 
 
 <template>
-  <div class="w-[200px] h-full border-r border-gray-200 p-2">
+  <div class="w-[200px] flex flex-col h-full border-r border-gray-200 p-2">
     <BookEditorMenuItem
       v-for="item in menuItems"
+      :id="item.id"
       :key="item.id"
       :title="item.title"
       :order="item.order"
       :level="item.level"
+      :itemClass="item.class"
     />
   </div>
 </template>

@@ -39,10 +39,9 @@ export default {
     id() {
       return this.name
     },
-    pageName() {
-      if (!this.$route) return ""
-      return this.$route.params.id
-    },
+    bookId() {
+      return this.$route.params.book_id
+    }
   },
   methods: {
     removeBook(id)  {
@@ -60,7 +59,7 @@ export default {
 <template>
   <div
     class="w-full h-full relative flex rounded-md transition-all hover:bg-gray-200 items-center group"
-    :class="{'bg-gray-200': pageName === name}"
+    :class="{'bg-gray-200': bookId === name}"
   >
     <router-link
       class="w-full h-full p-2"

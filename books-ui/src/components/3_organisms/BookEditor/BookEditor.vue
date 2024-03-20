@@ -11,17 +11,28 @@ export default {
   props: {
     serviceOfBooks: {
       type: Object,
-      default: () => {}
+      required: true
     },
     bookManager: {
       type: Object,
-      default: () => {}
+      required: true
     }
   },
   computed: {
     ...mapGetters('books', ['currentBook', 'tableOfContents']),
     menuItems() {
-      return this.tableOfContents.sections
+      const addItemButton = {
+        // <i class='ri-sticky-note-add-line'></i>
+        title: "Добавить...",
+        class: "hover:bg-gray-100 transition-all cursor-pointer text-gray-500 hover:text-gray-700 text-lg p-2 rounded-md ",
+        level: "button",
+        function: () => {
+        }
+      }
+
+      const sections = this.tableOfContents.sections
+      const items = [...sections, addItemButton]
+      return items
     }
   },
   mounted() {
