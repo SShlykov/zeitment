@@ -1,0 +1,462 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user_v1.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/user": {
+      "post": {
+        "operationId": "UserService_Find",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1ListUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1ListUsersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/signin": {
+      "post": {
+        "summary": "Аутентификация пользователя",
+        "operationId": "UserService_SignIn",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1SignInResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "LoginOrEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/signout": {
+      "get": {
+        "operationId": "UserService_SignOut",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1SignOutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/signup": {
+      "post": {
+        "summary": "Регистрация пользователя",
+        "operationId": "UserService_SignUp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1SignUpResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user.createdAt",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "user.updatedAt",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "user.deletedAt",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "user.loggedAt",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "user.confirmedAt",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "user.login",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user.email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user.deletedBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user.accessTemplateId",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "user.updateAfter",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "Password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/{id}": {
+      "get": {
+        "operationId": "UserService_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1GetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "user_v1GetOptions": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/definitions/user_v1Pagination"
+        }
+      }
+    },
+    "user_v1GetUserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/user_v1User"
+        }
+      }
+    },
+    "user_v1ListUsersRequest": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "$ref": "#/definitions/user_v1GetOptions"
+        }
+      },
+      "title": "------------------------------------------------------------------------------------------------------------------\n CRUD operations\n------------------------------------------------------------------------------------------------------------------"
+    },
+    "user_v1ListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_v1User"
+          }
+        },
+        "paginationMetadata": {
+          "$ref": "#/definitions/user_v1PaginationMetadata"
+        }
+      }
+    },
+    "user_v1Pagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "pageSize": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "user_v1PaginationMetadata": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "user_v1SignInResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "string"
+        },
+        "RoleName": {
+          "type": "string"
+        },
+        "Token": {
+          "type": "string"
+        }
+      }
+    },
+    "user_v1SignOutResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "user_v1SignUpResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "string"
+        },
+        "RoleName": {
+          "type": "string"
+        },
+        "Token": {
+          "type": "string"
+        }
+      }
+    },
+    "user_v1UpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/user_v1User"
+        }
+      }
+    },
+    "user_v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "loggedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confirmedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "login": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "deletedBy": {
+          "type": "string"
+        },
+        "accessTemplateId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "updateAfter": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

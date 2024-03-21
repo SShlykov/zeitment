@@ -34,6 +34,7 @@ func NewUserServiceServer(repository Repository) user_v1.UserServiceServer {
 }
 
 func (uss *userServiceServer) SignUp(ctx context.Context, in *user_v1.SignUpRequest) (*user_v1.SignUpResponse, error) {
+
 	if in.User == nil || in.Password == "" {
 		return nil, errors.New("пользователь или пароль не могут быть пустыми; ошибка протокола")
 	}
