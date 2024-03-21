@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	userService "github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
+	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"log"
@@ -16,11 +17,12 @@ var (
 )
 
 func main() {
+	logger := loggerPkg.SetupLogger("info")
 	proxyAddr := fmt.Sprintf(":%s", os.Getenv("PORT"))
-	HTTPProxy(proxyAddr)
+	HTTPProxy(proxyAddr, logger)
 }
 
-func HTTPProxy(proxyAddr string) {
+func HTTPProxy(proxyAddr string, logger loggerPkg.Logger) {
 	grpcGwMux := runtime.NewServeMux()
 
 	//----------------------------------------------------------------
@@ -30,13 +32,13 @@ func HTTPProxy(proxyAddr string) {
 	//grpc.WithPerRPCCredentials(&reqData{}),
 	grpcUserConn, err := grpc.Dial(authServiceURL, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalln("Filed to connect to User service", err)
+		logger.Error("Filed to connect to User service", loggerPkg.Err(err))
 	}
 	defer grpcUserConn.Close()
 
 	err = userService.RegisterUserServiceHandler(context.Background(), grpcGwMux, grpcUserConn)
 	if err != nil {
-		log.Fatalln("Filed to start HTTP server", err)
+		logger.Error("Filed to register User service", loggerPkg.Err(err))
 	}
 
 	//----------------------------------------------------------------
@@ -45,12 +47,7 @@ func HTTPProxy(proxyAddr string) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/api/v1/", grpcGwMux)
-	mux.HandleFunc("/", helloWorld)
 
-	fmt.Println("starting HTTP server at " + proxyAddr)
+	logger.Info("starting HTTP server at " + proxyAddr)
 	log.Fatal(http.ListenAndServe(proxyAddr, mux))
-}
-
-func helloWorld(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte("Hello, world!"))
 }

@@ -56,7 +56,7 @@ func (app *App) Run() error {
 	logg := app.logger
 	logg.Info("starting book app", slog.String("at", app.web.Address))
 	logg.Debug("debug messages enabled")
-	
+
 	go func() {
 		app.RunWebServer()
 	}()

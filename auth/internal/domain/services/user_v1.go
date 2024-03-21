@@ -52,7 +52,8 @@ func (uss *userServiceServer) SignUp(ctx context.Context, in *user_v1.SignUpRequ
 	user.PasswordHash = hashed
 	user.UpdateAfter = sql.Null[int64]{Valid: true, V: int64(30 * 24 * time.Hour)}
 
-	userID, err := uss.repo.Create(ctx, user)
+	var userID string
+	userID, err = uss.repo.Create(ctx, user)
 	if err != nil {
 		return nil, err
 	}
