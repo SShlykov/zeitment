@@ -7,6 +7,7 @@ import (
 	loggerPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
@@ -19,18 +20,20 @@ var (
 func main() {
 	logger := loggerPkg.SetupLogger("info")
 	proxyAddr := fmt.Sprintf(":%s", os.Getenv("PORT"))
-	HTTPProxy(proxyAddr, logger)
+	Run(context.Background(), proxyAddr, logger)
 }
 
-func HTTPProxy(proxyAddr string, logger loggerPkg.Logger) {
+func Run(ctx context.Context, proxyAddr string, logger loggerPkg.Logger) {
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	grpcGwMux := runtime.NewServeMux()
 
 	//----------------------------------------------------------------
 	// настройка подключений со стороны gRPC
 	//----------------------------------------------------------------
 
-	//grpc.WithPerRPCCredentials(&reqData{}),
-	grpcUserConn, err := grpc.Dial(authServiceURL, grpc.WithInsecure())
+	grpcUserConn, err := grpc.Dial(authServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Error("Filed to connect to User service", loggerPkg.Err(err))
 	}
