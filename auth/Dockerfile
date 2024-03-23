@@ -4,10 +4,7 @@ WORKDIR /app
 COPY ../api_gateway ./api_gateway
 COPY ../auth ./auth
 COPY ../bookback ./bookback
-COPY ../logger ./logger
-COPY ../metrics ./metrics
-COPY ../postgres ./postgres
-COPY ../scripts ./scripts
+COPY ../go_pkg ./go_pkg
 COPY ../go.work ./go.work
 
 RUN go build -o /app/main ./auth/cmd/auth

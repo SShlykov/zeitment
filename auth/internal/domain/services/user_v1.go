@@ -34,6 +34,7 @@ func NewUserServiceServer(repository Repository) user_v1.UserServiceServer {
 }
 
 func (uss *userServiceServer) SignUp(ctx context.Context, in *user_v1.SignUpRequest) (*user_v1.SignUpResponse, error) {
+
 	if in.User == nil || in.Password == "" {
 		return nil, errors.New("пользователь или пароль не могут быть пустыми; ошибка протокола")
 	}
@@ -52,7 +53,8 @@ func (uss *userServiceServer) SignUp(ctx context.Context, in *user_v1.SignUpRequ
 	user.PasswordHash = hashed
 	user.UpdateAfter = sql.Null[int64]{Valid: true, V: int64(30 * 24 * time.Hour)}
 
-	userID, err := uss.repo.Create(ctx, user)
+	var userID string
+	userID, err = uss.repo.Create(ctx, user)
 	if err != nil {
 		return nil, err
 	}
