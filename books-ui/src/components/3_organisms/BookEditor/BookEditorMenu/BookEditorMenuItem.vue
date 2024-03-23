@@ -23,17 +23,14 @@ export default {
     itemClass: {
       type: String,
       default: ""
-    }
-  },
-  computed: {
-    bookId() {
-      return this.$route.params.book_id
     },
-    sectionId() {
-      return this.$route.params.section_id
+    bookId: {
+      type: String,
+      required: true
     },
-    htmlTitle() {
-      return `<span>${this.title}</span>`
+    sectionId: {
+      type: String,
+      required: true
     }
   },
   mounted() {},

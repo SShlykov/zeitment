@@ -4,7 +4,7 @@ class ServiceOfChapters {
    * @param {Object} store
    */
   constructor(adapterOfChapters, store) {
-    this.adapterOfBooks = adapterOfChapters;
+    this.adapterOfChapters = adapterOfChapters;
     this.store = store;
   }
 
@@ -14,8 +14,14 @@ class ServiceOfChapters {
    * @returns {Promise<void>}
    */
   async fetchChaptersByBookId(bookId) {
-    const chaptersList = await this.adapterOfBooks.getChaptersByBookId(bookId);
+    const chaptersList = await this.adapterOfChapters.getChaptersByBookId(bookId);
     this.store.dispatch('chapters/saveChapters', chaptersList);
+  }
+
+  async fetchChapterById(chapterId) {
+    const chapter = await this.adapterOfChapters.getChapterById(chapterId);
+    this.store.dispatch('chapters/saveCurrentChapter', chapter);
+    return chapter
   }
 }
 

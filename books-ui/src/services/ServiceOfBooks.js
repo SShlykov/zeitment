@@ -102,7 +102,7 @@ class ServiceOfBooks {
 
   /**
    * функция получения оглавление книги по id и сохранения его в store
-   * @param {Number} bookId
+   * @param {String} bookId
    * @returns {Promise<void>}
    */
   async fetchTableOfContent(bookId) {
@@ -123,13 +123,13 @@ class ServiceOfBooks {
   }
 
   /**
-   * функция получения книги по id и оглавления ее и сохранения их в store
+   * функция получения книги по bookId и оглавления ее и сохранения их в store
    * @param {Number} id
    * @returns {Promise<{book: {owner: string, variables: [], author: string, description: string, title: string, mapParamsId: null, mapLink: null, createdAt: string, imageLink: null, deletedAt: null, publication: null, isPublic: boolean, id: string, updatedAt: string}, tableOfContents: *}>}
    */
-  async fetchCurrentBook(id) {
-    const book = await this.fetchEditableBook(id);
-    const tableOfContents = await this.fetchTableOfContent(id)
+  async fetchCurrentBook(bookId) {
+    const book = await this.fetchEditableBook(bookId);
+    const tableOfContents = await this.fetchTableOfContent(bookId)
     return {
       book,
       tableOfContents

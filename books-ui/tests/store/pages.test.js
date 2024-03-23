@@ -21,9 +21,9 @@ describe("tests pages store with vuex", () => {
     expect(pagesList).toEqual([appPage])
   })
 
-  test('select editable page', async () => {
-    await store.dispatch('pages/saveEditablePage', appPage)
-    const editablePage = store.getters['pages/editablePage']
-    expect(editablePage).toEqual(appPage)
+  test('select current page', async () => {
+    await store.dispatch('pages/saveCurrentPage', appPage)
+    const currentPage = store.getters['pages/currentPage']
+    expect(currentPage).toEqual(appPage)
   })
 })

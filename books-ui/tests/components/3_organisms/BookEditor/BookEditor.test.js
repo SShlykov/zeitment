@@ -8,6 +8,7 @@ import { store as books } from '@store/modules/books/index.js';
 import {createStore} from "vuex";
 import axios from "axios";
 import Router from "@router";
+import {bookPageConfig} from "@mocks/books.js";
 
 vi.mock('axios')
 
@@ -35,11 +36,13 @@ describe("tests of BookEditor", () => {
   axios.post.mockResolvedValue({data: []})
   axios.get.mockResolvedValue({data: []})
 
+
   test('mount test without book of BookEditor', async () => {
     const wrapper = mount(BookEditor, {
       props: {
         serviceOfBooks: {},
-        bookManager: {}
+        bookManager: {},
+        pageConfig: bookPageConfig
       },
       global: {
         plugins: [Router],
@@ -51,6 +54,9 @@ describe("tests of BookEditor", () => {
       }
     })
 
+    expect(wrapper.vm.pageConfig.bookId).toBe("book_id")
+    expect(wrapper.vm.pageConfig.sectionId).toBe("section_id")
+    expect(wrapper.vm.pageConfig.type).toBe("page")
     expect(wrapper.exists()).toBe(true)
     expect(wrapper.text()).contains('Книги не существует')
   })
@@ -61,7 +67,8 @@ describe("tests of BookEditor", () => {
     const wrapper = mount(BookEditor, {
       props: {
         serviceOfBooks: {},
-        bookManager: {}
+        bookManager: {},
+        pageConfig: bookPageConfig
       },
       global: {
         plugins: [Router],

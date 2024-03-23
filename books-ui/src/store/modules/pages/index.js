@@ -1,6 +1,6 @@
 const initialState = {
   chapterPages: [],
-  editablePage: null
+  currentPage: null
 }
 
 const state = {
@@ -9,7 +9,7 @@ const state = {
 
 const getters = {
   chapterPages: state => state.chapterPages,
-  editablePage: state => state.editablePage,
+  currentPage: state => state.currentPage,
 };
 
 const mutations = {
@@ -21,9 +21,9 @@ const mutations = {
   setChapterPages(state, pages) {
     state.chapterPages = pages;
   },
-  setEditablePage(state, page) {
-    state.editablePage = page;
-  },
+  setCurrentPage(state, page) {
+    state.currentPage = page;
+  }
 };
 
 const actions = {
@@ -33,8 +33,8 @@ const actions = {
   resetStore({ commit }) {
     commit('resetStore');
   },
-  saveEditablePage({ commit }, page) {
-    commit('setEditablePage', page);
+  saveCurrentPage({ commit }, page) {
+    commit('setCurrentPage', page);
   },
 };
 

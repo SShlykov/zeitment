@@ -104,4 +104,10 @@ const bookStore = {
   }
 }
 
-export { appBook, apiBook, apiBookResponse, apiBooksResponse, AdapterOfBooks, bookStore }
+const bookPageConfig = {
+  bookId: "book_id",
+  sectionId: "section_id",
+  type: "page"
+}
+
+export { appBook, apiBook, apiBookResponse, apiBooksResponse, AdapterOfBooks, bookStore, bookPageConfig }

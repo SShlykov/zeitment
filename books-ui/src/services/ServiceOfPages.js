@@ -11,7 +11,7 @@ class ServiceOfPages {
 
   async createPage(aPage) {
     const thePage = await this.adapter.createPage(aPage);
-    this.store.dispatch('pages/saveEditablePage', thePage);
+    this.store.dispatch('pages/saveCurrentPage', thePage);
   }
 
   async updatePage(page) {
@@ -26,23 +26,24 @@ class ServiceOfPages {
   }
 
   async storeEditablePageAttribute(attribute, value) {
-    const page = this.store.getters['pages/editablePage'];
+    const page = this.store.getters['pages/currentPage'];
     if (!page) return null;
     const updatedPage = {
       ...page,
       [attribute]: value
     };
-    await this.store.dispatch('pages/saveEditablePage', updatedPage);
+    await this.store.dispatch('pages/saveCurrentPage', updatedPage);
   }
 
   async saveEditablePageToServer() {
-    const page = this.store.getters['pages/editablePage'];
+    const page = this.store.getters['pages/currentPage'];
     await this.adapter.updatePage(page);
     return page;
   }
 
   async getPageById(id) {
-    const page = this.adapter.getPageById(id);
+    const page = await this.adapter.getPageById(id);
+    this.store.dispatch('pages/saveCurrentPage', page);
     return page
   }
 }

@@ -3,6 +3,8 @@ import {mount} from "@vue/test-utils";
 import BookEditorMenu from "@organisms/BookEditor/BookEditorMenu/BookEditorMenu.vue";
 import BookEditorMenuItem from "@organisms/BookEditor/BookEditorMenu/BookEditorMenuItem.vue";
 import Router from "@router";
+import {bookPageConfig} from "@mocks/books.js";
+import book from "@pages/Book/Book.vue";
 
 
 vi.mock('axios')
@@ -22,6 +24,9 @@ describe('tests of BookEditorMenu', () => {
 
   test('mount test of BookEditorMenu', async () => {
     const wrapper = mount(BookEditorMenu, {
+      props: {
+        pageConfig: bookPageConfig
+      },
       global: {
         plugins: [Router],
         mocks: {
@@ -36,6 +41,9 @@ describe('tests of BookEditorMenu', () => {
 
   test('BookEditorMenu toggle', async () => {
     const wrapper = mount(BookEditorMenu, {
+      props: {
+        pageConfig: bookPageConfig
+      },
       shallow: true,
       global: {
         plugins: [Router],
@@ -69,7 +77,8 @@ describe('tests of BookEditorMenu', () => {
             id: "id",
             level: "chapter"
           }
-        ]
+        ],
+        pageConfig: bookPageConfig
       }
     })
 
@@ -80,6 +89,14 @@ describe('tests of BookEditorMenu', () => {
 describe('tests of BookEditorMenuItem', () => {
   test('mount test of BookEditorMenuItem', async () => {
     const wrapper = mount(BookEditorMenuItem, {
+      props: {
+        title: "title",
+        id: "section_id",
+        level: "chapter",
+        bookId: bookPageConfig.bookId,
+        sectionId: bookPageConfig.sectionId
+
+      },
       shallow: true,
       global: {
         plugins: [Router],
@@ -98,7 +115,9 @@ describe('tests of BookEditorMenuItem', () => {
       props: {
         title: "title",
         id: "section_id",
-        level: "chapter"
+        level: "chapter",
+        bookId: bookPageConfig.bookId,
+        sectionId: bookPageConfig.sectionId
       },
       global: {
         plugins: [Router],
@@ -119,7 +138,9 @@ describe('tests of BookEditorMenuItem', () => {
       props: {
         title: "title",
         id: "bad_id",
-        level: "chapter"
+        level: "chapter",
+        bookId: bookPageConfig.bookId,
+        sectionId: bookPageConfig.sectionId
       },
       global: {
         plugins: [Router],

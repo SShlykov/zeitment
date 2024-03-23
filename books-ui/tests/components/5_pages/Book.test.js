@@ -44,7 +44,8 @@ describe("tests of BookPage", () => {
       }
     })
 
-    expect(wrapper.vm.bookId).toBe("book_id")
+
+    expect(wrapper.vm.pageConfig.bookId).toBe("book_id")
     expect(wrapper.exists()).toBe(true)
   })
 })

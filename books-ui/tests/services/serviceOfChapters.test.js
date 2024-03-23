@@ -27,4 +27,10 @@ describe('serviceOfChapters', () => {
     const chaptersList = store.getters['chapters/chapters']
     expect(chaptersList).toEqual([appChapter])
   })
+
+  test('fetch chapter by Id', async () => {
+    await serviceOfChapters.fetchChapterById(1)
+    const chapter = store.getters['chapters/currentChapter']
+    expect(chapter).toEqual(appChapter)
+  })
 })

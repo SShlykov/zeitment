@@ -3,7 +3,7 @@ import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader/BookEditorH
 import BookEditorMenu from "@organisms/BookEditor/BookEditorMenu/BookEditorMenu.vue";
 import BookEditorBody from "@organisms/BookEditor/BookEditorBody.vue";
 import {mapGetters} from "vuex";
-
+import {IPageConfig} from "@organisms/BookEditor/interfaces.js";
 
 export default {
   name: 'BookEditor',
@@ -15,6 +15,10 @@ export default {
     },
     bookManager: {
       type: Object,
+      required: true
+    },
+    pageConfig: {
+      type: IPageConfig,
       required: true
     }
   },
@@ -57,6 +61,7 @@ export default {
     <div class="w-full flex flex-grow">
       <BookEditorMenu
         :menuItems="menuItems"
+        :pageConfig="pageConfig"
       />
       <BookEditorBody />
     </div>

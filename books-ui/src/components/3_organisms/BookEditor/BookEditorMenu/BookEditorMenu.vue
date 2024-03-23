@@ -1,5 +1,6 @@
 <script>
 import BookEditorMenuItem from "./BookEditorMenuItem.vue";
+import {IPageConfig} from "@organisms/BookEditor/interfaces.js";
 
 export default {
   name: 'BookEditorMenu',
@@ -9,6 +10,10 @@ export default {
       type: Array,
       default: () => []
     },
+    pageConfig: {
+      type: IPageConfig,
+      required: true
+    }
   },
   data() {
     return {
@@ -36,6 +41,8 @@ export default {
       :order="item.order"
       :level="item.level"
       :itemClass="item.class"
+      :bookId="pageConfig.bookId"
+      :sectionId="pageConfig.sectionId"
     />
   </div>
 </template>

@@ -6,6 +6,10 @@ import ContentLoader from "@molecules/ContentLoader.vue";
 import {mapGetters} from "vuex";
 import BookManager from "@useCases/BookManager.js";
 import ServiceOfLayout from "@services/ServiceOfLayout.js";
+import ServiceOfChapters from "@services/ServiceOfChapters.js";
+import ServiceOfPages from "@services/ServiceOfPages.js";
+import {AdapterOfChapters} from "@mocks/chapters.js";
+import {AdapterOfPages} from "@mocks/pages.js";
 
 export default {
   name: 'BookPage',
@@ -18,28 +22,41 @@ export default {
   },
   computed: {
     ...mapGetters('books', ['currentBook']),
-    bookId() {
-      return this.$route.params.book_id
+    pageConfig() {
+      return {
+        bookId: this.$route.params.book_id,
+        type: this.$route.params.type,
+        sectionId: this.$route.params.section_id
+      }
     }
   },
   watch:{
     $route (to){
-      this.serviceOfBooks.fetchCurrentBook(to.book_id)
+      const bookId = to.params.book_id
+      const type = to.params.type
+      const sectionId = to.params.section_id
+      this.bookManager.fetchBookWithPage(bookId, type, sectionId)
     }
   },
   mounted() {
     const url = import.meta.env.VITE_API_ADDR
     const adapterOfBooks = new AdapterOfBooks(url)
+    const adapterOfChapters = new AdapterOfChapters(url)
+    const adapterOfPages = new AdapterOfPages(url)
     const store = this.$store
-    const bookId = this.bookId
+    const bookId = this.pageConfig.bookId
+    const type = this.pageConfig.type
+    const sectionId = this.pageConfig.sectionId
     if (!bookId) {
       this.$router.push('/')
     }
     const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
+    const serviceOfChapters = new ServiceOfChapters(adapterOfChapters, store)
+    const serviceOfPages = new ServiceOfPages(adapterOfPages, store)
     const layoutService  = new ServiceOfLayout(store)
-    const bookManager    = new BookManager(serviceOfBooks, layoutService)
+    const bookManager    = new BookManager(serviceOfBooks, serviceOfChapters, serviceOfPages, layoutService)
 
-    serviceOfBooks.fetchCurrentBook(bookId)
+    bookManager.fetchBookWithPage(bookId, type, sectionId)
 
     this.bookManager = bookManager
     this.serviceOfBooks = serviceOfBooks
@@ -55,6 +72,7 @@ export default {
       v-if="currentBook"
       :serviceOfBooks="serviceOfBooks"
       :bookManager="bookManager"
+      :pageConfig="pageConfig"
     />
     <ContentLoader
       v-if="!currentBook"
