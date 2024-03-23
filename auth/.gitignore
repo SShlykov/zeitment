@@ -4,3 +4,4 @@ tmp/*.go
 Makefile
 .env
 bin
+/vendor.protogen

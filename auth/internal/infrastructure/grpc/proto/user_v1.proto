@@ -79,7 +79,7 @@ message User {
   google.protobuf.Timestamp logged_at = 5;
   google.protobuf.Timestamp confirmed_at = 6;
 
-  string login = 7;
+  string login = 7 [(validate.rules).string = { min_len: 6, max_len: 100 }];
   google.protobuf.StringValue email = 8;
 
   google.protobuf.StringValue deleted_by = 9;
@@ -92,7 +92,7 @@ message User {
 //------------------------------------------------------------------------------------------------------------------
 message SignUpRequest {
   User user = 1;
-  string Password = 2;
+  string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
 }
 message SignUpResponse {
   string Status = 1;
@@ -104,8 +104,8 @@ message SignUpResponse {
 //  SignIn
 //------------------------------------------------------------------------------------------------------------------
 message SignInRequest {
-  string LoginOrEmail = 1;
-  string Password = 2;
+  string LoginOrEmail = 1 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+  string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
 }
 message SignInResponse {
   string Status = 1;
