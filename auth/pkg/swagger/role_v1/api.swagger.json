@@ -1,0 +1,349 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Модуль управления ролями",
+    "description": "Модуль реализующий работу с ролями пользователей",
+    "version": "0.0.1",
+    "contact": {
+      "name": "Sergey Shlykov",
+      "email": "zeitment@gmail.com"
+    },
+    "license": {
+      "name": "FSF",
+      "url": "..."
+    }
+  },
+  "tags": [
+    {
+      "name": "RolesService"
+    }
+  ],
+  "host": "localhost:8080",
+  "basePath": "/api/v1/auth/roles",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/create": {
+      "post": {
+        "summary": "Создать пользователя",
+        "operationId": "RolesService_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/role_v1RoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/role_v1CreateRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    },
+    "/delete/{id}": {
+      "delete": {
+        "summary": "Удалить пользователя",
+        "operationId": "RolesService_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Идентификатор роли",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    },
+    "/get/{id}": {
+      "get": {
+        "summary": "Получить пользователя",
+        "operationId": "RolesService_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/role_v1RoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Идентификатор роли",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    },
+    "/get_by_name/{name}": {
+      "get": {
+        "summary": "Получить роль по имени",
+        "operationId": "RolesService_GetByName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/role_v1RoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "Название роли",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    },
+    "/list": {
+      "get": {
+        "summary": "Список ролей",
+        "operationId": "RolesService_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/role_v1ListRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "status.status",
+            "description": "Статус операции",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status.message",
+            "description": "Сообщение об ошибке",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    },
+    "/update/{id}": {
+      "put": {
+        "summary": "Обновить пользователя",
+        "operationId": "RolesService_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/role_v1RoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Идентификатор роли",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "RolesService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RolesServiceUpdateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Название роли"
+        }
+      },
+      "title": "Запрос на обновление роли"
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "role_v1CreateRoleRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Название роли"
+        }
+      },
+      "title": "Запрос на создание роли"
+    },
+    "role_v1ListRolesResponse": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/role_v1Role"
+          }
+        }
+      },
+      "title": "Ответ на запрос создания роли"
+    },
+    "role_v1Role": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Идентификатор роли"
+        },
+        "name": {
+          "type": "string",
+          "title": "Название роли"
+        }
+      },
+      "title": "Роль"
+    },
+    "role_v1RoleResponse": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/role_v1Role",
+          "title": "Роль"
+        },
+        "status": {
+          "$ref": "#/definitions/role_v1Status",
+          "title": "Статус операции"
+        }
+      },
+      "title": "Ответ на запрос получения роли"
+    },
+    "role_v1Status": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "title": "Статус операции"
+        },
+        "message": {
+          "type": "string",
+          "title": "Сообщение об ошибке"
+        }
+      },
+      "title": "Статус операции"
+    }
+  }
+}

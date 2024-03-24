@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package role_v1;
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/proto/role_v1;role_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Модуль управления ролями"
+    version: "0.0.1"
+    description: "Модуль реализующий работу с ролями пользователей"
+    license: {
+      name: "FSF"
+      url: "..."
+    }
+    contact: {
+      name: "Sergey Shlykov"
+      email: "zeitment@gmail.com"
+    };
+  };
+
+  base_path: "/api/v1/auth/roles"
+
+  host: "localhost:8080",
+  schemes: HTTP,
+  schemes: HTTPS,
+  consumes: "application/json",
+  produces: "application/json",
+};
+
+
+// Сервис работы с ролями пользователей
+service RolesService {
+  // Список ролей
+  rpc List(ListRolesRequest) returns (ListRolesResponse) {
+    option (google.api.http) = {
+      get: "/list"
+    };
+  };
+
+  // Получить роль по имени
+  rpc GetByName(GetByNameReq) returns (RoleResponse) {
+    option (google.api.http) = {
+      get: "/get_by_name/{name}"
+    };
+  };
+
+  // Получить пользователя
+  rpc Get(GetByIdReq) returns (RoleResponse) {
+    option (google.api.http) = {
+      get: "/get/{id}"
+    };
+  };
+
+  // Создать пользователя
+  rpc Create(CreateRoleRequest) returns (RoleResponse) {
+    option (google.api.http) = {
+      post: "/create"
+      body: "*"
+    };
+  };
+
+  // Обновить пользователя
+  rpc Update(UpdateRoleRequest) returns (RoleResponse) {
+    option (google.api.http) = {
+      put: "/update/{id}"
+      body: "*"
+    };
+  };
+
+  // Удалить пользователя
+  rpc Delete(DeleteRoleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/delete/{id}"
+    };
+  };
+}
+
+// Роль
+message Role {
+  // Идентификатор роли
+  string id = 1;
+  // Название роли
+  string name = 2;
+
+}
+
+// Запрос на создание роли
+message ListRolesRequest {
+  Status status = 1;
+}
+
+// Ответ на запрос создания роли
+message ListRolesResponse {
+  repeated Role roles = 1;
+}
+
+// Запрос на получение роли по имени
+message GetByNameReq {
+  // Название роли
+  string name = 1;
+}
+
+// Запрос на получение роли по идентификатору
+message GetByIdReq {
+  // Идентификатор роли
+  string id = 1;
+}
+
+// Ответ на запрос получения роли
+message RoleResponse {
+  // Роль
+  Role role = 1;
+  // Статус операции
+  Status status = 2;
+}
+
+// Запрос на создание роли
+message CreateRoleRequest {
+  // Название роли
+  string name = 1 [(validate.rules).string = {min_len: 3, max_len: 50}];
+}
+
+// Запрос на обновление роли
+message UpdateRoleRequest {
+  // Идентификатор роли
+  string id = 1;
+  // Название роли
+  string name = 2 [(validate.rules).string = {min_len: 3, max_len: 50}];
+}
+
+// Запрос на удаление роли
+message DeleteRoleRequest {
+  // Идентификатор роли
+  string id = 1;
+}
+
+// Статус операции
+message Status {
+  // Статус операции
+  string status = 1;
+  // Сообщение об ошибке
+  string message = 2;
+}

@@ -1,0 +1,349 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Авторизационный модуль",
+    "description": "Модуль реализующий авторизацию сервисов",
+    "version": "0.0.1",
+    "contact": {
+      "name": "Sergey Shlykov",
+      "email": "zeitment@gmail.com"
+    },
+    "license": {
+      "name": "FSF",
+      "url": "..."
+    }
+  },
+  "tags": [
+    {
+      "name": "AuthService"
+    }
+  ],
+  "host": "localhost:8080",
+  "basePath": "/api/v1/auth/sign",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/in": {
+      "post": {
+        "summary": "Аутентификация пользователя",
+        "operationId": "AuthService_LogIn",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1LogInResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1LogInRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/is-confirmed": {
+      "get": {
+        "operationId": "AuthService_IsConfirmed",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1IsConfirmedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/out": {
+      "get": {
+        "summary": "Разлогинить пользователя",
+        "operationId": "AuthService_LogOut",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1LogOutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/up": {
+      "post": {
+        "summary": "Регистрация пользователя",
+        "operationId": "AuthService_SignUp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1SignUpResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1SignUpRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "auth_v1IsConfirmedResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/auth_v1Status"
+        },
+        "IsConfirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "auth_v1LogInRequest": {
+      "type": "object",
+      "properties": {
+        "LoginOrEmail": {
+          "type": "string",
+          "title": "Логин или почта пользователя"
+        },
+        "Type": {
+          "type": "string",
+          "title": "Тип аутентификации | login - логин, email - почта"
+        },
+        "Password": {
+          "type": "string",
+          "title": "Пароль пользователя"
+        }
+      },
+      "title": "Аутентификация пользователя"
+    },
+    "auth_v1LogInResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/auth_v1Status",
+          "title": "Статус операции"
+        },
+        "RoleName": {
+          "type": "string",
+          "title": "Имя роли пользователя"
+        },
+        "Token": {
+          "type": "string",
+          "title": "Токен доступа"
+        }
+      },
+      "title": "Ответ на аутентификацию пользователя"
+    },
+    "auth_v1LogOutResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/auth_v1Status"
+        }
+      }
+    },
+    "auth_v1SignUpRequest": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/user_v1User",
+          "title": "Структура пользователя"
+        },
+        "Password": {
+          "type": "string",
+          "title": "Пароль пользователя | min_len: 6, max_len: 100"
+        }
+      },
+      "title": "Регистрация пользователя в системе"
+    },
+    "auth_v1SignUpResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/auth_v1Status",
+          "title": "Статус операции"
+        },
+        "RoleName": {
+          "type": "string",
+          "title": "Имя роли пользователя"
+        },
+        "Token": {
+          "type": "string",
+          "title": "Токен доступа"
+        }
+      },
+      "title": "Ответ на регистрацию пользователя"
+    },
+    "auth_v1Status": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "title": "Статус операции"
+        },
+        "message": {
+          "type": "string",
+          "title": "Сообщение об ошибке"
+        }
+      },
+      "title": "Статус операции"
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "user_v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Идентификатор пользователя"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Дата создания"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Дата обновления"
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Дата удаления | null - не удален"
+        },
+        "loggedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Дата последнего входа | null - не входил"
+        },
+        "confirmedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Дата подтверждения почты | null - не подтвержден"
+        },
+        "login": {
+          "type": "string",
+          "title": "Логин пользователя | min_len: 6, max_len: 100"
+        },
+        "email": {
+          "type": "string",
+          "title": "Почта пользователя | null - не указана"
+        },
+        "deletedBy": {
+          "type": "string",
+          "title": "Кем удален | null - не удален"
+        },
+        "accessTemplateId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Особая метка доступа для связи с другими сервисами"
+        },
+        "updateAfter": {
+          "type": "string",
+          "format": "int64",
+          "title": "Период через который нужно обновить пароль пользователя"
+        }
+      }
+    }
+  }
+}

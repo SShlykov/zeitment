@@ -1,12 +1,12 @@
 package adapters
 
 import (
-	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
+	"github.com/SShlykov/zeitment/auth/internal/models/dto"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func UsersToProto(users []*entity.User) []*user_v1.User {
+func UsersToProto(users []*dto.User) []*user_v1.User {
 	protoUsers := make([]*user_v1.User, len(users))
 	for i, user := range users {
 		protoUsers[i] = UserToProto(user)
@@ -14,8 +14,16 @@ func UsersToProto(users []*entity.User) []*user_v1.User {
 	return protoUsers
 }
 
-func ProtoToUser(protoUser *user_v1.User) *entity.User {
-	user := &entity.User{
+func ProtoToUsers(protoUsers []*user_v1.User) []*dto.User {
+	users := make([]*dto.User, len(protoUsers))
+	for i, protoUser := range protoUsers {
+		users[i] = ProtoToUser(protoUser)
+	}
+	return users
+}
+
+func ProtoToUser(protoUser *user_v1.User) *dto.User {
+	user := &dto.User{
 		ID:          protoUser.Id,
 		CreatedAt:   protoUser.CreatedAt.AsTime(),
 		UpdatedAt:   protoUser.UpdatedAt.AsTime(),
@@ -34,7 +42,7 @@ func ProtoToUser(protoUser *user_v1.User) *entity.User {
 	return user
 }
 
-func UserToProto(user *entity.User) *user_v1.User {
+func UserToProto(user *dto.User) *user_v1.User {
 	protoUser := &user_v1.User{
 		Id:          user.ID,
 		CreatedAt:   timestamppb.New(user.CreatedAt),

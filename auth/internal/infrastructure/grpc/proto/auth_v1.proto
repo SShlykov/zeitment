@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "user_v1.proto";
+
+option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/proto/auth_v1;auth_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Авторизационный модуль"
+    version: "0.0.1"
+    description: "Модуль реализующий авторизацию сервисов"
+    license: {
+      name: "FSF"
+      url: "..."
+    }
+    contact: {
+      name: "Sergey Shlykov"
+      email: "zeitment@gmail.com"
+    };
+  };
+
+  base_path: "/api/v1/auth/sign"
+
+  host: "localhost:8080",
+  schemes: HTTP,
+  schemes: HTTPS,
+  consumes: "application/json",
+  produces: "application/json",
+};
+
+service AuthService {
+  // Регистрация пользователя
+  rpc SignUp (SignUpRequest) returns (SignUpResponse) {
+    option (google.api.http) = {
+      post: "/up"
+      body: "*"
+    };
+  }
+
+  rpc IsConfirmed (IsConfirmedRequest) returns (IsConfirmedResponse) {
+    option (google.api.http) = {
+      get: "/is-confirmed"
+    };
+  }
+
+  // Аутентификация пользователя
+  rpc LogIn (LogInRequest) returns (LogInResponse) {
+    option (google.api.http) = {
+      post: "/in"
+      body: "*"
+    };
+  }
+
+  // Разлогинить пользователя
+  rpc LogOut (LogOutRequest) returns (LogOutResponse) {
+    option (google.api.http) = {
+      get: "/out"
+    };
+  }
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  SignUp
+//------------------------------------------------------------------------------------------------------------------
+
+// Регистрация пользователя в системе
+message SignUpRequest {
+  // Структура пользователя
+  user_v1.User user = 1;
+  // Пароль пользователя | min_len: 6, max_len: 100
+  string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+}
+
+// Ответ на регистрацию пользователя
+message SignUpResponse {
+  // Статус операции
+  Status Status = 1;
+  // Имя роли пользователя
+  string RoleName = 2;
+  // Токен доступа
+  string Token = 3;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  SignIn
+//------------------------------------------------------------------------------------------------------------------
+
+// Аутентификация пользователя
+message LogInRequest {
+  // Логин или почта пользователя
+  string LoginOrEmail = 1 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+  // Тип аутентификации | login - логин, email - почта
+  string Type = 2 [(validate.rules).string = { in: ["login", "email"] }];
+  // Пароль пользователя
+  string Password = 3 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+}
+
+// Ответ на аутентификацию пользователя
+message LogInResponse {
+  // Статус операции
+  Status Status = 1;
+  // Имя роли пользователя
+  string RoleName = 2;
+  // Токен доступа
+  string Token = 3;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  SignOut
+//------------------------------------------------------------------------------------------------------------------
+message LogOutRequest {
+  string Token = 1;
+}
+message LogOutResponse {
+  Status Status = 1;
+}
+
+// Статус операции
+message Status {
+  // Статус операции
+  string status = 1;
+  // Сообщение об ошибке
+  string message = 2;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  IsConfirmed
+//------------------------------------------------------------------------------------------------------------------
+
+message IsConfirmedRequest {
+  string Token = 1;
+}
+
+message IsConfirmedResponse {
+  Status Status = 1;
+  bool IsConfirmed = 2;
+}

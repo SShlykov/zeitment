@@ -9,6 +9,8 @@ services:
     container_name: auth
     restart: always
     hostname: auth
+    ports:
+      - "50051:50051"
     env_file:
       - ./auth/.env
     logging:

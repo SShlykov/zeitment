@@ -22,6 +22,9 @@ type Simulated[T any] interface {
 // Repository определяет обобщенный интерфейс для операций CRUD над сущностями типа T.
 // T представляет тип сущности, который должен быть структурой.
 type Repository[T any] interface {
+	// Count возвращает количество сущностей в репозитории.
+	Count(ctx context.Context) (uint64, error)
+
 	// List извлекает срез сущностей на основе лимита и смещения для пагинации.
 	List(ctx context.Context, options dbutils.Pagination) ([]*T, error)
 
@@ -46,6 +49,25 @@ type repository[T Simulated[T]] struct {
 	Name   string
 	entity T
 	db     postgres.Client
+}
+
+func (r *repository[T]) Count(ctx context.Context) (uint64, error) {
+	query, args, err := r.db.Builder().
+		Select("COUNT(*)").
+		From(r.entity.TableName()).
+		ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	q := postgres.Query{Name: r.Name + ".Count", Raw: query}
+	var count uint64
+	if err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (r *repository[T]) List(ctx context.Context, options dbutils.Pagination) ([]*T, error) {

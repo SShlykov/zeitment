@@ -13,13 +13,20 @@ option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/g
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "SShlykov/zeitment/auth"
-    version: "1.0.0"
+    title: "Пользовательский модуль"
+    version: "0.0.1"
+    description: "Модуль реализующий работу с пользователями"
+    license: {
+      name: "FSF"
+      url: "..."
+    }
     contact: {
       name: "Sergey Shlykov"
       email: "zeitment@gmail.com"
     };
   };
+
+  base_path: "/api/v1/auth/user"
 
   host: "localhost:8080",
   schemes: HTTP,
@@ -29,40 +36,35 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 
+// Сервис работы с пользователем
 service UserService {
-  //Регистрация пользователя
-  rpc SignUp (SignUpRequest) returns (SignUpResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/user/signup"
-    };
-  }
-
-  //Аутентификация пользователя
-  rpc SignIn (SignInRequest) returns (SignInResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/user/signin"
-    };
-  }
-
-  rpc SignOut (SignOutRequest) returns (SignOutResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/user/signout"
-    };
-  }
-  //------------------------------------------------------------------------------------------------------------------
-  // CRUD operations
-  //------------------------------------------------------------------------------------------------------------------
-  rpc Update(UpdateUserRequest) returns (UpdateUserResponse) {};
-  rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {};
-  rpc Get(GetUserRequest) returns (GetUserResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/user/{id}"
-    };
-  };
+  // Поиск пользователей
   rpc Find(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
-      post: "/api/v1/user",
+      post: "/find",
       body: "*"
+    };
+  };
+
+  // Получить пользователя
+  rpc Get(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/get/{id}"
+    };
+  };
+
+  // Обновить пользователя
+  rpc Update(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/update/{id}"
+      body: "*"
+    };
+  };
+
+  // Удалить пользователя
+  rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/delete/{id}"
     };
   };
 }
@@ -72,124 +74,149 @@ service UserService {
 //------------------------------------------------------------------------------------------------------------------
 
 message User {
+  // Идентификатор пользователя
   string id = 1;
+  // Дата создания
   google.protobuf.Timestamp created_at = 2;
+  // Дата обновления
   google.protobuf.Timestamp updated_at = 3;
+  // Дата удаления | null - не удален
   google.protobuf.Timestamp deleted_at = 4;
+  // Дата последнего входа | null - не входил
   google.protobuf.Timestamp logged_at = 5;
+  // Дата подтверждения почты | null - не подтвержден
   google.protobuf.Timestamp confirmed_at = 6;
 
+  // Логин пользователя | min_len: 6, max_len: 100
   string login = 7 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+  // Почта пользователя | null - не указана
   google.protobuf.StringValue email = 8;
 
+  // Кем удален | null - не удален
   google.protobuf.StringValue deleted_by = 9;
+  // Особая метка доступа для связи с другими сервисами
   google.protobuf.Int32Value access_template_id = 10;
+  // Период через который нужно обновить пароль пользователя
   google.protobuf.Int64Value update_after = 11;
 }
 
 //------------------------------------------------------------------------------------------------------------------
-//  SignUp
+//  ListUsers operations
 //------------------------------------------------------------------------------------------------------------------
-message SignUpRequest {
-  User user = 1;
-  string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
-}
-message SignUpResponse {
-  string Status = 1;
-  string RoleName = 2;
-  string Token = 3;
-}
 
-//------------------------------------------------------------------------------------------------------------------
-//  SignIn
-//------------------------------------------------------------------------------------------------------------------
-message SignInRequest {
-  string LoginOrEmail = 1 [(validate.rules).string = { min_len: 6, max_len: 100 }];
-  string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
-}
-message SignInResponse {
-  string Status = 1;
-  string RoleName = 2;
-  string Token = 3;
-}
-
-//------------------------------------------------------------------------------------------------------------------
-//  SignOut
-//------------------------------------------------------------------------------------------------------------------
-message SignOutRequest {
-  string Token = 1;
-}
-message SignOutResponse {
-  int32 Status = 1;
-}
-
-//------------------------------------------------------------------------------------------------------------------
-//  CRUD operations
-//------------------------------------------------------------------------------------------------------------------
+// Запрос на поиск пользователей
 message ListUsersRequest {
+  // Опции поиска пользователей; пагинация
   GetOptions options = 1;
 }
 
+// Ответ на поиск пользователей
 message ListUsersResponse {
-  string status = 1;
+  // Статус операции
+  Status status = 1;
+  // Список пользователей
   repeated User users = 2;
+  // Метаданные пагинации
   PaginationMetadata pagination_metadata = 3;
 }
 
+//------------------------------------------------------------------------------------------------------------------
+//  Get User operations
+//------------------------------------------------------------------------------------------------------------------
+
+// Получить пользователя
 message GetUserRequest {
+  // Идентификатор пользователя
   string id = 1;
 }
 
+// Ответ на получение пользователя
 message GetUserResponse {
+  // Идентификатор пользователя
   string id = 1;
-  string status = 2;
+  Status status = 2;
   User user = 3;
 }
 
-message CreateUserRequest {
-  User user = 1;
-}
+//------------------------------------------------------------------------------------------------------------------
+//  Update User operations
+//------------------------------------------------------------------------------------------------------------------
 
-message CreateUserResponse {
-  string id = 1;
-  string status = 2;
-  User user = 3;
-}
-
+// Обновить пользователя
 message UpdateUserRequest {
+  // Идентификатор пользователя
   string id = 1;
+  // Структура пользователя (обновленная)
   User user = 2;
 }
 
+// Ответ на обновление пользователя
 message UpdateUserResponse {
+  // Идентификатор пользователя
   string id = 1;
-  string status = 2;
+  // Статус операции
+  Status status = 2;
+  // Обновленный пользователь
   User user = 3;
 }
 
+//------------------------------------------------------------------------------------------------------------------
+//  Delete User operations
+//------------------------------------------------------------------------------------------------------------------
+
+// Удалить пользователя
 message DeleteUserRequest {
+  // Идентификатор пользователя
   string id = 1;
 }
 
+
+//------------------------------------------------------------------------------------------------------------------
+//  Вспомогательные структуры
+//------------------------------------------------------------------------------------------------------------------
+
+// Статус операции
+message Status {
+  // Статус операции
+  string status = 1;
+  // Сообщение об ошибке
+  string message = 2;
+}
+
+// Опции поиска
 message GetOptions {
+  // Пагинация
   Pagination pagination = 1;
 }
 
+// Метаданные пагинации (для ответа)
 message PaginationMetadata {
-  int32 page = 1;
-  int32 page_size = 2;
-  int32 total = 3;
-  int32 total_pages = 4;
+  // Номер страницы
+  uint64 page = 1;
+  // Размер страницы
+  uint64 page_size = 2;
+  // Общее количество элементов
+  uint64 total = 3;
+  // Общее количество страниц
+  uint64 total_pages = 4;
 }
 
+// Пагинация (для запроса)
 message Pagination {
+  // Номер страницы
   uint64 page = 1;
+  // Размер страницы
   uint64 page_size = 2;
 }
 
+// Фильтры
 message Filter {
+  // Поле для фильтрации (название поля)
   string field = 1;
+  // Значение для фильтрации
   string value = 2;
+  // Оператор фильтрации (equal, not_equal, greater_than, greater_than_or_equal, less_than, less_than_or_equal,
+  // like, not_like, in, not_in, is_null, is_not_null)
   Operator operator = 3;
 }
 

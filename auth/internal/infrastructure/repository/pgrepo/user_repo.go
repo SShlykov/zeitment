@@ -6,6 +6,7 @@ import (
 	"github.com/SShlykov/zeitment/postgres"
 )
 
+//go:generate mockgen -destination=../../../test/mocks/repository/mocks/mock_users_repo.go -package=mocks github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/pgrepo UsersRepo
 type UsersRepo interface {
 	Repository[entity.User]
 	FindByLogin(ctx context.Context, login string) (*entity.User, error)

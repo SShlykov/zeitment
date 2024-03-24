@@ -2,9 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/SShlykov/zeitment/auth/internal/domain/services"
+	"github.com/SShlykov/zeitment/auth/internal/domain/services/auth"
+	"github.com/SShlykov/zeitment/auth/internal/domain/services/user"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/pgrepo"
 	"github.com/SShlykov/zeitment/auth/internal/interceptor"
+	"github.com/SShlykov/zeitment/auth/pkg/grpc/auth_v1"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	logPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/postgres"
@@ -27,7 +29,8 @@ func NewServer(logger logPkg.Logger, db postgres.Client, port int) error {
 
 	reflection.Register(s)
 
-	RegisterUserService(s, db)
+	RegisterUserServiceServer(s, db)
+	RegisterAuthService(s, db)
 
 	logger.Info("gRPC server started", logPkg.Int("port", port))
 
@@ -37,8 +40,15 @@ func NewServer(logger logPkg.Logger, db postgres.Client, port int) error {
 	return nil
 }
 
-func RegisterUserService(s *grpc.Server, db postgres.Client) {
+func RegisterUserServiceServer(s *grpc.Server, db postgres.Client) {
 	repo := pgrepo.NewUsersRepository(db)
-	service := services.NewUserServiceServer(repo)
+	service := user.NewUserServiceServer(repo)
 	user_v1.RegisterUserServiceServer(s, service)
+}
+
+func RegisterAuthService(s *grpc.Server, db postgres.Client) {
+	repo := pgrepo.NewUsersRepository(db)
+	userService := user.NewService(repo)
+	service := auth.NewAuthService(userService)
+	auth_v1.RegisterAuthServiceServer(s, service)
 }
