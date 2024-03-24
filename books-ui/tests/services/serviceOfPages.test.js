@@ -56,8 +56,8 @@ describe('serviceOfPages', () => {
     await store.dispatch('pages/saveCurrentPage', appPage)
     await serviceOfPages.storeEditablePageAttribute("title", "new title")
 
-    const editablePage = store.getters['pages/currentPage']
-    expect(editablePage.title).toEqual("new title")
+    const currentPage = store.getters['pages/currentPage']
+    expect(currentPage.title).toEqual("new title")
   })
 
   test("test of get page by id", async () => {
@@ -70,5 +70,11 @@ describe('serviceOfPages', () => {
     await store.dispatch('pages/saveCurrentPage', appPage)
     const page = await serviceOfPages.saveEditablePageToServer()
     expect(page).toEqual(appPage)
+  })
+
+  test("get currentPage", async () => {
+    await store.dispatch('pages/saveCurrentPage', appPage)
+    const currentPage = serviceOfPages.currentPage()
+    expect(currentPage).toEqual(appPage)
   })
 })

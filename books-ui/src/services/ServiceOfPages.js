@@ -46,6 +46,10 @@ class ServiceOfPages {
     this.store.dispatch('pages/saveCurrentPage', page);
     return page
   }
+
+  currentPage() {
+    return this.store.getters['pages/currentPage'];
+  }
 }
 
 export default ServiceOfPages;

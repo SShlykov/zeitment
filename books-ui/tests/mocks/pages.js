@@ -63,6 +63,7 @@ class AdapterOfPages {
   async getPagesByChapterId() {
     return [appPage]
   }
+
 }
 
 export {appPage, apiPage, apiPageResponse, apiPagesResponse, AdapterOfPages}

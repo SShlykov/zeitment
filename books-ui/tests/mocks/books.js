@@ -78,31 +78,6 @@ class AdapterOfBooks {
   }
 }
 
-const bookStore = {
-  namespaced: true,
-  state: {
-    userBooks: []
-  },
-  mutations: {
-    setUserBooks(state, userBooks) {
-      state.userBooks = userBooks
-    },
-    resetStore(state) {
-      state.userBooks = []
-    }
-  },
-  getters: {
-    userBooks: (state) => state.userBooks
-  },
-  actions: {
-    async saveUserBooks({commit}, userBooks) {
-      commit('setUserBooks', userBooks)
-    },
-    resetStore({commit}) {
-      commit('resetStore')
-    }
-  }
-}
 
 const bookPageConfig = {
   bookId: "book_id",
@@ -110,4 +85,4 @@ const bookPageConfig = {
   type: "page"
 }
 
-export { appBook, apiBook, apiBookResponse, apiBooksResponse, AdapterOfBooks, bookStore, bookPageConfig }
+export { appBook, apiBook, apiBookResponse, apiBooksResponse, AdapterOfBooks, bookPageConfig }

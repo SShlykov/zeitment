@@ -43,6 +43,37 @@ class BookManager {
       chapter
     }
   }
+
+
+  /**
+   *
+   * @returns {{number: {null | string}, text: string, title: string}}
+   */
+  getCurrentSectionContent() {
+    let title = ""
+    let text = ""
+    let number = null
+
+    const currentChapter = this.chapterService.currentChapter()
+    const currentPage = this.pageService.currentPage()
+    if (currentPage) {
+      title = currentPage.title
+      text = currentPage.text
+      number = null
+    } else if (currentChapter) {
+      title = currentChapter.title
+      text = currentChapter.text
+      number = currentChapter.number
+    }
+
+    return {
+      title,
+      text,
+      number
+    }
+  }
+
+
 }
 
 export default BookManager

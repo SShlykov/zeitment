@@ -23,6 +23,10 @@ class ServiceOfChapters {
     this.store.dispatch('chapters/saveCurrentChapter', chapter);
     return chapter
   }
+
+  currentChapter() {
+    return this.store.getters['chapters/currentChapter']
+  }
 }
 
 export default ServiceOfChapters;

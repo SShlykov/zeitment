@@ -34,8 +34,8 @@ describe('BookManager', () => {
   const bookAdapter = new AdapterOfBooks('')
   const bookService = new ServiceOfBooks(bookAdapter, store)
   const chapterAdapter = new AdapterOfChapters('')
-  const chapterService = new ServiceOfChapters(chapterAdapter, store)
   const pageAdapter = new AdapterOfPages('')
+  const chapterService = new ServiceOfChapters(chapterAdapter, store)
   const pageService = new ServiceOfPages(pageAdapter, store)
   const layoutService = new ServiceOfLayout(store)
   const bookManager = new BookManager(bookService, chapterService, pageService, layoutService)
@@ -94,4 +94,34 @@ describe('BookManager', () => {
     expect(store.getters['pages/currentPage']).toBe(null)
     expect(store.getters['chapters/currentChapter']).toEqual(appChapter)
   })
+
+  test('get currentSectionContent when section = page', async () => {
+    store.dispatch('chapters/saveCurrentChapter', null)
+    store.dispatch('pages/saveCurrentPage', appPage)
+
+    const {
+      title,
+      text,
+      number
+    } = bookManager.getCurrentSectionContent()
+    expect(title).toEqual(appPage.title)
+    expect(text).toEqual(appPage.text)
+    expect(number).toEqual(null)
+  })
+
+  test('get currentSectionContent when section = chapter', async () => {
+    store.dispatch('chapters/saveCurrentChapter', appChapter)
+    store.dispatch('pages/saveCurrentPage', null)
+
+    const {
+      title,
+      text,
+      number
+    } = bookManager.getCurrentSectionContent()
+
+    expect(title).toEqual(appChapter.title)
+    expect(text).toEqual(appChapter.text)
+    expect(number).toEqual(appChapter.number)
+  })
 })
+
