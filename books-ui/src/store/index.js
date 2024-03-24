@@ -3,6 +3,7 @@ import { store as layout } from '@/store/modules/layout';
 import { store as auth } from '@/store/modules/auth';
 import { store as books } from '@/store/modules/books';
 import { store as test } from '@/store/modules/test';
+import { store as pages } from '@/store/modules/pages';
 import { store as chapters } from '@/store/modules/chapters';
 
 
@@ -19,7 +20,8 @@ export const store = createStore({
     auth,
     books,
     test,
-    chapters
+    chapters,
+    pages
   },
 });
 

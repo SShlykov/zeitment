@@ -1,5 +1,5 @@
 import {expect, describe, test, vi} from 'vitest'
-import {mount} from "@vue/test-utils.proto";
+import {mount} from "@vue/test-utils";
 import BookEditorHeader from "@organisms/BookEditor/BookEditorHeader/BookEditorHeader.vue";
 import BookEditorHeaderContainer from "@organisms/BookEditor/BookEditorHeader/BookEditorHeaderContainer.vue";
 
@@ -13,7 +13,7 @@ describe("tests of BookEditorHeader", () => {
     bookManager: {
       saveBookWithPage: vi.fn()
     },
-    editableBook: {
+    currentBook: {
       title: "test",
     }
   }

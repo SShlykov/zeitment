@@ -3,7 +3,7 @@ import Head from '@frames/Head.vue';
 import SideMenu from '@frames/SideMenu/SideMenu.vue';
 import AppNotifications from "@frames/AppNotifications/AppNotifications.vue";
 import {mapGetters} from "vuex";
-import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import AdapterOfBooks from "@adapters/AdapterOfBooks/AdapterOfBooks.js";
 import ServiceOfBooks from "@services/ServiceOfBooks.js";
 
 

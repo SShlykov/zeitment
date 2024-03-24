@@ -1,6 +1,9 @@
 const initialState = {
   userBooks: [],
-  editableBook: null
+  currentBook: null,
+  tableOfContents: {
+    sections: []
+  },
 }
 
 const state = {
@@ -9,7 +12,8 @@ const state = {
 
 const getters = {
   userBooks:    state => state.userBooks,
-  editableBook: state => state.editableBook,
+  currentBook: state => state.currentBook,
+  tableOfContents: state => state.tableOfContents,
 };
 
 const mutations = {
@@ -21,9 +25,12 @@ const mutations = {
   setUserBooks(state, userBooks) {
     state.userBooks = userBooks;
   },
-  setEditableBook(state, book) {
-    state.editableBook = book;
+  setCurrentBook(state, book) {
+    state.currentBook = book;
   },
+  setTableOfContent(state, tableOfContents) {
+    state.tableOfContents = tableOfContents;
+  }
 };
 
 const actions = {
@@ -33,9 +40,12 @@ const actions = {
   resetStore({ commit }) {
     commit('resetStore');
   },
-  saveEditableBook({ commit }, book) {
-    commit('setEditableBook', book);
+  saveCurrentBook({ commit }, book) {
+    commit('setCurrentBook', book);
   },
+  saveTableOfContent({ commit }, tableOfContents) {
+    commit('setTableOfContent', tableOfContents);
+  }
 };
 
 export const store = {

@@ -1,6 +1,6 @@
 <script>
 import BooksViewer from '@organisms/BooksViewer/BooksViewer.vue';
-import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import AdapterOfBooks from "@adapters/AdapterOfBooks/AdapterOfBooks.js";
 import ServiceOfBooks from "@services/ServiceOfBooks.js";
 import {useStore} from "@store";
 

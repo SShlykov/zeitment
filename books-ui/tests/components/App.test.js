@@ -1,5 +1,5 @@
 import {expect, describe, test, vi} from 'vitest'
-import {mount} from "@vue/test-utils.proto";
+import {mount} from "@vue/test-utils";
 import App from "@/App.vue";
 import {createStore} from "vuex";
 import axios  from "axios";
@@ -18,6 +18,10 @@ describe("tests of App", async () => {
     }
   })
   axios.post.mockResolvedValue({data: apiBooksResponse})
+  // axios.post.mockImplementation((v, v1) => {
+  //   console.log({v, v1})
+  //   return {data: apiBooksResponse}
+  // })
 
   test('mount test of App', async () => {
     const wrapper = mount(App, {

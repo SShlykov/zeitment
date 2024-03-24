@@ -20,7 +20,7 @@ import {mapGetters, mapMutations} from "vuex";
 import MenuHead from './SideMenuHead.vue'
 import MenuList from './SideMenuList.vue'
 import {booksListToMenuList} from '@helpers/menuFuncs'
-import AdapterOfBooks from "@adapters/AdapterOfBooks.js";
+import AdapterOfBooks from "@adapters/AdapterOfBooks/AdapterOfBooks.js";
 import ServiceOfBooks from "@services/ServiceOfBooks.js";
 import {useStore} from "@store";
 

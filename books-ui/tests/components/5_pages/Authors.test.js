@@ -1,5 +1,5 @@
 import {test, describe, expect} from 'vitest'
-import { mount} from '@vue/test-utils.proto'
+import { mount} from '@vue/test-utils'
 import AuthorsPage from '@pages/Authors/Authors.vue';
 
 describe("tests of AuthorsPage", () => {

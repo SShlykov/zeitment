@@ -32,4 +32,38 @@ const apiPageResponse = {
   status: "ok"
 }
 
-export {appPage, apiPage, apiPageResponse, apiPagesResponse}
+class AdapterOfPages {
+  constructor(url) {
+    this.url = url
+  }
+
+  async fetchChapterPages() {
+    return [appPage]
+  }
+
+  async createPage() {
+    return appPage
+  }
+
+  async updatePage(newPage) {
+    return {
+      ...appPage,
+      ...newPage
+    }
+  }
+
+  async removePage() {
+    return appPage
+  }
+
+  async getPageById() {
+    return appPage
+  }
+
+  async getPagesByChapterId() {
+    return [appPage]
+  }
+
+}
+
+export {appPage, apiPage, apiPageResponse, apiPagesResponse, AdapterOfPages}

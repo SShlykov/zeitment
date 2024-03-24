@@ -1,5 +1,5 @@
 import {test, describe, expect} from 'vitest'
-import { mount} from '@vue/test-utils.proto'
+import { mount} from '@vue/test-utils'
 import BackgroundImage from '@atoms/BackgroundImage.vue';
 
 describe("tests of BackgroundImage", () => {

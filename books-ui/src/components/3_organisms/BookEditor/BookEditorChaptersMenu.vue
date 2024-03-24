@@ -11,6 +11,6 @@ export default {
 
 <template>
   <div class="w-[100px] h-full border-r border-gray-200">
-    template
+    template2
   </div>
 </template>

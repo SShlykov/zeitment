@@ -1,7 +1,8 @@
 import {test, describe, vi, expect} from 'vitest'
 import axios from 'axios'
-import AdapterOfBooks from "@adapters/AdapterOfBooks.js"
+import AdapterOfBooks from "@adapters/AdapterOfBooks/AdapterOfBooks.js"
 import {appBook, apiBookResponse, apiBooksResponse} from '@mocks/books.js'
+import {apiTableOfContentResponse, appTableOfContent} from "@mocks/tableOfContent.js";
 
 vi.mock('axios')
 
@@ -63,6 +64,13 @@ describe("tests of AdapterOfBooks ", () => {
     expect(booksData).toEqual([appBook])
   })
 
+  test("get books table of content", async () => {
+    axios.post.mockResolvedValue({data: apiBooksResponse})
+
+    const booksData = await booksAdapter.getBooks(null)
+    expect(booksData).toEqual([appBook])
+  })
+
   test("create book (save book)", async () => {
     axios.post.mockResolvedValue({data: apiBookResponse})
 
@@ -92,5 +100,11 @@ describe("tests of AdapterOfBooks ", () => {
     const booksData = await booksAdapter.deleteBookById(appBook.id)
     expect(booksData).toEqual(appBook)
   })
-})
 
+  test("get book table of content", async () => {
+    axios.post.mockResolvedValue({data: apiTableOfContentResponse})
+
+    const TOC = await booksAdapter.getTableOfContent(appBook.id)
+    expect(TOC).toEqual(appTableOfContent)
+  })
+})

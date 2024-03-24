@@ -1,6 +1,6 @@
 const initialState = {
   chapters: [],
-  editableChapter: null,
+  currentChapter: null,
 }
 
 const state = {
@@ -9,7 +9,7 @@ const state = {
 
 const getters = {
   chapters:        state => state.chapters,
-  editableChapter: state => state.editableChapter,
+  currentChapter: state => state.currentChapter,
 };
 
 const mutations = {
@@ -21,8 +21,8 @@ const mutations = {
   setChapters(state, chapters) {
     state.chapters = chapters;
   },
-  setEditableChapter(state, chapter) {
-    state.editableChapter = chapter;
+  setCurrentChapter(state, chapter) {
+    state.currentChapter = chapter;
   },
 };
 
@@ -33,8 +33,8 @@ const actions = {
   resetStore({ commit }) {
     commit('resetStore');
   },
-  saveEditableChapter({ commit }, chapter) {
-    commit('setEditableChapter', chapter);
+  saveCurrentChapter({ commit }, chapter) {
+    commit('setCurrentChapter', chapter);
   },
 };
 

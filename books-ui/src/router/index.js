@@ -19,8 +19,13 @@ const prod_routes = [
     component: UserSettings,
   },
   {
-    path: "/book/:id",
+    path: "/book/:book_id",
     name: "book",
+    component: Book,
+  },
+  {
+    path: "/book/:book_id/:type/:section_id",
+    name: "book_item",
     component: Book,
   },
   {
