@@ -73,7 +73,25 @@ class BookManager {
     }
   }
 
-
+  /**
+   *
+   * @param {{
+   *   id: string,
+   * }} sortableElement
+   * @returns {Promise<void>}
+   */
+  async updateOrderTableOfContent(sortableElement) {
+    console.log(sortableElement)
+    // const tableOfContents = this.bookService.tableOfContents()
+    // const newTableOfContents = tableOfContents.map((element) => {
+    //   if (element.id === sortableElement.id) {
+    //     element.order = sortableElement.order
+    //   }
+    //   return element
+    // })
+    const tableOfContents = await this.bookService.fetchTableOfContent(sortableElement.id)
+    return tableOfContents
+  }
 }
 
 export default BookManager

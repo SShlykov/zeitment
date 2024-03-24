@@ -6,7 +6,7 @@ import {store as chapters} from "@store/modules/chapters/index.js";
 import {store as pages} from "@store/modules/pages/index.js";
 import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {AdapterOfBooks, appBook} from "@mocks/books.js"
-import {appTableOfContents} from "@mocks/tableOfContent.js"
+import {appTableOfContent, appTableOfContents} from "@mocks/tableOfContent.js"
 import {AdapterOfChapters, appChapter} from "@mocks/chapters.js"
 import {AdapterOfPages, appPage} from "@mocks/pages.js"
 import BookManager from "@useCases/BookManager.js"
@@ -122,6 +122,17 @@ describe('BookManager', () => {
     expect(title).toEqual(appChapter.title)
     expect(text).toEqual(appChapter.text)
     expect(number).toEqual(appChapter.number)
+  })
+
+  test("test of updateOrderTableOfContent", async () => {
+    await store.dispatch('books/saveTableOfContents', appTableOfContents)
+    const sortableElement = {
+      id: "id",
+      number: 1000,
+      level: "chapter"
+    }
+    const updatedTableOfContent = await bookManager.updateOrderTableOfContent(sortableElement)
+    expect(updatedTableOfContent).toEqual(appTableOfContent)
   })
 })
 

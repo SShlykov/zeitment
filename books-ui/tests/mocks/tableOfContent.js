@@ -19,6 +19,20 @@ const apiTableOfContent = {
       "level": "page",
       "is_public": false
     },
+    {
+      "id": "99dfcc38-41d3-4967-bd6f-df22ad551cac",
+      "title": "Chapter 2",
+      "order": 2000,
+      "level": "chapter",
+      "is_public": true
+    },
+    {
+      "id": "22943bd1-bc4e-44fa-b398-5190943d3611",
+      "title": "Chapter 2",
+      "order": 3000,
+      "level": "chapter",
+      "is_public": false
+    }
   ]
 }
 
@@ -43,6 +57,20 @@ const appTableOfContent = {
       "level": "page",
       "isPublic": false
     },
+    {
+      "id": "99dfcc38-41d3-4967-bd6f-df22ad551cac",
+      "title": "Chapter 2",
+      "order": 2000,
+      "level": "chapter",
+      "isPublic": true
+    },
+    {
+      "id": "22943bd1-bc4e-44fa-b398-5190943d3611",
+      "title": "Chapter 2",
+      "order": 3000,
+      "level": "chapter",
+      "isPublic": false
+    }
   ]
 }
 

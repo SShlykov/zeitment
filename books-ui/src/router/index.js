@@ -5,7 +5,7 @@ import NewBook from "@pages/NewBook/NewBook.vue"
 import Book from "@pages/Book/Book.vue"
 import UserSettings from "@pages/UserSettings/UserSettings.vue"
 import TestsPage from "@pages/Tests/TestsPage.vue"
-
+import BooksCompendium from "@pages/BooksCompendium/BooksCompendium.vue"
 
 const prod_routes = [
   {
@@ -32,6 +32,11 @@ const prod_routes = [
     path: "/new_book",
     name: "new_book",
     component: NewBook,
+  },
+  {
+    path: "/books_compendium",
+    name: "books_compendium",
+    component: BooksCompendium,
   },
   {
     path: "/auth",

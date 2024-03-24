@@ -80,7 +80,6 @@ describe("tests of BookEditor", () => {
       }
     })
 
-    expect(wrapper.html()).contains("Добавить")
     expect(wrapper.exists()).toBe(true)
   })
 

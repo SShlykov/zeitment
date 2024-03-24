@@ -21,13 +21,28 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('books', ['currentBook']),
+    ...mapGetters('books', ['currentBook', 'tableOfContents', "tableOfContentsSections"]),
     pageConfig() {
       return {
         bookId: this.$route.params.book_id,
         type: this.$route.params.type,
         sectionId: this.$route.params.section_id
       }
+    },
+    menuItems() {
+      const addItemButton = {
+        title: "Добавить...",
+        class: "hover:bg-gray-100 transition-all cursor-pointer text-gray-500 hover:text-gray-700 text-lg p-2 rounded-md ",
+        level: "button",
+        icon: "ri-sticky-note-add-line",
+        sort: false,
+        onClick: () => {
+        }
+      }
+
+      const sections = this.tableOfContentsSections
+      const items = [...sections, addItemButton]
+      return items
     }
   },
   watch:{
@@ -73,6 +88,7 @@ export default {
       :serviceOfBooks="serviceOfBooks"
       :bookManager="bookManager"
       :pageConfig="pageConfig"
+      :menuItems="menuItems"
     />
     <ContentLoader
       v-if="!currentBook"

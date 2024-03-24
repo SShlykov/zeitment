@@ -76,12 +76,37 @@ describe('tests of BookEditorMenu', () => {
             section_id: "section_id",
             id: "id",
             level: "chapter"
+          },
+          {
+            title: "Добавить...",
+            class: "hover:bg-gray-100 transition-all cursor-pointer text-gray-500 hover:text-gray-700 text-lg p-2 rounded-md ",
+            level: "button",
+            icon: "ri-sticky-note-add-line",
           }
         ],
         pageConfig: bookPageConfig
       }
     })
 
+    expect(wrapper.vm.bottomMenuItems).toEqual([
+      {
+        title: "Добавить...",
+        class: "hover:bg-gray-100 transition-all cursor-pointer text-gray-500 hover:text-gray-700 text-lg p-2 rounded-md ",
+        level: "button",
+        icon: "ri-sticky-note-add-line",
+      }
+    ])
+    expect(wrapper.vm.pagesAndChapters).toEqual([
+      {
+        title: "test",
+        link: "/test",
+        section_id: "section_id",
+        id: "id",
+        level: "chapter",
+      },
+    ])
+    expect(wrapper.html()).contains('Добавить')
+    expect(wrapper.html()).contains('ri-sticky-note-add-line')
     expect(wrapper.text()).toContain("test")
   })
 })

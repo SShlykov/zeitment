@@ -1,3 +1,5 @@
+import {groupSectionsByPagesAndChapters} from './helpers.js';
+
 const initialState = {
   userBooks: [],
   currentBook: null,
@@ -14,6 +16,7 @@ const getters = {
   userBooks:    state => state.userBooks,
   currentBook: state => state.currentBook,
   tableOfContents: state => state.tableOfContents,
+  tableOfContentsSections: state => groupSectionsByPagesAndChapters(state.tableOfContents.sections)
 };
 
 const mutations = {

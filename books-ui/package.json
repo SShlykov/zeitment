@@ -22,6 +22,7 @@
     "socket.io-client": "^4.7.4",
     "tippy.js": "^6.3.7",
     "vue": "^3.4.15",
+    "vue-draggable-next": "^2.2.1",
     "vue-multiselect": "^2.1.8",
     "vue-router": "^4.2.5",
     "vue-tippy": "^6.4.1",

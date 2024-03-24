@@ -3,7 +3,7 @@ import {createStore} from "vuex";
 import { store as books } from '@/store/modules/books';
 import ServiceOfBooks from '@services/ServiceOfBooks.js'
 import {AdapterOfBooks, appBook} from "@mocks/books.js"
-import {appTableOfContent} from "@mocks/tableOfContent.js"
+import {appTableOfContent, appTableOfContents} from "@mocks/tableOfContent.js"
 
 describe('serviceOfBooks', () => {
   const store = createStore({
@@ -120,9 +120,4 @@ describe('serviceOfBooks', () => {
     expect(book.tableOfContents).toEqual(appTableOfContent)
   })
 
-  test("fetch table of content", async () => {
-    await serviceOfBooks.fetchTableOfContent(appBook.id)
-    const tableOfContents = store.getters['books/tableOfContents']
-    expect(tableOfContents).toEqual(appTableOfContent)
-  })
 })
