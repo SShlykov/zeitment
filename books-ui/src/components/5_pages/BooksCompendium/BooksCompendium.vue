@@ -85,8 +85,8 @@ export default {
           class="list-group"
           :list="element.items"
           animation="'150'"
-          @change="log"
           group="nested"
+          @change="log"
         >
           <div
             v-for="item in element.items"
