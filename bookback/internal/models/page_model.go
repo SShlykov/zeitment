@@ -11,6 +11,7 @@ type Page struct {
 	UpdatedAt   time.Time             `json:"updated_at"`
 	DeletedAt   types.Null[time.Time] `json:"deleted_at"`
 	Title       string                `json:"title"`
+	Number      int                   `json:"number"`
 	Text        string                `json:"text"`
 	ChapterID   string                `json:"chapter_id"`
 	IsPublic    bool                  `json:"is_public"`
