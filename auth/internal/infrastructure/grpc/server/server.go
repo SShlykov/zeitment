@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/SShlykov/zeitment/auth/internal/domain/services"
 	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/pgrepo"
+	"github.com/SShlykov/zeitment/auth/internal/interceptor"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
 	logPkg "github.com/SShlykov/zeitment/logger"
 	"github.com/SShlykov/zeitment/postgres"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"net"
 )
@@ -18,7 +20,10 @@ func NewServer(logger logPkg.Logger, db postgres.Client, port int) error {
 		return err
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+	)
 
 	reflection.Register(s)
 

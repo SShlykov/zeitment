@@ -203,7 +203,16 @@ func (m *User) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Login
+	if l := utf8.RuneCountInString(m.GetLogin()); l < 6 || l > 100 {
+		err := UserValidationError{
+			field:  "Login",
+			reason: "value length must be between 6 and 100 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if all {
 		switch v := interface{}(m.GetEmail()).(type) {
@@ -449,7 +458,16 @@ func (m *SignUpRequest) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Password
+	if l := utf8.RuneCountInString(m.GetPassword()); l < 6 || l > 100 {
+		err := SignUpRequestValidationError{
+			field:  "Password",
+			reason: "value length must be between 6 and 100 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return SignUpRequestMultiError(errors)
@@ -657,9 +675,27 @@ func (m *SignInRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for LoginOrEmail
+	if l := utf8.RuneCountInString(m.GetLoginOrEmail()); l < 6 || l > 100 {
+		err := SignInRequestValidationError{
+			field:  "LoginOrEmail",
+			reason: "value length must be between 6 and 100 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
-	// no validation rules for Password
+	if l := utf8.RuneCountInString(m.GetPassword()); l < 6 || l > 100 {
+		err := SignInRequestValidationError{
+			field:  "Password",
+			reason: "value length must be between 6 and 100 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return SignInRequestMultiError(errors)

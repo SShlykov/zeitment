@@ -1,13 +1,22 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "user_v1.proto",
-    "version": "version not set"
+    "title": "SShlykov/zeitment/auth",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Sergey Shlykov",
+      "email": "zeitment@gmail.com"
+    }
   },
   "tags": [
     {
       "name": "UserService"
     }
+  ],
+  "host": "localhost:8080",
+  "schemes": [
+    "http",
+    "https"
   ],
   "consumes": [
     "application/json"
