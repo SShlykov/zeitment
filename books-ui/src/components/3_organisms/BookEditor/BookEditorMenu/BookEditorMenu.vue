@@ -55,7 +55,7 @@ export default {
       class="w-full flex flex-col "
       :list="pagesAndChapters"
       animation="150"
-      @change="onSort"
+      @change="(event) => onSort(event, pagesAndChapters)"
     >
       <div
         v-for="element in pagesAndChapters"
@@ -80,7 +80,7 @@ export default {
             animation="150"
             group="nested"
             class="flex flex-col h-full w-full"
-            @change="onSort"
+            @change="(event) => onSort(event, element.items)"
           >
             <BookEditorMenuItem
               v-for="item in element.items"

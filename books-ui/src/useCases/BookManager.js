@@ -80,8 +80,9 @@ class BookManager {
    * }} sortableElement
    * @returns {Promise<void>}
    */
-  async updateOrderTableOfContent(sortableElement) {
+  async updateOrderTableOfContent(sortableElement, event) {
     console.log(sortableElement)
+    console.log(event)
     // const tableOfContents = this.bookService.tableOfContents()
     // const newTableOfContents = tableOfContents.map((element) => {
     //   if (element.id === sortableElement.id) {
