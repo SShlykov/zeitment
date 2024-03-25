@@ -32,8 +32,8 @@ func NewUserServiceServer(repository Repository) user_v1.UserServiceServer {
 }
 
 func (uss *Service) isUserExist(ctx context.Context, login string) bool {
-	_, err := uss.repo.FindByLogin(ctx, login)
-	return err == nil
+	user, _ := uss.repo.FindByLogin(ctx, login)
+	return user != nil
 }
 
 func (uss *Service) getPaginationMetadata(ctx context.Context, pagination *user_v1.Pagination) *user_v1.PaginationMetadata {

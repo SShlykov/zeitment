@@ -10,7 +10,7 @@ func (as *Service) SignUp(ctx context.Context, in *auth_v1.SignUpRequest) (*auth
 	status := &auth_v1.Status{Status: "ok", Message: ""}
 	resp := &auth_v1.SignUpResponse{Status: status}
 
-	_, err := as.userService.Create(ctx, adapters.ProtoToUser(in.User), in.Password)
+	_, err := as.userService.Create(ctx, adapters.AuthProtoToUser(in.User), in.Password)
 	if err != nil {
 		status.Status = "error"
 		status.Message = err.Error()

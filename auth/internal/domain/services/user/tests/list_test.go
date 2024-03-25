@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/SShlykov/zeitment/auth/internal/domain/services/user"
+	"github.com/SShlykov/zeitment/auth/internal/infrastructure/repository/entity"
 	"github.com/SShlykov/zeitment/auth/internal/models/adapters"
 	"github.com/SShlykov/zeitment/auth/internal/test/mocks/repository/mocks"
 	"github.com/SShlykov/zeitment/auth/pkg/grpc/user_v1"
@@ -12,16 +13,16 @@ import (
 	"testing"
 )
 
-type Args struct {
+type ListArgs struct {
 	ctx context.Context
 	req *user_v1.ListUsersRequest
 }
 
 type repoMockFunc func(*mocks.MockUsersRepo) user.Repository
 
-type TestStruct struct {
+type TestListStruct struct {
 	name     string
-	args     Args
+	args     ListArgs
 	mock     repoMockFunc
 	expected *user_v1.ListUsersResponse
 	err      error
@@ -42,17 +43,21 @@ func TestFindUsers(t *testing.T) {
 		}
 
 		resGrpc = []*user_v1.User{{Id: "1", Login: "login1"}, {Id: "2", Login: "login2"}, {Id: "3", Login: "login3"}}
-		resEnt  = adapters.ProtoToUsers(resGrpc)
-		status  = &user_v1.Status{Status: "ok", Message: ""}
+		resEnt  = []*entity.User{
+			adapters.UserProtoToEntity(resGrpc[0]),
+			adapters.UserProtoToEntity(resGrpc[1]),
+			adapters.UserProtoToEntity(resGrpc[2]),
+		}
+		status = &user_v1.Status{Status: "ok", Message: ""}
 
 		metaTemplate = &user_v1.PaginationMetadata{Page: 1, PageSize: 10, Total: 3, TotalPages: 1}
 	)
 	defer ctrl.Finish()
 
-	tests := []TestStruct{
+	tests := []TestListStruct{
 		{
 			name: "success",
-			args: Args{ctx: ctx, req: &req},
+			args: ListArgs{ctx: ctx, req: &req},
 			mock: func(m *mocks.MockUsersRepo) user.Repository {
 				m.EXPECT().List(ctx, dbutils.NewPaginationWithLimitOffset(metaTemplate.Page, metaTemplate.PageSize)).Return(resEnt, nil)
 				m.EXPECT().Count(ctx).Return(uint64(len(resEnt)), nil)
@@ -64,7 +69,6 @@ func TestFindUsers(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			mockRepo := mocks.NewMockUsersRepo(ctrl)

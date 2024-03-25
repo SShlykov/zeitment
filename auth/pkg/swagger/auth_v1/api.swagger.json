@@ -219,7 +219,7 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/user_v1User",
+          "$ref": "#/definitions/auth_v1User",
           "title": "Структура пользователя"
         },
         "Password": {
@@ -261,35 +261,7 @@
       },
       "title": "Статус операции"
     },
-    "googlerpcStatus": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/protobufAny"
-          }
-        }
-      }
-    },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "@type": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": {}
-    },
-    "user_v1User": {
+    "auth_v1User": {
       "type": "object",
       "properties": {
         "id": {
@@ -344,6 +316,34 @@
           "title": "Период через который нужно обновить пароль пользователя"
         }
       }
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
     }
   }
 }

@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package auth_v1;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "user_v1.proto";
 
 option go_package = "github.com/SShlykov/zeitment/auth/internal/infrastructure/grpc/proto/auth_v1;auth_v1";
 
@@ -71,7 +72,7 @@ service AuthService {
 // Регистрация пользователя в системе
 message SignUpRequest {
   // Структура пользователя
-  user_v1.User user = 1;
+  User user = 1;
   // Пароль пользователя | min_len: 6, max_len: 100
   string Password = 2 [(validate.rules).string = { min_len: 6, max_len: 100 }];
 }
@@ -139,4 +140,35 @@ message IsConfirmedRequest {
 message IsConfirmedResponse {
   Status Status = 1;
   bool IsConfirmed = 2;
+}
+
+//------------------------------------------------------------------------------------------------------------------
+//  User
+//------------------------------------------------------------------------------------------------------------------
+
+message User {
+  // Идентификатор пользователя
+  string id = 1;
+  // Дата создания
+  google.protobuf.Timestamp created_at = 2;
+  // Дата обновления
+  google.protobuf.Timestamp updated_at = 3;
+  // Дата удаления | null - не удален
+  google.protobuf.Timestamp deleted_at = 4;
+  // Дата последнего входа | null - не входил
+  google.protobuf.Timestamp logged_at = 5;
+  // Дата подтверждения почты | null - не подтвержден
+  google.protobuf.Timestamp confirmed_at = 6;
+
+  // Логин пользователя | min_len: 6, max_len: 100
+  string login = 7 [(validate.rules).string = { min_len: 6, max_len: 100 }];
+  // Почта пользователя | null - не указана
+  google.protobuf.StringValue email = 8;
+
+  // Кем удален | null - не удален
+  google.protobuf.StringValue deleted_by = 9;
+  // Особая метка доступа для связи с другими сервисами
+  google.protobuf.Int32Value access_template_id = 10;
+  // Период через который нужно обновить пароль пользователя
+  google.protobuf.Int64Value update_after = 11;
 }
