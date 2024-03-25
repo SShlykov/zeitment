@@ -23,6 +23,10 @@ type Service struct {
 	repo Repository
 }
 
+const (
+	StatusError = "error"
+)
+
 func NewService(repository Repository) *Service {
 	return &Service{repo: repository}
 }

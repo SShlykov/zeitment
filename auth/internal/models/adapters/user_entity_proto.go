@@ -30,16 +30,16 @@ func UserProtoToEntity(u *user_v1.User) *entity.User {
 		ID:          u.Id,
 		CreatedAt:   ProtoToDt(u.CreatedAt),
 		UpdatedAt:   ProtoToDt(u.UpdatedAt),
-		DeletedAt:   ProtoToSqlDt(u.DeletedAt),
-		LoggedAt:    ProtoToSqlDt(u.LoggedAt),
-		ConfirmedAt: ProtoToSqlDt(u.ConfirmedAt),
+		DeletedAt:   ProtoToSQLDt(u.DeletedAt),
+		LoggedAt:    ProtoToSQLDt(u.LoggedAt),
+		ConfirmedAt: ProtoToSQLDt(u.ConfirmedAt),
 
 		Login: u.Login,
-		Email: ProtoToSqlString(u.Email),
+		Email: ProtoToSQLString(u.Email),
 
-		DeletedBy:        ProtoToSqlString(u.DeletedBy),
-		AccessTemplateID: ProtoToSqlInt(u.AccessTemplateId),
-		UpdateAfter:      ProtoToSqlInt64(u.UpdateAfter),
+		DeletedBy:        ProtoToSQLString(u.DeletedBy),
+		AccessTemplateID: ProtoToSQLInt(u.AccessTemplateId),
+		UpdateAfter:      ProtoToSQLInt64(u.UpdateAfter),
 	}
 }
 
@@ -61,28 +61,28 @@ func UserEntityToProto(u *entity.User) *user_v1.User {
 	}
 }
 
-func ProtoToSqlString(str *wrapperspb.StringValue) sql.Null[string] {
+func ProtoToSQLString(str *wrapperspb.StringValue) sql.Null[string] {
 	if str != nil {
 		return sql.Null[string]{Valid: true, V: str.Value}
 	}
 	return sql.Null[string]{Valid: false}
 }
 
-func ProtoToSqlDt(dt *timestamppb.Timestamp) sql.Null[time.Time] {
+func ProtoToSQLDt(dt *timestamppb.Timestamp) sql.Null[time.Time] {
 	if dt != nil {
 		return sql.Null[time.Time]{Valid: true, V: dt.AsTime()}
 	}
 	return sql.Null[time.Time]{Valid: false}
 }
 
-func ProtoToSqlInt(i *wrapperspb.Int32Value) sql.Null[int] {
+func ProtoToSQLInt(i *wrapperspb.Int32Value) sql.Null[int] {
 	if i != nil {
 		return sql.Null[int]{Valid: true, V: int(i.Value)}
 	}
 	return sql.Null[int]{Valid: false}
 }
 
-func ProtoToSqlInt64(i *wrapperspb.Int64Value) sql.Null[int64] {
+func ProtoToSQLInt64(i *wrapperspb.Int64Value) sql.Null[int64] {
 	if i != nil {
 		return sql.Null[int64]{Valid: true, V: i.Value}
 	}

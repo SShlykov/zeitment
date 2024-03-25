@@ -13,7 +13,7 @@ func (uss *Service) Get(ctx context.Context, in *user_v1.GetUserRequest) (*user_
 
 	if err != nil {
 		status.Message = "Пользователь не найден"
-		status.Status = "error"
+		status.Status = StatusError
 
 		return resp, nil
 	}

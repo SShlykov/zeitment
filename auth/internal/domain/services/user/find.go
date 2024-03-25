@@ -14,7 +14,7 @@ func (uss *Service) Find(ctx context.Context, in *user_v1.ListUsersRequest) (*us
 
 	if in.Options.Pagination.Page > meta.TotalPages {
 		status.Message = "Запрашиваемая страница не существует"
-		status.Status = "error"
+		status.Status = StatusError
 
 		return resp, nil
 	}
@@ -22,7 +22,7 @@ func (uss *Service) Find(ctx context.Context, in *user_v1.ListUsersRequest) (*us
 	users, err := uss.repo.List(ctx, dbutils.NewPaginationWithLimitOffset(meta.Page, meta.PageSize))
 	if err != nil {
 		status.Message = "Пользователи не найдены"
-		status.Status = "error"
+		status.Status = StatusError
 
 		return resp, nil
 	}
