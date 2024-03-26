@@ -24,9 +24,33 @@ describe('serviceOfBooks', () => {
   })
 
   test("fetch booksList", async () => {
-    await serviceOfBooks.fetchUserBooks()
+    const booksList = await serviceOfBooks.fetchUserBooks()
+    expect(booksList).toEqual([appBook])
+  })
+
+  test("get booksList from store", async () => {
+    await store.dispatch('books/saveUserBooks', [appBook])
+    const booksList = await serviceOfBooks.getUserBooks()
+    expect(booksList).toEqual([appBook])
+  })
+
+  test("get current book", () => {
+    store.dispatch('books/saveCurrentBook', appBook)
+    const currentBook = serviceOfBooks.getCurrentBook()
+    expect(currentBook).toEqual(appBook)
+  })
+
+  test("put booksList", async () => {
+    await serviceOfBooks.putUserBooks([appBook])
     const booksList = store.getters['books/userBooks']
     expect(booksList).toEqual([appBook])
+  })
+
+  test("make fetch and put booksList", async () => {
+    const booksList = await serviceOfBooks.makeFetchAndPutUserBooks()
+    const storeBooksList = store.getters['books/userBooks']
+    expect(booksList).toEqual([appBook])
+    expect(storeBooksList).toEqual([appBook])
   })
 
   test("create book", async () => {
@@ -53,9 +77,9 @@ describe('serviceOfBooks', () => {
     expect(book).toEqual(appBook)
   })
 
-  test("test of storeEditableBookAttribute", async () => {
+  test("test of putBookAttribute", async () => {
     await store.dispatch('books/saveCurrentBook', appBook)
-    await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+    await serviceOfBooks.putBookAttribute("title", "new title")
 
     const editableBook = store.getters['books/currentBook']
 
@@ -65,28 +89,28 @@ describe('serviceOfBooks', () => {
     })
   })
 
-  test("test of storeEditableBookAttribute with no editableBook", async () => {
+  test("test of putBookAttribute with no editableBook", async () => {
     await store.dispatch('books/saveCurrentBook', null)
     const editableBook = store.getters['books/currentBook']
     expect(editableBook).toEqual(null)
-    const updatedBook = await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+    const updatedBook = await serviceOfBooks.putBookAttribute("title", "new title")
     expect(updatedBook).toEqual(null)
   })
 
   test("get book by id", async () => {
-    const book = await serviceOfBooks.getBookById(appBook.id)
+    const book = await serviceOfBooks.fetchBookById(appBook.id)
     expect(book).toEqual(appBook)
   })
 
   test("save editable book to server", async () => {
     await store.dispatch('books/saveCurrentBook', appBook)
-    await serviceOfBooks.storeEditableBookAttribute("title", "new title")
+    await serviceOfBooks.putBookAttribute("title", "new title")
     const storedEditableBook = store.getters['books/currentBook']
 
     expectTypeOf(storedEditableBook.id).toBeString()
-    await serviceOfBooks.saveCurrentBookToServer()
+    await serviceOfBooks.saveCurrentBook()
 
-    let book = await serviceOfBooks.getBookById(appBook.id)
+    let book = await serviceOfBooks.fetchBookById(appBook.id)
     book = {
       ...book,
       title: "new title"
@@ -99,7 +123,7 @@ describe('serviceOfBooks', () => {
     const storedEditableBook = store.getters['books/currentBook']
     expect(storedEditableBook).toEqual(null)
 
-    const updatedBook = await serviceOfBooks.saveCurrentBookToServer()
+    const updatedBook = await serviceOfBooks.saveCurrentBook()
     expect(updatedBook).toEqual(null)
   })
 
@@ -108,6 +132,27 @@ describe('serviceOfBooks', () => {
     const editableBook = store.getters['books/currentBook']
     expect(editableBook).toEqual(appBook)
     expect(book).toEqual(appBook)
+  })
+
+  test("fetch table of contents", async () => {
+    store.dispatch('books/saveTableOfContent', appTableOfContent)
+    const tableOfContents = await serviceOfBooks.fetchTableOfContents(appBook.id)
+    const storedTableOfContents = store.getters['books/tableOfContents']
+    expect(storedTableOfContents).toEqual(appTableOfContent)
+    expect(tableOfContents).toEqual(appTableOfContent)
+  })
+
+  test("put table of contents", async () => {
+    await serviceOfBooks.putTableOfContents(appTableOfContent)
+    const storedTableOfContents = store.getters['books/tableOfContents']
+    expect(storedTableOfContents).toEqual(appTableOfContent)
+  })
+
+  test("make fetch and put table of contents", async () => {
+    const tableOfContents = await serviceOfBooks.makeFetchAndPutTableOfContents(appBook.id)
+    const storedTableOfContents = store.getters['books/tableOfContents']
+    expect(tableOfContents).toEqual(appTableOfContent)
+    expect(storedTableOfContents).toEqual(appTableOfContent)
   })
 
   test("fetch currentBook", async () => {

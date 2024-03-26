@@ -7,7 +7,7 @@ class BookManager {
   }
 
   async saveBookWithPage() {
-    const book = await this.bookService.saveCurrentBookToServer()
+    const book = await this.bookService.saveCurrentBook()
     this.layoutService.addNotification({
       message: "Книга сохранена",
       type: "success",
@@ -90,7 +90,7 @@ class BookManager {
     //   }
     //   return element
     // })
-    const tableOfContents = await this.bookService.fetchTableOfContent(sortableElement.id)
+    const tableOfContents = await this.bookService.fetchTableOfContents(sortableElement.id)
     return tableOfContents
   }
 }

@@ -6,7 +6,7 @@ import BookEditorHeaderContainer from "@organisms/BookEditor/BookEditorHeader/Bo
 describe("tests of BookEditorHeader", () => {
   const props = {
     serviceOfBooks: {
-      storeEditableBookAttribute: vi.fn(),
+      putBookAttribute: vi.fn(),
       saveEditableBookToServer: vi.fn(),
       fetchEditableBook: vi.fn()
     },

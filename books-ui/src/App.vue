@@ -31,7 +31,7 @@ export default {
     const store = this.$store
 
     const serviceOfBooks = new ServiceOfBooks(adapterOfBooks, store)
-    serviceOfBooks.fetchUserBooks()
+    serviceOfBooks.makeFetchAndPutUserBooks()
   },
 }
 </script>
