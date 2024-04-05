@@ -7,4 +7,5 @@ use (
 	./go_pkg/logger
 	./go_pkg/postgres
 	./go_pkg/metrics
+	./go_pkg/etcd
 )

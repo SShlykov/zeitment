@@ -2,6 +2,20 @@ version: "3.8"
 
 
 services:
+  etcd0:
+    image: bitnami/etcd:3.5.13
+    container_name: etcd0
+    restart: always
+    env_file:
+      - ./systems/etcd/.env
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    volumes:
+      - ./systems/etcd/etcd_data/snapshots:/snapshots
+      - ./systems/etcd/etcd_data/data:/bitnami/etcd/data
+      - ./systems/etcd/conf.yaml:/opt/bitnami/Etcd/conf/etcd.conf.yml
+
   auth:
     build:
       context: .

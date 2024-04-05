@@ -1,0 +1,64 @@
+name: 'default'
+data-dir:
+wal-dir:
+snapshot-count: 10
+heartbeat-interval: 100
+election-timeout: 1000
+quota-backend-bytes: 0
+listen-peer-urls: http://localhost:2380
+listen-client-urls: http://localhost:2379
+max-snapshots: 5
+max-wals: 5
+cors:
+initial-advertise-peer-urls: http://localhost:2380
+advertise-client-urls: http://localhost:2379
+discovery:
+discovery-fallback: 'proxy'
+discovery-proxy:
+discovery-srv:
+initial-cluster:
+initial-cluster-token: 'etcd-cluster'
+initial-cluster-state: 'new'
+strict-reconfig-check: false
+enable-pprof: true
+proxy: 'off'
+proxy-failure-wait: 5000
+proxy-refresh-interval: 30000
+proxy-dial-timeout: 1000
+proxy-write-timeout: 5000
+proxy-read-timeout: 0
+
+client-transport-security:
+  cert-file:
+  key-file:
+  client-cert-auth: false
+  trusted-ca-file:
+  auto-tls: false
+
+peer-transport-security:
+  cert-file:
+  key-file:
+  client-cert-auth: false
+  trusted-ca-file:
+  auto-tls: false
+
+self-signed-cert-validity: 1
+
+log-level: debug
+
+logger: zap
+
+log-outputs: [stderr]
+
+force-new-cluster: false
+
+auto-compaction-mode: periodic
+auto-compaction-retention: "1"
+
+cipher-suites: [
+  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+]
+
+tls-min-version: 'TLS1.2'
+tls-max-version: 'TLS1.3'

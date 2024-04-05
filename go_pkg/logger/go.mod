@@ -1,4 +1,4 @@
-module github.com/SShlykov/zeitment/logger
+module github.com/SShlykov/zeitment/go_pkg/logger
 
 go 1.22.0
 

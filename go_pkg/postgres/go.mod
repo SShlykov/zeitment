@@ -1,4 +1,4 @@
-module github.com/SShlykov/zeitment/postgres
+module github.com/SShlykov/zeitment/go_pkg/postgres
 
 go 1.22.0
 
